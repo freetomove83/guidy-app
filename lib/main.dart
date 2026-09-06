@@ -196,18 +196,32 @@ class _MainShellState extends State<MainShell> {
   }
 
   Widget _navItemScan(Color primaryC) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final accentC = isDark ? GuidyColors.darkAccent : GuidyColors.accent;
+
     return GestureDetector(
       onTap: () => Navigator.pushNamed(context, '/scan'),
       child: Container(
-        width: 52, height: 52,
-        decoration: BoxDecoration(
-          color: primaryC,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(color: primaryC.withValues(alpha: 0.4), blurRadius: 12, offset: const Offset(0, 4)),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 36, height: 36,
+              decoration: BoxDecoration(
+                color: accentC.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(Icons.qr_code_scanner_rounded, color: accentC, size: 20),
+            ),
+            const SizedBox(height: 2),
+            Text('스캔', style: TextStyle(
+              fontFamily: GuidyText.fontFamily, fontSize: 10,
+              fontWeight: FontWeight.w700,
+              color: accentC,
+            )),
           ],
         ),
-        child: const Icon(Icons.qr_code_scanner_rounded, color: Colors.white, size: 24),
       ),
     );
   }

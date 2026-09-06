@@ -15,7 +15,7 @@ class LibraryScreen extends StatefulWidget {
 
 class _LibraryScreenState extends State<LibraryScreen> {
   int _tabIndex = 0;
-  final _tabs = ['컬렉션', '이어듣기', '팔로우', '즐겨찾기'];
+  final _tabs = ['컬렉션', '이어듣기', '즐겨찾기'];
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +73,6 @@ class _LibraryScreenState extends State<LibraryScreen> {
                 children: const [
                   _CollectionTab(),
                   _ContinueTab(),
-                  _FollowTab(),
                   _FavoritesTab(),
                 ],
               ),
@@ -267,80 +266,6 @@ class _ContinueTab extends StatelessWidget {
         ),
       )).toList(),
     );
-  }
-}
-
-// 팔로우 탭
-class _FollowTab extends StatelessWidget {
-  const _FollowTab();
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textC = isDark ? GuidyColors.darkText : GuidyColors.ink;
-    final subC = isDark ? GuidyColors.darkSub : GuidyColors.sub;
-    final lineC = isDark ? GuidyColors.darkLine : GuidyColors.line;
-    final surfaceC = isDark ? GuidyColors.darkSurface : GuidyColors.surface;
-
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
-      children: [
-        // 가로 스크롤 스토리 스트립
-        SizedBox(
-          height: 100,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemCount: DummyData.creators.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 14),
-            itemBuilder: (context, i) {
-              final cr = DummyData.creators[i];
-              return GestureDetector(
-                onTap: () => Navigator.pushNamed(context, '/creator/${cr.id}'),
-                child: Column(
-                  children: [
-                    CreatorAvatar(creator: cr, size: 52, showBadgeRing: true, showNewBadge: i < 2, newCount: i + 1),
-                    const SizedBox(height: 4),
-                    Text(cr.name, style: GuidyText.small(subC), maxLines: 1, overflow: TextOverflow.ellipsis),
-                  ],
-                ),
-              );
-            },
-          ),
-        ),
-        const SizedBox(height: 16),
-        ...DummyData.creators.map((cr) => Container(
-          margin: const EdgeInsets.only(bottom: 10),
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: surfaceC,
-            borderRadius: GuidyRadius.lgBorder,
-            border: Border.all(color: lineC),
-          ),
-          child: Row(
-            children: [
-              CreatorAvatar(creator: cr, size: 44),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(cr.name, style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w700)),
-                    Text('가이드 ${cr.guideCount}개 · 팔로워 ${_formatNum(cr.followerCount)}명',
-                      style: GuidyText.small(subC)),
-                  ],
-                ),
-              ),
-              PillButton(label: '팔로잉', size: 'sm'),
-            ],
-          ),
-        )),
-      ],
-    );
-  }
-
-  String _formatNum(int n) {
-    if (n >= 1000) return '${(n / 1000).toStringAsFixed(1)}k';
-    return n.toString();
   }
 }
 
