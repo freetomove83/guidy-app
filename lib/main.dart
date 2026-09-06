@@ -1,0 +1,379 @@
+// lib/main.dart
+// Guidy 오디오 가이드 앱 메인
+
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'theme/app_theme.dart';
+import 'theme/theme_provider.dart';
+import 'screens/home/home_screen.dart';
+import 'screens/detail/detail_screen.dart';
+import 'screens/player/player_screen.dart';
+import 'screens/following/following_screen.dart';
+import 'screens/creator/creator_profile_screen.dart';
+import 'screens/creator/creator_studio_screen.dart';
+import 'screens/archive/archive_screen.dart';
+import 'screens/library/library_screen.dart';
+import 'screens/scan/scan_screen.dart';
+import 'widgets/common_widgets.dart';
+
+void main() {
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => ThemeProvider(),
+      child: const GuidyApp(),
+    ),
+  );
+}
+
+class GuidyApp extends StatelessWidget {
+  const GuidyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final themeProvider = context.watch<ThemeProvider>();
+
+    return MaterialApp(
+      title: 'Guidy',
+      debugShowCheckedModeBanner: false,
+      theme: buildLightTheme(),
+      darkTheme: buildDarkTheme(),
+      themeMode: themeProvider.isDark ? ThemeMode.dark : ThemeMode.light,
+      initialRoute: '/',
+      onGenerateRoute: _generateRoute,
+    );
+  }
+
+  Route<dynamic>? _generateRoute(RouteSettings settings) {
+    final name = settings.name ?? '/';
+
+
+    Widget page;
+
+    if (name == '/') {
+      page = const MainShell();
+    } else if (name.startsWith('/detail/')) {
+      final id = name.replaceFirst('/detail/', '');
+      page = DetailScreen(exhibitionId: id);
+    } else if (name.startsWith('/player/')) {
+      final id = name.replaceFirst('/player/', '');
+      page = PlayerScreen(artworkId: id);
+    } else if (name == '/following') {
+      page = const FollowingScreen();
+    } else if (name.startsWith('/creator/')) {
+      final id = name.replaceFirst('/creator/', '');
+      page = CreatorProfileScreen(creatorId: id);
+    } else if (name == '/creator-studio') {
+      page = const CreatorStudioScreen();
+    } else if (name.startsWith('/archive/')) {
+      final id = name.replaceFirst('/archive/', '');
+      page = ArchiveScreen(exhibitionId: id);
+    } else if (name == '/library') {
+      page = const LibraryScreen();
+    } else if (name == '/scan') {
+      page = const ScanScreen();
+    } else {
+      page = const MainShell();
+    }
+
+    return PageRouteBuilder(
+      settings: settings,
+      pageBuilder: (_, __, ___) => page,
+      transitionsBuilder: (_, animation, __, child) {
+        return FadeTransition(
+          opacity: animation,
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0, 0.04),
+              end: Offset.zero,
+            ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic)),
+            child: child,
+          ),
+        );
+      },
+      transitionDuration: const Duration(milliseconds: 350),
+    );
+  }
+}
+
+// ─── 메인 쉘 (바텀 탭) ───────────────────────────────────
+class MainShell extends StatefulWidget {
+  const MainShell({super.key});
+
+  @override
+  State<MainShell> createState() => _MainShellState();
+}
+
+class _MainShellState extends State<MainShell> {
+  int _navIndex = 0;
+  final bool _showMiniPlayer = true;
+  bool _isPlaying = false;
+
+  final List<Widget> _pages = const [
+    HomeScreen(),
+    ScanScreen(),
+    LibraryScreen(),
+    _SettingsPage(),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final surfaceC = isDark ? GuidyColors.darkSurface : GuidyColors.surface;
+    final lineC = isDark ? GuidyColors.darkLine : GuidyColors.line;
+    final primaryC = isDark ? GuidyColors.darkPrimary : GuidyColors.primary;
+    final muteC = isDark ? GuidyColors.darkMute : GuidyColors.mute;
+    final textC = isDark ? GuidyColors.darkText : GuidyColors.ink;
+
+    return Scaffold(
+      body: IndexedStack(
+        index: _navIndex,
+        children: _pages,
+      ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: surfaceC,
+          border: Border(top: BorderSide(color: lineC)),
+          boxShadow: GuidyShadow.up,
+        ),
+        child: SafeArea(
+          top: false,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // 미니 플레이어
+              if (_showMiniPlayer)
+                GestureDetector(
+                  onTap: () => Navigator.pushNamed(context, '/player/a1'),
+                  child: MiniPlayer(
+                    artworkTitle: '무제 #7',
+                    exhibitionTitle: '빛과 표면',
+                    coverSeed: 0,
+                    isPlaying: _isPlaying,
+                    onPlayPause: () => setState(() => _isPlaying = !_isPlaying),
+                  ),
+                ),
+              // 탭바
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _navItem(Icons.home_rounded, Icons.home_outlined, '홈', 0, primaryC, muteC, textC),
+                    _navItemScan(primaryC),
+                    _navItem(Icons.library_books_rounded, Icons.library_books_outlined, '서재', 2, primaryC, muteC, textC),
+                    _navItem(Icons.person_rounded, Icons.person_outline_rounded, '내 정보', 3, primaryC, muteC, textC),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _navItem(IconData activeIcon, IconData inactiveIcon, String label, int idx, Color primaryC, Color muteC, Color textC) {
+    final isActive = _navIndex == idx;
+    return GestureDetector(
+      onTap: () => setState(() => _navIndex = idx),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(isActive ? activeIcon : inactiveIcon, size: 24,
+              color: isActive ? primaryC : muteC),
+            const SizedBox(height: 2),
+            Text(label, style: TextStyle(
+              fontFamily: GuidyText.fontFamily, fontSize: 10,
+              fontWeight: isActive ? FontWeight.w800 : FontWeight.w500,
+              color: isActive ? primaryC : muteC,
+            )),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _navItemScan(Color primaryC) {
+    return GestureDetector(
+      onTap: () => Navigator.pushNamed(context, '/scan'),
+      child: Container(
+        width: 52, height: 52,
+        decoration: BoxDecoration(
+          color: primaryC,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(color: primaryC.withValues(alpha: 0.4), blurRadius: 12, offset: const Offset(0, 4)),
+          ],
+        ),
+        child: const Icon(Icons.qr_code_scanner_rounded, color: Colors.white, size: 24),
+      ),
+    );
+  }
+}
+
+// ─── 설정 페이지 ─────────────────────────────────────────
+class _SettingsPage extends StatelessWidget {
+  const _SettingsPage();
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgC = isDark ? GuidyColors.darkBg : GuidyColors.bg;
+    final textC = isDark ? GuidyColors.darkText : GuidyColors.ink;
+    final subC = isDark ? GuidyColors.darkSub : GuidyColors.sub;
+    final muteC = isDark ? GuidyColors.darkMute : GuidyColors.mute;
+    final surfaceC = isDark ? GuidyColors.darkSurface : GuidyColors.surface;
+    final lineC = isDark ? GuidyColors.darkLine : GuidyColors.line;
+
+    return Scaffold(
+      backgroundColor: bgC,
+      body: SafeArea(
+        bottom: false,
+        child: ListView(
+          padding: const EdgeInsets.all(20),
+          children: [
+            const SizedBox(height: 12),
+            Text('내 정보', style: GuidyText.h2(textC)),
+            const SizedBox(height: 20),
+
+            // 프로필 카드
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: surfaceC,
+                borderRadius: GuidyRadius.xlBorder,
+                border: Border.all(color: lineC),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 56, height: 56,
+                    decoration: const BoxDecoration(
+                      color: GuidyColors.primarySoft,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Center(
+                      child: Text('G', style: TextStyle(
+                        color: GuidyColors.primary, fontSize: 24, fontWeight: FontWeight.w800,
+                        fontFamily: GuidyText.fontFamily,
+                      )),
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Guidy 사용자', style: GuidyText.h3(textC)),
+                        Text('로그인하여 더 많은 기능을 이용하세요', style: GuidyText.small(subC)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // 설정 메뉴
+            _settingItem(Icons.mic_rounded, '크리에이터 되기', '오디오 가이드를 만들어 수익을 창출하세요', context, surfaceC, lineC, textC, subC, () => Navigator.pushNamed(context, '/creator-studio')),
+            const SizedBox(height: 8),
+
+            // 다크 모드 토글
+            Consumer<ThemeProvider>(
+              builder: (context, themeP, _) => Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: surfaceC,
+                  borderRadius: GuidyRadius.lgBorder,
+                  border: Border.all(color: lineC),
+                ),
+                child: Row(
+                  children: [
+                    Icon(isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded, color: muteC, size: 20),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('다크 모드', style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w600)),
+                          Text(isDark ? '현재 다크 모드' : '현재 라이트 모드', style: GuidyText.small(subC)),
+                        ],
+                      ),
+                    ),
+                    Switch(
+                      value: isDark,
+                      onChanged: (_) => themeP.toggle(),
+                      activeThumbColor: GuidyColors.primary,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+
+            _settingItem(Icons.help_outline_rounded, '도움말', '사용 방법 및 FAQ', context, surfaceC, lineC, textC, subC, null),
+            const SizedBox(height: 8),
+            _settingItem(Icons.info_outline_rounded, 'Guidy 소개', '버전 1.0.0', context, surfaceC, lineC, textC, subC, null),
+
+            const SizedBox(height: 40),
+
+            // 앱 정보
+            Center(
+              child: Column(
+                children: [
+                  Container(
+                    width: 48, height: 48,
+                    decoration: BoxDecoration(
+                      color: GuidyColors.primary,
+                      borderRadius: GuidyRadius.lgBorder,
+                    ),
+                    child: const Icon(Icons.headphones_rounded, color: Colors.white, size: 24),
+                  ),
+                  const SizedBox(height: 8),
+                  Text('guidy', style: GuidyText.h3(textC)),
+                  Text('오디오 가이드 마켓플레이스', style: GuidyText.small(subC)),
+                  const SizedBox(height: 4),
+                  Text('v1.0.0', style: GuidyText.kicker(muteC)),
+                ],
+              ),
+            ),
+            const SizedBox(height: 80),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _settingItem(IconData icon, String title, String sub, BuildContext context, Color surfaceC, Color lineC, Color textC, Color subC, VoidCallback? onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: surfaceC,
+          borderRadius: GuidyRadius.lgBorder,
+          border: Border.all(color: lineC),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 20, color: GuidyColors.mute),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w600)),
+                  Text(sub, style: GuidyText.small(subC)),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right_rounded, color: GuidyColors.mute, size: 18),
+          ],
+        ),
+      ),
+    );
+  }
+}
