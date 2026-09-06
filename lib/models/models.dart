@@ -163,15 +163,27 @@ class DummyData {
   ];
 
   static final List<Artwork> artworks = [
-    Artwork(id: 'a1', exhibitionId: 'e1', title: '무제 #7', artist: '오세열', material: '캔버스에 유채', imageSeed: 10, durationSec: 180, description: '오세열 작가의 무제 시리즈는 순수한 시각적 체험을 추구합니다. 이 작품에서 빛은 단순한 조명이 아닌 재료 자체가 됩니다.', curatorNote: '이 작품 앞에 10분 이상 머물러 보세요. 처음엔 보이지 않던 것들이 보이기 시작합니다.', captions: [
-      Caption(startSec: 0, endSec: 8, text: '오세열 작가의 무제 시리즈는 1990년대부터 시작된'),
-      Caption(startSec: 8, endSec: 16, text: '순수한 시각적 체험을 추구하는 작업입니다.'),
-      Caption(startSec: 16, endSec: 24, text: '이 작품에서 빛은 단순한 조명이 아닌'),
-      Caption(startSec: 24, endSec: 32, text: '재료 자체가 되어 화면을 가득 채웁니다.'),
+    Artwork(id: 'a1', exhibitionId: 'e1', title: '무제 #7', artist: '오세열', material: '캔버스에 유채', imageSeed: 10,
+      audioUrl: 'assets/audio/sample_guide_01.mp3',
+      durationSec: 372, description: '오세열 작가의 무제 시리즈는 순수한 시각적 체험을 추구합니다. 이 작품에서 빛은 단순한 조명이 아닌 재료 자체가 됩니다.', curatorNote: '이 작품 앞에 10분 이상 머물러 보세요. 처음엔 보이지 않던 것들이 보이기 시작합니다.', captions: [
+      Caption(startSec: 0, endSec: 12, text: '오세열 작가의 무제 시리즈는 1990년대부터 시작된'),
+      Caption(startSec: 12, endSec: 24, text: '순수한 시각적 체험을 추구하는 작업입니다.'),
+      Caption(startSec: 24, endSec: 38, text: '이 작품에서 빛은 단순한 조명이 아닌'),
+      Caption(startSec: 38, endSec: 55, text: '재료 자체가 되어 화면을 가득 채웁니다.'),
+      Caption(startSec: 55, endSec: 72, text: '작가는 캔버스 위에 수십 겹의 유채를 덧칠하며'),
+      Caption(startSec: 72, endSec: 90, text: '빛이 표면에 스며드는 순간을 포착합니다.'),
+      Caption(startSec: 90, endSec: 110, text: '관객은 작품 앞에 서서 시간이 흐를수록'),
+      Caption(startSec: 110, endSec: 130, text: '보이지 않던 색의 층위를 발견하게 됩니다.'),
     ]),
-    Artwork(id: 'a2', exhibitionId: 'e1', title: '표면의 기억', artist: '양혜규', material: '블라인드, 전구', imageSeed: 11, durationSec: 210, description: '양혜규의 설치 작품은 일상적인 블라인드를 통해 빛과 그림자의 드라마를 만들어냅니다.', curatorNote: '작품을 천천히 걸으며 보는 각도에 따라 달라지는 빛의 변화를 경험해보세요.', captions: [
-      Caption(startSec: 0, endSec: 10, text: '양혜규 작가는 베니스 비엔날레 한국관 대표작가로'),
-      Caption(startSec: 10, endSec: 20, text: '일상의 오브제에 특별한 의미를 부여합니다.'),
+    Artwork(id: 'a2', exhibitionId: 'e1', title: '표면의 기억', artist: '양혜규', material: '블라인드, 전구', imageSeed: 11,
+      audioUrl: 'assets/audio/sample_guide_02.mp3',
+      durationSec: 425, description: '양혜규의 설치 작품은 일상적인 블라인드를 통해 빛과 그림자의 드라마를 만들어냅니다.', curatorNote: '작품을 천천히 걸으며 보는 각도에 따라 달라지는 빛의 변화를 경험해보세요.', captions: [
+      Caption(startSec: 0, endSec: 15, text: '양혜규 작가는 베니스 비엔날레 한국관 대표작가로'),
+      Caption(startSec: 15, endSec: 32, text: '일상의 오브제에 특별한 의미를 부여합니다.'),
+      Caption(startSec: 32, endSec: 50, text: '이 작품에서 수백 개의 금속 블라인드는'),
+      Caption(startSec: 50, endSec: 68, text: '빛을 분절하고 재조합하는 악기가 됩니다.'),
+      Caption(startSec: 68, endSec: 90, text: '전구의 온기와 블라인드의 차가운 금속이'),
+      Caption(startSec: 90, endSec: 115, text: '서로 충돌하며 독특한 공간감을 만들어냅니다.'),
     ]),
   ];
 

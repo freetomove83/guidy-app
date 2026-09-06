@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'theme/app_theme.dart';
 import 'theme/theme_provider.dart';
+import 'services/audio_service.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/detail/detail_screen.dart';
 import 'screens/player/player_screen.dart';
@@ -23,8 +24,11 @@ import 'widgets/common_widgets.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => ThemeProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => GuidyAudioService()),
+      ],
       child: const GuidyApp(),
     ),
   );
