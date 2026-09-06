@@ -14,6 +14,9 @@ import 'screens/creator/creator_studio_screen.dart';
 import 'screens/archive/archive_screen.dart';
 import 'screens/library/library_screen.dart';
 import 'screens/scan/scan_screen.dart';
+import 'screens/auth/login_screen.dart';
+import 'screens/auth/signup_screen.dart';
+import 'screens/search/search_screen.dart';
 import 'widgets/common_widgets.dart';
 
 void main() {
@@ -71,6 +74,12 @@ class GuidyApp extends StatelessWidget {
       page = const LibraryScreen();
     } else if (name == '/scan') {
       page = const ScanScreen();
+    } else if (name == '/login') {
+      page = const LoginScreen();
+    } else if (name == '/signup') {
+      page = const SignupScreen();
+    } else if (name == '/search') {
+      page = const SearchScreen();
     } else {
       page = const MainShell();
     }
@@ -252,40 +261,44 @@ class _SettingsPage extends StatelessWidget {
             Text('내 정보', style: GuidyText.h2(textC)),
             const SizedBox(height: 20),
 
-            // 프로필 카드
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: surfaceC,
-                borderRadius: GuidyRadius.xlBorder,
-                border: Border.all(color: lineC),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 56, height: 56,
-                    decoration: const BoxDecoration(
-                      color: GuidyColors.primarySoft,
-                      shape: BoxShape.circle,
+            // 프로필 카드 (탭 시 로그인 화면)
+            GestureDetector(
+              onTap: () => Navigator.pushNamed(context, '/login'),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: surfaceC,
+                  borderRadius: GuidyRadius.xlBorder,
+                  border: Border.all(color: lineC),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 56, height: 56,
+                      decoration: const BoxDecoration(
+                        color: GuidyColors.primarySoft,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Center(
+                        child: Text('G', style: TextStyle(
+                          color: GuidyColors.primary, fontSize: 24, fontWeight: FontWeight.w800,
+                          fontFamily: GuidyText.fontFamily,
+                        )),
+                      ),
                     ),
-                    child: const Center(
-                      child: Text('G', style: TextStyle(
-                        color: GuidyColors.primary, fontSize: 24, fontWeight: FontWeight.w800,
-                        fontFamily: GuidyText.fontFamily,
-                      )),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Guidy 사용자', style: GuidyText.h3(textC)),
+                          Text('로그인하여 더 많은 기능을 이용하세요', style: GuidyText.small(subC)),
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Guidy 사용자', style: GuidyText.h3(textC)),
-                        Text('로그인하여 더 많은 기능을 이용하세요', style: GuidyText.small(subC)),
-                      ],
-                    ),
-                  ),
-                ],
+                    Icon(Icons.chevron_right_rounded, color: muteC, size: 18),
+                  ],
+                ),
               ),
             ),
 

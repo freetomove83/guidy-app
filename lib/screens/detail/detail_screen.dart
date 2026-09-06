@@ -142,7 +142,7 @@ class DetailScreen extends StatelessWidget {
                                   children: [
                                     _metaItem(Icons.timer_outlined, '소요 시간', exhibition.duration, textC, muteC),
                                     _metaItem(Icons.attach_money_rounded, '이용료',
-                                      exhibition.price == 0 ? '무료' : '₩${exhibition.price}', textC, muteC),
+                                      exhibition.price == 0 ? '무료' : '₩${_formatPrice(exhibition.price)}', textC, muteC),
                                   ],
                                 ),
                               ],
@@ -223,7 +223,7 @@ class DetailScreen extends StatelessWidget {
                             Icon(Icons.shopping_bag_outlined, color: isDark ? GuidyColors.darkBg : Colors.white, size: 18),
                             const SizedBox(width: 6),
                             Text(
-                              exhibition.price == 0 ? '무료로 감상하기' : '₩${exhibition.price} 구매',
+                              exhibition.price == 0 ? '무료로 감상하기' : '₩${_formatPrice(exhibition.price)} 구매',
                               style: TextStyle(
                                 color: isDark ? GuidyColors.darkBg : Colors.white,
                                 fontSize: 15, fontWeight: FontWeight.w800,
@@ -244,8 +244,14 @@ class DetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _iconBtn(IconData icon) {
-    return Container(
+  String _formatPrice(int price) {
+    return price.toString().replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (m) => '\${m[1]},',
+    );
+  }
+
+  Widget _iconBtn(IconData icon) {    return Container(
       width: 36, height: 36,
       decoration: BoxDecoration(
         color: Colors.black.withValues(alpha: 0.4),

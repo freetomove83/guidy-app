@@ -439,7 +439,10 @@ class GuidyHeader extends StatelessWidget {
           if (showSearch)
             Padding(
               padding: const EdgeInsets.only(left: 8),
-              child: Icon(Icons.search_rounded, size: 24, color: textC),
+              child: GestureDetector(
+                onTap: () => Navigator.pushNamed(context, '/search'),
+                child: Icon(Icons.search_rounded, size: 24, color: textC),
+              ),
             ),
           if (showBell)
             Padding(
@@ -674,6 +677,77 @@ class ExhibitionCard extends StatelessWidget {
     return price.toString().replaceAllMapped(
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
       (m) => '${m[1]},',
+    );
+  }
+}
+
+// ─── GuidyInputLabel ─────────────────────────────────────
+class GuidyInputLabel extends StatelessWidget {
+  final String label;
+  final Color textC;
+  const GuidyInputLabel({super.key, required this.label, required this.textC});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(label, style: GuidyText.small(textC).copyWith(fontWeight: FontWeight.w700));
+  }
+}
+
+// ─── GuidyInputField ─────────────────────────────────────
+class GuidyInputField extends StatelessWidget {
+  final TextEditingController controller;
+  final String hint;
+  final bool obscureText;
+  final TextInputType keyboardType;
+  final Color surfaceC;
+  final Color lineC;
+  final Color textC;
+  final Color subC;
+  final Widget? suffix;
+  final FocusNode? focusNode;
+  final ValueChanged<String>? onChanged;
+
+  const GuidyInputField({
+    super.key,
+    required this.controller,
+    required this.hint,
+    this.obscureText = false,
+    this.keyboardType = TextInputType.text,
+    required this.surfaceC,
+    required this.lineC,
+    required this.textC,
+    required this.subC,
+    this.suffix,
+    this.focusNode,
+    this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: surfaceC,
+        borderRadius: GuidyRadius.lgBorder,
+        border: Border.all(color: lineC),
+      ),
+      child: TextField(
+        controller: controller,
+        obscureText: obscureText,
+        keyboardType: keyboardType,
+        focusNode: focusNode,
+        onChanged: onChanged,
+        style: GuidyText.body(textC),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: GuidyText.body(subC),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          suffixIcon: suffix != null
+              ? Padding(padding: const EdgeInsets.only(right: 12), child: suffix)
+              : null,
+          suffixIconConstraints: const BoxConstraints(minWidth: 40),
+        ),
+      ),
     );
   }
 }

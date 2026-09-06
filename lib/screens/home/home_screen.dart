@@ -197,7 +197,7 @@ class _DiscoverTab extends StatelessWidget {
         // ── 주목받는 크리에이터 ──
         const SectionHeader(title: '주목받는 크리에이터', action: '더보기 →'),
         SizedBox(
-          height: 160,
+          height: 170,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 20),
