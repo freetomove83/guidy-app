@@ -627,38 +627,83 @@ class ExhibitionCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // ── 이미지 영역: 고정 높이로 텍스트 공간 보장 ──
-            SizedBox(
-              height: 150,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  GuidyCover(
-                    seed: exhibition.coverSeed,
-                    height: 150,
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(16),
-                      topRight: Radius.circular(16),
+            ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
+              ),
+              child: SizedBox(
+                height: 150,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    GuidyCover(
+                      seed: exhibition.coverSeed,
+                      height: 150,
+                      borderRadius: BorderRadius.zero,
                     ),
-                  ),
-                  Positioned(
-                    top: 10, left: 10,
-                    child: ChannelBadge(type: exhibition.channel),
-                  ),
-                  if (exhibition.isActive)
                     Positioned(
-                      top: 10, right: 10,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: GuidyColors.ok,
-                          borderRadius: GuidyRadius.pillBorder,
-                        ),
-                        child: const Text('진행 중', style: TextStyle(
-                          color: Colors.white, fontSize: 9, fontWeight: FontWeight.w800,
-                        )),
-                      ),
+                      top: 10, left: 10,
+                      child: ChannelBadge(type: exhibition.channel),
                     ),
-                ],
+                    if (exhibition.isActive)
+                      Positioned(
+                        top: 10, right: 10,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: GuidyColors.ok,
+                            borderRadius: GuidyRadius.pillBorder,
+                          ),
+                          child: const Text('진행 중', style: TextStyle(
+                            color: Colors.white, fontSize: 9, fontWeight: FontWeight.w800,
+                          )),
+                        ),
+                      ),
+                    // ── 진행률 바 — ClipRRect 내부라 이미지와 자연스럽게 일체화 ──
+                    if (progressRatio != null)
+                      Positioned(
+                        bottom: 0, left: 0, right: 0,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // 그라데이션 마스크: 위쪽 페이드인
+                            Container(
+                              height: 24,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    Colors.black.withValues(alpha: 0.0),
+                                    Colors.black.withValues(alpha: 0.32),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            // 실제 진행 바: 3px 두께
+                            SizedBox(
+                              height: 3,
+                              child: Row(
+                                children: [
+                                  Flexible(
+                                    flex: (progressRatio! * 1000).round().clamp(1, 1000),
+                                    child: Container(color: GuidyColors.accent),
+                                  ),
+                                  Flexible(
+                                    flex: ((1 - progressRatio!) * 1000).round().clamp(0, 999),
+                                    child: Container(
+                                      color: Colors.white.withValues(alpha: 0.30),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
             // ── 텍스트 영역: Expanded로 남은 공간 모두 사용 ──
@@ -713,21 +758,7 @@ class ExhibitionCard extends StatelessWidget {
                             ),
                           ],
                         ),
-                        // 진행 바 — progressRatio 가 있을 때만 표시
-                        if (progressRatio != null) ...[  
-                          const SizedBox(height: 8),
-                          ClipRRect(
-                            borderRadius: GuidyRadius.pillBorder,
-                            child: LinearProgressIndicator(
-                              value: progressRatio!.clamp(0.0, 1.0),
-                              backgroundColor: lineC,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                GuidyColors.accent,
-                              ),
-                              minHeight: 3,
-                            ),
-                          ),
-                        ],
+
                       ],
                     ),
                   ],
