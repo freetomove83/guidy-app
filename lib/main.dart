@@ -17,6 +17,7 @@ import 'screens/scan/scan_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/signup_screen.dart';
 import 'screens/search/search_screen.dart';
+import 'screens/splash/splash_screen.dart';
 import 'widgets/common_widgets.dart';
 
 void main() {
@@ -41,7 +42,7 @@ class GuidyApp extends StatelessWidget {
       theme: buildLightTheme(),
       darkTheme: buildDarkTheme(),
       themeMode: themeProvider.isDark ? ThemeMode.dark : ThemeMode.light,
-      initialRoute: '/',
+      initialRoute: '/splash',
       onGenerateRoute: _generateRoute,
     );
   }
@@ -52,7 +53,18 @@ class GuidyApp extends StatelessWidget {
 
     Widget page;
 
-    if (name == '/') {
+    if (name == '/splash') {
+      // 스플래시는 전환 애니메이션 없이 즉시 표시
+      return PageRouteBuilder(
+        settings: settings,
+        pageBuilder: (_, __, ___) => const SplashScreen(),
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
+        transitionsBuilder: (_, __, ___, child) => child,
+      );
+    }
+
+    if (name == '/' || name == '/home') {
       page = const MainShell();
     } else if (name.startsWith('/detail/')) {
       final id = name.replaceFirst('/detail/', '');
