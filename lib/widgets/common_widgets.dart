@@ -606,6 +606,7 @@ class ExhibitionCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
+        height: double.infinity,          // 그리드 셀 전체 높이 점유
         decoration: BoxDecoration(
           color: surface,
           borderRadius: GuidyRadius.lgBorder,
@@ -614,60 +615,92 @@ class ExhibitionCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Stack(
-              children: [
-                GuidyCover(seed: exhibition.coverSeed,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(16),
-                    topRight: Radius.circular(16),
-                  ),
-                ),
-                Positioned(
-                  top: 10, left: 10,
-                  child: ChannelBadge(type: exhibition.channel),
-                ),
-                if (exhibition.isActive)
-                  Positioned(
-                    top: 10, right: 10,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: GuidyColors.ok,
-                        borderRadius: GuidyRadius.pillBorder,
-                      ),
-                      child: const Text('진행 중', style: TextStyle(
-                        color: Colors.white, fontSize: 9, fontWeight: FontWeight.w800,
-                      )),
+            // ── 이미지 영역: 고정 높이로 텍스트 공간 보장 ──
+            SizedBox(
+              height: 150,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  GuidyCover(
+                    seed: exhibition.coverSeed,
+                    height: 150,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      topRight: Radius.circular(16),
                     ),
                   ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 12, 12, 14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(exhibition.title, style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w700),
-                    maxLines: 2, overflow: TextOverflow.ellipsis),
-                  const SizedBox(height: 5),
-                  Text(exhibition.venue, style: GuidyText.small(subC), maxLines: 1, overflow: TextOverflow.ellipsis),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Flexible(
-                        child: Text('${exhibition.workCount}작품 · ${exhibition.duration}',
-                          style: GuidyText.small(muteC), overflow: TextOverflow.ellipsis),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        exhibition.price == 0 ? '무료' : '₩${_formatPrice(exhibition.price)}',
-                        style: GuidyText.small(exhibition.price == 0 ? GuidyColors.ok : textC)
-                          .copyWith(fontWeight: FontWeight.w700),
-                      ),
-                    ],
+                  Positioned(
+                    top: 10, left: 10,
+                    child: ChannelBadge(type: exhibition.channel),
                   ),
+                  if (exhibition.isActive)
+                    Positioned(
+                      top: 10, right: 10,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: GuidyColors.ok,
+                          borderRadius: GuidyRadius.pillBorder,
+                        ),
+                        child: const Text('진행 중', style: TextStyle(
+                          color: Colors.white, fontSize: 9, fontWeight: FontWeight.w800,
+                        )),
+                      ),
+                    ),
                 ],
+              ),
+            ),
+            // ── 텍스트 영역: Expanded로 남은 공간 모두 사용 ──
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // 제목 + 장소
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          exhibition.title,
+                          style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w700),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          exhibition.venue,
+                          style: GuidyText.small(subC),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                    // 작품수·시간 + 가격 (항상 하단에 고정)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            '${exhibition.workCount}작품 · ${exhibition.duration}',
+                            style: GuidyText.small(muteC),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          exhibition.price == 0
+                              ? '무료'
+                              : '₩${_formatPrice(exhibition.price)}',
+                          style: GuidyText.small(
+                            exhibition.price == 0 ? GuidyColors.ok : textC,
+                          ).copyWith(fontWeight: FontWeight.w700),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
