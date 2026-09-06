@@ -247,9 +247,9 @@ class _DiscoverTab extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              childAspectRatio: 0.65,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
+              childAspectRatio: 0.62,
+              crossAxisSpacing: 14,
+              mainAxisSpacing: 14,
             ),
             itemCount: DummyData.exhibitions.length,
             itemBuilder: (context, i) {
@@ -410,9 +410,9 @@ class _ExhibitionListTab extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        childAspectRatio: 0.65,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
+        childAspectRatio: 0.62,
+        crossAxisSpacing: 14,
+        mainAxisSpacing: 14,
       ),
       itemCount: items.length,
       itemBuilder: (context, i) => ExhibitionCard(

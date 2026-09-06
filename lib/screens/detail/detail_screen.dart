@@ -245,10 +245,14 @@ class DetailScreen extends StatelessWidget {
   }
 
   String _formatPrice(int price) {
-    return price.toString().replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (m) => '\${m[1]},',
-    );
+    final s = price.toString();
+    if (s.length <= 3) return s;
+    final result = StringBuffer();
+    for (int i = 0; i < s.length; i++) {
+      if (i > 0 && (s.length - i) % 3 == 0) result.write(',');
+      result.write(s[i]);
+    }
+    return result.toString();
   }
 
   Widget _iconBtn(IconData icon) {    return Container(

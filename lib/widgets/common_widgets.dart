@@ -643,20 +643,23 @@ class ExhibitionCard extends StatelessWidget {
               ],
             ),
             Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 14),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(exhibition.title, style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w700),
                     maxLines: 2, overflow: TextOverflow.ellipsis),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 5),
                   Text(exhibition.venue, style: GuidyText.small(subC), maxLines: 1, overflow: TextOverflow.ellipsis),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('${exhibition.workCount}작품 · ${exhibition.duration}',
-                        style: GuidyText.small(muteC)),
+                      Flexible(
+                        child: Text('${exhibition.workCount}작품 · ${exhibition.duration}',
+                          style: GuidyText.small(muteC), overflow: TextOverflow.ellipsis),
+                      ),
+                      const SizedBox(width: 4),
                       Text(
                         exhibition.price == 0 ? '무료' : '₩${_formatPrice(exhibition.price)}',
                         style: GuidyText.small(exhibition.price == 0 ? GuidyColors.ok : textC)
