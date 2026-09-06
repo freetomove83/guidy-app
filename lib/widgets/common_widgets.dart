@@ -595,8 +595,15 @@ class SectionHeader extends StatelessWidget {
 class ExhibitionCard extends StatelessWidget {
   final Exhibition exhibition;
   final VoidCallback? onTap;
+  /// 0.0 ~ 1.0 사이 진행률. null 이면 바를 표시하지 않음
+  final double? progressRatio;
 
-  const ExhibitionCard({super.key, required this.exhibition, this.onTap});
+  const ExhibitionCard({
+    super.key,
+    required this.exhibition,
+    this.onTap,
+    this.progressRatio,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -681,26 +688,46 @@ class ExhibitionCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    // 작품수·시간 + 가격 (항상 하단에 고정)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    // 작품수·시간 + 가격 + 진행 바 (하단 고정)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Flexible(
-                          child: Text(
-                            '${exhibition.workCount}작품 · ${exhibition.duration}',
-                            style: GuidyText.small(muteC),
-                            overflow: TextOverflow.ellipsis,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                '${exhibition.workCount}작품 · ${exhibition.duration}',
+                                style: GuidyText.small(muteC),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              exhibition.price == 0
+                                  ? '무료'
+                                  : '₩${_formatPrice(exhibition.price)}',
+                              style: GuidyText.small(
+                                exhibition.price == 0 ? GuidyColors.ok : textC,
+                              ).copyWith(fontWeight: FontWeight.w700),
+                            ),
+                          ],
+                        ),
+                        // 진행 바 — progressRatio 가 있을 때만 표시
+                        if (progressRatio != null) ...[  
+                          const SizedBox(height: 8),
+                          ClipRRect(
+                            borderRadius: GuidyRadius.pillBorder,
+                            child: LinearProgressIndicator(
+                              value: progressRatio!.clamp(0.0, 1.0),
+                              backgroundColor: lineC,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                GuidyColors.accent,
+                              ),
+                              minHeight: 3,
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          exhibition.price == 0
-                              ? '무료'
-                              : '₩${_formatPrice(exhibition.price)}',
-                          style: GuidyText.small(
-                            exhibition.price == 0 ? GuidyColors.ok : textC,
-                          ).copyWith(fontWeight: FontWeight.w700),
-                        ),
+                        ],
                       ],
                     ),
                   ],

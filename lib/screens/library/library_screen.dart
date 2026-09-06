@@ -116,37 +116,10 @@ class _CollectionTab extends StatelessWidget {
             itemCount: DummyData.exhibitions.where((e) => e.isActive).length,
             itemBuilder: (context, i) {
               final items = DummyData.exhibitions.where((e) => e.isActive).toList();
-              return Stack(
-                children: [
-                  ExhibitionCard(
-                    exhibition: items[i],
-                    onTap: () => Navigator.pushNamed(context, '/detail/${items[i].id}'),
-                  ),
-                  // 진행률 바
-                  Positioned(
-                    bottom: 0, left: 0, right: 0,
-                    child: Container(
-                      height: 3,
-                      decoration: BoxDecoration(
-                        color: lineC,
-                        borderRadius: const BorderRadius.only(
-                          bottomLeft: Radius.circular(16),
-                          bottomRight: Radius.circular(16),
-                        ),
-                      ),
-                      child: FractionallySizedBox(
-                        alignment: Alignment.centerLeft,
-                        widthFactor: (i + 1) * 0.25,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: GuidyColors.accent,
-                            borderRadius: GuidyRadius.pillBorder,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+              return ExhibitionCard(
+                exhibition: items[i],
+                onTap: () => Navigator.pushNamed(context, '/detail/${items[i].id}'),
+                progressRatio: (i + 1) * 0.25,
               );
             },
           ),
