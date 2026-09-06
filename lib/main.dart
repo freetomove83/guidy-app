@@ -18,6 +18,7 @@ import 'screens/auth/login_screen.dart';
 import 'screens/auth/signup_screen.dart';
 import 'screens/search/search_screen.dart';
 import 'screens/splash/splash_screen.dart';
+import 'screens/notifications/notifications_screen.dart';
 import 'widgets/common_widgets.dart';
 
 void main() {
@@ -92,6 +93,8 @@ class GuidyApp extends StatelessWidget {
       page = const SignupScreen();
     } else if (name == '/search') {
       page = const SearchScreen();
+    } else if (name == '/notifications') {
+      page = const NotificationsScreen();
     } else {
       page = const MainShell();
     }

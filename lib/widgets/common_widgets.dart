@@ -447,21 +447,25 @@ class GuidyHeader extends StatelessWidget {
           if (showBell)
             Padding(
               padding: const EdgeInsets.only(left: 8),
-              child: Stack(
-                children: [
-                  Icon(Icons.notifications_outlined, size: 24, color: textC),
-                  Positioned(
-                    top: 0, right: 0,
-                    child: Container(
-                      width: 7, height: 7,
-                      decoration: BoxDecoration(
-                        color: accentC,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: bgC, width: 1.5),
+              child: GestureDetector(
+                onTap: () => Navigator.pushNamed(context, '/notifications'),
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Icon(Icons.notifications_outlined, size: 24, color: textC),
+                    Positioned(
+                      top: -1, right: -1,
+                      child: Container(
+                        width: 8, height: 8,
+                        decoration: BoxDecoration(
+                          color: accentC,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: bgC, width: 1.5),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
         ],
