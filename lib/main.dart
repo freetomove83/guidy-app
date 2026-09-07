@@ -373,10 +373,16 @@ class _SettingsPage extends StatelessWidget {
                   Container(
                     width: 48, height: 48,
                     decoration: BoxDecoration(
-                      color: GuidyColors.primary,
                       borderRadius: GuidyRadius.lgBorder,
                     ),
-                    child: const Icon(Icons.headphones_rounded, color: Colors.white, size: 24),
+                    child: ClipRRect(
+                      borderRadius: GuidyRadius.lgBorder,
+                      child: Image.asset(
+                        'assets/icon/app_icon.png',
+                        width: 48, height: 48,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text('guidy', style: GuidyText.h3(textC)),

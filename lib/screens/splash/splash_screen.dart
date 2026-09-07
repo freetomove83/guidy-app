@@ -431,11 +431,6 @@ class _HeadphoneIcon extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: const Color(0xFF0B3D5C).withValues(alpha: 0.6),
-        border: Border.all(
-          color: const Color(0xFF4A8BB0).withValues(alpha: 0.5),
-          width: 1.5,
-        ),
         boxShadow: [
           BoxShadow(
             color: const Color(0xFF0B3D5C).withValues(alpha: 0.8),
@@ -449,10 +444,12 @@ class _HeadphoneIcon extends StatelessWidget {
           ),
         ],
       ),
-      child: Center(
-        child: CustomPaint(
-          size: Size(size * 0.55, size * 0.55),
-          painter: _HeadphonePainter(),
+      child: ClipOval(
+        child: Image.asset(
+          'assets/icon/app_icon.png',
+          width: size,
+          height: size,
+          fit: BoxFit.cover,
         ),
       ),
     );

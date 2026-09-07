@@ -58,11 +58,17 @@ class LoginScreen extends StatelessWidget {
                     Container(
                       width: 64, height: 64,
                       decoration: BoxDecoration(
-                        color: primaryC,
                         borderRadius: GuidyRadius.lgBorder,
                         boxShadow: GuidyShadow.pop,
                       ),
-                      child: const Icon(Icons.headphones_rounded, color: Colors.white, size: 32),
+                      child: ClipRRect(
+                        borderRadius: GuidyRadius.lgBorder,
+                        child: Image.asset(
+                          'assets/icon/app_icon.png',
+                          width: 64, height: 64,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 16),
                     Text('guidy', style: TextStyle(
