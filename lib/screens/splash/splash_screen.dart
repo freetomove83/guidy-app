@@ -315,7 +315,7 @@ class _SplashScreenState extends State<SplashScreen>
                     builder: (_, __) => FadeTransition(
                       opacity: _tagFade,
                       child: Text(
-                        'GUIDY',
+                        'Guidy',
                         style: TextStyle(
                           fontFamily: GuidyText.fontFamily,
                           fontSize: 11,

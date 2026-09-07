@@ -374,7 +374,6 @@ class GuidyHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final dark = isDark || Theme.of(context).brightness == Brightness.dark;
     final textC = dark ? GuidyColors.darkText : GuidyColors.ink;
-    final primaryC = dark ? GuidyColors.darkPrimary : GuidyColors.primary;
     final accentC = dark ? GuidyColors.darkAccent : GuidyColors.accent;
     final bgC = dark ? GuidyColors.darkBg : GuidyColors.bg;
 
@@ -397,18 +396,15 @@ class GuidyHeader extends StatelessWidget {
               ),
             ),
           if (showLogo) ...[
-            Container(
-              width: 30, height: 30,
-              decoration: BoxDecoration(
-                color: primaryC,
-                borderRadius: GuidyRadius.smBorder,
-              ),
-              child: const Center(
-                child: Icon(Icons.headphones_rounded, color: Colors.white, size: 16),
+            ClipRRect(
+              borderRadius: GuidyRadius.smBorder,
+              child: Image.asset(
+                'assets/icon/app_icon.png',
+                width: 30, height: 30, fit: BoxFit.cover,
               ),
             ),
             const SizedBox(width: 8),
-            Text('guidy', style: TextStyle(
+            Text('Guidy', style: TextStyle(
               fontFamily: GuidyText.fontFamily,
               fontSize: 20, fontWeight: FontWeight.w800,
               letterSpacing: -0.6, color: textC,

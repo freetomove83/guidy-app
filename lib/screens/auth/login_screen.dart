@@ -71,7 +71,7 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    Text('guidy', style: TextStyle(
+                    Text('Guidy', style: TextStyle(
                       fontFamily: GuidyText.fontFamily,
                       fontSize: 28, fontWeight: FontWeight.w900,
                       letterSpacing: -1.0, color: textC,
