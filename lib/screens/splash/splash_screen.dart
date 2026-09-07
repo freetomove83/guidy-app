@@ -1,9 +1,11 @@
 // lib/screens/splash/splash_screen.dart
 // Guidy 스플래시 · Deep Marine 테마 애니메이션
 
+import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/ad_overlay.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -40,6 +42,9 @@ class _SplashScreenState extends State<SplashScreen>
 
   // ── 퇴장 ──────────────────────────────────────────────────
   late final Animation<double> _exitFade;
+
+  // ── 광고 오버레이 ─────────────────────────────────────────
+  bool _showSplashAd = false;
 
   @override
   void initState() {
@@ -136,10 +141,24 @@ class _SplashScreenState extends State<SplashScreen>
     // 4) 완료 후 잠깐 유지
     await Future.delayed(const Duration(milliseconds: 300));
 
-    // 5) 퇴장 페이드 아웃
-    await _exitCtrl.forward();
+    // 5) 스플래시 광고 분기
+    if (!mounted) return;
+    final ad = AdDataStore.splashAd;
+    if (ad != null) {
+      setState(() => _showSplashAd = true);
+      return; // 광고 닫힐 때 _onAdClosed() 에서 이동
+    }
 
-    // 6) 홈으로 이동
+    // 6) 광고 없을 때 → 바로 퇴장
+    await _exitCtrl.forward();
+    if (!mounted) return;
+    Navigator.of(context).pushReplacementNamed('/home');
+  }
+
+  Future<void> _onAdClosed() async {
+    if (!mounted) return;
+    setState(() => _showSplashAd = false);
+    await _exitCtrl.forward();
     if (!mounted) return;
     Navigator.of(context).pushReplacementNamed('/home');
   }
@@ -158,7 +177,9 @@ class _SplashScreenState extends State<SplashScreen>
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
 
-    return AnimatedBuilder(
+    return Stack(
+      children: [
+        AnimatedBuilder(
       animation: _exitCtrl,
       builder: (context, child) {
         return Opacity(
@@ -311,6 +332,18 @@ class _SplashScreenState extends State<SplashScreen>
           ],
         ),
       ),
+    ),
+        // ── 스플래시 광고 오버레이 ────────────────────────────
+        if (_showSplashAd && AdDataStore.splashAd != null)
+          SplashAdOverlay(
+            ad: AdDataStore.splashAd!,
+            onClose: _onAdClosed,
+            onNavigate: (route) {
+              // 광고 랜딩 후 홈으로 이동 (내부 라우트는 홈 진입 후 처리)
+              Navigator.of(context).pushReplacementNamed('/home');
+            },
+          ),
+      ],
     );
   }
 }

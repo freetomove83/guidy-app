@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../../models/models.dart';
 import '../../widgets/common_widgets.dart';
+import '../../widgets/ad_overlay.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,6 +18,27 @@ class _HomeScreenState extends State<HomeScreen> {
   int _tabIndex = 0;
   final _tabs = ['발견', '큐레이션', '크리에이터', '아카이브', '팔로잉'];
 
+  // ── 광고 상태 ───────────────────────────────────────────
+  bool _showPopupAd   = false;
+  bool _showSlideUpAd = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // 홈 진입 0.8초 후 팝업 광고 표시
+    Future.delayed(const Duration(milliseconds: 800), () {
+      if (mounted && AdDataStore.popupAd != null) {
+        setState(() => _showPopupAd = true);
+      }
+    });
+    // 팝업 닫힌 후 2초 뒤 슬라이드업 광고 표시
+    Future.delayed(const Duration(milliseconds: 3500), () {
+      if (mounted && AdDataStore.slideUpAd != null && !_showPopupAd) {
+        setState(() => _showSlideUpAd = true);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -24,37 +46,76 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       backgroundColor: bgC,
-      body: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            // 헤더
-            GuidyHeader(showLogo: true, showSearch: true, showBell: true),
-            // 카테고리 탭
-            CategoryTabs(
-              tabs: _tabs,
-              activeIndex: _tabIndex,
-              onChanged: (i) {
-                setState(() => _tabIndex = i);
-                if (i == 4) {
-                  _navigateToFollowing();
+      body: Stack(
+        children: [
+          // ── 메인 콘텐츠 ────────────────────────────────
+          SafeArea(
+            bottom: false,
+            child: Column(
+              children: [
+                // 헤더
+                GuidyHeader(showLogo: true, showSearch: true, showBell: true),
+                // 카테고리 탭
+                CategoryTabs(
+                  tabs: _tabs,
+                  activeIndex: _tabIndex,
+                  onChanged: (i) {
+                    setState(() => _tabIndex = i);
+                    if (i == 4) {
+                      _navigateToFollowing();
+                    }
+                  },
+                ),
+                // 콘텐츠
+                Expanded(
+                  child: IndexedStack(
+                    index: _tabIndex == 4 ? 0 : _tabIndex,
+                    children: const [
+                      _DiscoverTab(),
+                      _CurationTab(),
+                      _CreatorTab(),
+                      _ArchiveTab(),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // ── 홈 팝업 광고 ─────────────────────────────
+          if (_showPopupAd && AdDataStore.popupAd != null)
+            HomePopupAd(
+              ad: AdDataStore.popupAd!,
+              onClose: () {
+                setState(() => _showPopupAd = false);
+                // 팝업 닫힌 후 1.5초 후 슬라이드업 노출
+                Future.delayed(const Duration(milliseconds: 1500), () {
+                  if (mounted && AdDataStore.slideUpAd != null) {
+                    setState(() => _showSlideUpAd = true);
+                  }
+                });
+              },
+              onNavigate: (route) {
+                setState(() => _showPopupAd = false);
+                if (route.startsWith('/')) {
+                  Navigator.pushNamed(context, route);
                 }
               },
             ),
-            // 콘텐츠
-            Expanded(
-              child: IndexedStack(
-                index: _tabIndex == 4 ? 0 : _tabIndex,
-                children: const [
-                  _DiscoverTab(),
-                  _CurationTab(),
-                  _CreatorTab(),
-                  _ArchiveTab(),
-                ],
-              ),
+
+          // ── 홈 하단 슬라이드업 광고 ───────────────────
+          if (_showSlideUpAd && AdDataStore.slideUpAd != null)
+            HomeSlideUpAd(
+              ad: AdDataStore.slideUpAd!,
+              onClose: () => setState(() => _showSlideUpAd = false),
+              onNavigate: (route) {
+                setState(() => _showSlideUpAd = false);
+                if (route.startsWith('/')) {
+                  Navigator.pushNamed(context, route);
+                }
+              },
             ),
-          ],
-        ),
+        ],
       ),
     );
   }

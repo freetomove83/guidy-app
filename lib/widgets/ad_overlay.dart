@@ -36,7 +36,7 @@ class AdData {
 
 // ─── 더미 광고 데이터 (Firebase 연결 전 더미) ──────────────
 class AdDataStore {
-  static const _splashAd = AdData(
+  static final _splashAd = AdData(
     id: 'ad_splash_001',
     title: '여름 특별전 시작!',
     mediaType: AdMediaType.image,
@@ -47,7 +47,7 @@ class AdDataStore {
     active: true,
   );
 
-  static const _popupAd = AdData(
+  static final _popupAd = AdData(
     id: 'ad_popup_001',
     title: '경복궁 심층 탐방 오디오 가이드',
     mediaType: AdMediaType.image,
@@ -58,7 +58,7 @@ class AdDataStore {
     active: true,
   );
 
-  static const _slideUpAd = AdData(
+  static final _slideUpAd = AdData(
     id: 'ad_slideup_001',
     title: '신규 크리에이터 김민준 등장',
     mediaType: AdMediaType.image,
@@ -478,8 +478,7 @@ class _HomeSlideUpAdState extends State<HomeSlideUpAd>
   }
 
   // 스와이프 다운 처리
-  double _dragStart = 0;
-  void _onDragStart(DragStartDetails d) => _dragStart = d.localPosition.dy;
+  void _onDragStart(DragStartDetails d) {/* drag tracking */}
   void _onDragEnd(DragEndDetails d) {
     if (d.primaryVelocity != null && d.primaryVelocity! > 300) {
       _close();
@@ -488,7 +487,6 @@ class _HomeSlideUpAdState extends State<HomeSlideUpAd>
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
     final bottomPad   = MediaQuery.of(context).padding.bottom;
 
     return Positioned(
@@ -562,7 +560,7 @@ class _HomeSlideUpAdState extends State<HomeSlideUpAd>
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: GuidyColors.inkBase,
+                            color: GuidyColors.chip,
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: const Text('광고', style: TextStyle(color: GuidyColors.mute, fontSize: 10)),
