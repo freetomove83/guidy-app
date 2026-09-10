@@ -64,11 +64,6 @@ class _PlayerScreenState extends State<PlayerScreen>
     super.dispose();
   }
 
-  Artwork _findArtwork(String id) {
-    final store = context.read<AppStore>();
-    return store.artworkById(id) ?? store.artworks.first;
-  }
-
   Artwork get _currentArtwork => _playlist[_artworkIndex];
 
   // 이전 작품
