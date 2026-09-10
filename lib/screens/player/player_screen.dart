@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../theme/app_theme.dart';
 import '../../models/models.dart';
+import '../../models/app_store.dart';
 import '../../services/audio_service.dart';
 import '../../widgets/common_widgets.dart';
 
@@ -38,8 +39,9 @@ class _PlayerScreenState extends State<PlayerScreen>
     )..repeat(reverse: true);
 
     // 작품 목록 & 인덱스 구성
-    final artwork = _findArtwork(widget.artworkId);
-    _playlist = DummyData.artworks
+    final store = context.read<AppStore>();
+    final artwork = store.artworkById(widget.artworkId) ?? store.artworks.first;
+    _playlist = store.artworks
         .where((a) => a.exhibitionId == artwork.exhibitionId)
         .toList();
     _artworkIndex = _playlist.indexWhere((a) => a.id == artwork.id);
@@ -62,11 +64,10 @@ class _PlayerScreenState extends State<PlayerScreen>
     super.dispose();
   }
 
-  Artwork _findArtwork(String id) =>
-      DummyData.artworks.firstWhere(
-        (a) => a.id == id,
-        orElse: () => DummyData.artworks.first,
-      );
+  Artwork _findArtwork(String id) {
+    final store = context.read<AppStore>();
+    return store.artworkById(id) ?? store.artworks.first;
+  }
 
   Artwork get _currentArtwork => _playlist[_artworkIndex];
 

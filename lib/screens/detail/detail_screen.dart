@@ -2,8 +2,10 @@
 // 전시 상세 화면
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../theme/app_theme.dart';
 import '../../models/models.dart';
+import '../../models/app_store.dart';
 import '../../widgets/common_widgets.dart';
 
 class DetailScreen extends StatelessWidget {
@@ -12,10 +14,9 @@ class DetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final exhibition = DummyData.exhibitions.firstWhere(
-      (e) => e.id == exhibitionId,
-      orElse: () => DummyData.exhibitions.first,
-    );
+    final store = context.read<AppStore>();
+    final exhibition = store.exhibitionById(exhibitionId)
+        ?? store.exhibitions.first;
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgC = isDark ? GuidyColors.darkBg : GuidyColors.bg;

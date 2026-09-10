@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'theme/app_theme.dart';
 import 'theme/theme_provider.dart';
 import 'services/audio_service.dart';
+import 'models/app_store.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/detail/detail_screen.dart';
 import 'screens/player/player_screen.dart';
@@ -28,6 +29,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => GuidyAudioService()),
+        ChangeNotifierProvider(create: (_) => AppStore()),
       ],
       child: const GuidyApp(),
     ),
