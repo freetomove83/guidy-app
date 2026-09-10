@@ -17,6 +17,9 @@ class DetailScreen extends StatelessWidget {
     final store = context.read<AppStore>();
     final exhibition = store.exhibitionById(exhibitionId)
         ?? store.exhibitions.first;
+    // 이 전시의 첫 번째 작품 ID (미리듣기/재생 버튼에 사용)
+    final artworks = store.artworksFor(exhibitionId);
+    final firstArtworkId = artworks.isNotEmpty ? artworks.first.id : 'a1';
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgC = isDark ? GuidyColors.darkBg : GuidyColors.bg;
@@ -206,7 +209,7 @@ class DetailScreen extends StatelessWidget {
               child: Row(
                 children: [
                   PillButton(label: '미리듣기', size: 'md',
-                    onPressed: () => Navigator.pushNamed(context, '/player/a1'),
+                    onPressed: () => Navigator.pushNamed(context, '/player/$firstArtworkId'),
                   ),
                   const SizedBox(width: 10),
                   Expanded(

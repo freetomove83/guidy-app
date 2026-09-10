@@ -23,13 +23,16 @@ import 'screens/splash/splash_screen.dart';
 import 'screens/notifications/notifications_screen.dart';
 import 'widgets/common_widgets.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final appStore = AppStore();
+  await appStore.init(); // localStorage에서 CMS 추가 항목 불러오기
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => GuidyAudioService()),
-        ChangeNotifierProvider(create: (_) => AppStore()),
+        ChangeNotifierProvider.value(value: appStore),
       ],
       child: const GuidyApp(),
     ),
