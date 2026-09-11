@@ -434,13 +434,13 @@ class _ArchiveTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark    = Theme.of(context).brightness == Brightness.dark;
-    final bgC       = isDark ? GuidyColors.darkBg      : GuidyColors.bg;
     final textC     = isDark ? GuidyColors.darkText     : GuidyColors.ink;
     final subC      = isDark ? GuidyColors.darkSub      : GuidyColors.sub;
     final muteC     = isDark ? GuidyColors.darkMute     : GuidyColors.mute;
     final surfaceC  = isDark ? GuidyColors.darkSurface  : GuidyColors.surface;
     final lineC     = isDark ? GuidyColors.darkLine     : GuidyColors.line;
     final primaryC  = isDark ? GuidyColors.darkPrimary  : GuidyColors.primary;
+    final accentC   = isDark ? GuidyColors.darkAccent   : GuidyColors.accent;
 
     final archives = DummyData.exhibitions
         .where((e) => e.channel == ChannelType.archive)
@@ -459,108 +459,175 @@ class _ArchiveTab extends StatelessWidget {
       );
     }
 
-    return CustomScrollView(
-      slivers: [
-        // ─── 상단 안내 배너 ─────────────────────────────
-        SliverToBoxAdapter(
-          child: Container(
-            margin: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: surfaceC,
-              borderRadius: GuidyRadius.lgBorder,
-              border: Border.all(color: lineC),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 32, height: 32,
-                  decoration: BoxDecoration(
-                    color: primaryC.withValues(alpha: 0.10),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(Icons.inventory_2_outlined,
-                      size: 16, color: primaryC),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('아카이브 전시',
-                          style: GuidyText.body(textC)
-                              .copyWith(fontWeight: FontWeight.w700)),
-                      const SizedBox(height: 3),
-                      Text(
-                        '종료된 전시의 오디오 가이드를 기록으로 보존합니다.\n'
-                        '일부 전시는 무료로 감상할 수 있습니다.',
-                        style: GuidyText.small(subC).copyWith(height: 1.5),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-
-        // ─── 무료/유료 구분 범례 ─────────────────────────
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: GuidyColors.ok.withValues(alpha: 0.12),
-                    borderRadius: GuidyRadius.pillBorder,
-                    border: Border.all(
-                        color: GuidyColors.ok.withValues(alpha: 0.3)),
-                  ),
+    return Column(
+      children: [
+        // ─── 스크롤 영역 ─────────────────────────────────
+        Expanded(
+          child: CustomScrollView(
+            slivers: [
+              // ─── 무료/유료 구분 범례 ───────────────────
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
                   child: Row(
-                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.lock_open_rounded,
-                          size: 11, color: GuidyColors.ok),
-                      const SizedBox(width: 4),
-                      Text('무료 감상',
-                          style: GuidyText.kicker(GuidyColors.ok)
-                              .copyWith(fontWeight: FontWeight.w700)),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: GuidyColors.ok.withValues(alpha: 0.12),
+                          borderRadius: GuidyRadius.pillBorder,
+                          border: Border.all(
+                              color: GuidyColors.ok.withValues(alpha: 0.3)),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.lock_open_rounded,
+                                size: 11, color: GuidyColors.ok),
+                            const SizedBox(width: 4),
+                            Text('무료 감상',
+                                style: GuidyText.kicker(GuidyColors.ok)
+                                    .copyWith(fontWeight: FontWeight.w700)),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text('표시된 전시는 결제 없이 감상 가능',
+                          style: GuidyText.small(muteC)),
                     ],
                   ),
                 ),
-                const SizedBox(width: 8),
-                Text('표시된 전시는 결제 없이 감상 가능',
-                    style: GuidyText.small(muteC)),
-              ],
-            ),
+              ),
+
+              // ─── 전시 그리드 ───────────────────────────
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+                sliver: SliverGrid(
+                  gridDelegate:
+                      const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 0.62,
+                    crossAxisSpacing: 14,
+                    mainAxisSpacing: 14,
+                  ),
+                  delegate: SliverChildBuilderDelegate(
+                    (context, i) => _ArchiveCard(
+                      exhibition: archives[i],
+                      onTap: () => Navigator.pushNamed(
+                          context, '/detail/${archives[i].id}'),
+                    ),
+                    childCount: archives.length,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
 
-        // ─── 전시 그리드 ─────────────────────────────────
-        SliverPadding(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 100),
-          sliver: SliverGrid(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.62,
-              crossAxisSpacing: 14,
-              mainAxisSpacing: 14,
-            ),
-            delegate: SliverChildBuilderDelegate(
-              (context, i) => _ArchiveCard(
-                exhibition: archives[i],
-                onTap: () => Navigator.pushNamed(
-                    context, '/detail/${archives[i].id}'),
-              ),
-              childCount: archives.length,
-            ),
-          ),
+        // ─── 하단 고정 띠 배너 ────────────────────────────
+        _ArchiveNoticeBanner(
+          isDark: isDark,
+          textC: textC,
+          subC: subC,
+          surfaceC: surfaceC,
+          lineC: lineC,
+          primaryC: primaryC,
+          accentC: accentC,
+          onTap: () => Navigator.pushNamed(context, '/detail/e3'),
         ),
       ],
+    );
+  }
+}
+
+// ─── 아카이브 하단 고정 띠 배너 ──────────────────────────────
+class _ArchiveNoticeBanner extends StatelessWidget {
+  final bool isDark;
+  final Color textC, subC, surfaceC, lineC, primaryC, accentC;
+  final VoidCallback onTap;
+
+  const _ArchiveNoticeBanner({
+    required this.isDark,
+    required this.textC,
+    required this.subC,
+    required this.surfaceC,
+    required this.lineC,
+    required this.primaryC,
+    required this.accentC,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        decoration: BoxDecoration(
+          color: surfaceC,
+          border: Border(
+            top: BorderSide(color: lineC, width: 1),
+          ),
+        ),
+        child: Row(
+          children: [
+            // 아이콘 컨테이너
+            Container(
+              width: 38, height: 38,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    primaryC.withValues(alpha: 0.15),
+                    accentC.withValues(alpha: 0.10),
+                  ],
+                ),
+                borderRadius: GuidyRadius.mdBorder,
+              ),
+              child: Icon(Icons.headphones_rounded, size: 18, color: primaryC),
+            ),
+            const SizedBox(width: 12),
+            // 텍스트 영역
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    '아카이브 무료 감상 가능',
+                    style: GuidyText.body(textC)
+                        .copyWith(fontWeight: FontWeight.w700),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '종료된 전시도 오디오 가이드로 언제든 다시 만나보세요',
+                    style: GuidyText.small(subC),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            // 화살표
+            Container(
+              width: 28, height: 28,
+              decoration: BoxDecoration(
+                color: primaryC.withValues(alpha: 0.08),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 12,
+                color: primaryC,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
