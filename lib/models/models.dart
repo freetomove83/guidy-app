@@ -146,6 +146,62 @@ class FeedItem {
   });
 }
 
+// ─── 섹션 (전시 구성 단위) ──────────────────────────────
+class ExhibitionSection {
+  final String id;
+  final String exhibitionId;
+  final int order;
+  final String title;
+  final String description;
+  final String? imageUrl;   // 대표 이미지 URL (CMS 업로드)
+  final int imageSeed;      // 이미지 없을 때 플레이스홀더용
+  final List<String> artworkIds; // 이 섹션에 속한 작품 ID 목록
+
+  const ExhibitionSection({
+    required this.id,
+    required this.exhibitionId,
+    required this.order,
+    required this.title,
+    this.description = '',
+    this.imageUrl,
+    this.imageSeed = 0,
+    this.artworkIds = const [],
+  });
+}
+
+// ─── 크리에이터 가이드 (같은 전시의 크리에이터 버전) ────
+class CreatorGuide {
+  final String id;
+  final String exhibitionId;
+  final String creatorId;
+  final String creatorName;
+  final String creatorTitle;
+  final String avatarColor;
+  final bool isVerified;
+  final String guideTitle;
+  final String description;
+  final int durationSec;
+  final int plays;
+  final double rating;
+  final String? firstArtworkId;
+
+  const CreatorGuide({
+    required this.id,
+    required this.exhibitionId,
+    required this.creatorId,
+    required this.creatorName,
+    required this.creatorTitle,
+    this.avatarColor = '#0B3D5C',
+    this.isVerified = false,
+    required this.guideTitle,
+    this.description = '',
+    this.durationSec = 0,
+    this.plays = 0,
+    this.rating = 0,
+    this.firstArtworkId,
+  });
+}
+
 // ─── 더미 데이터 ─────────────────────────────────────────
 class DummyData {
   static final List<Creator> creators = [
