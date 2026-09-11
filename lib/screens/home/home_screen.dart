@@ -142,230 +142,227 @@ class _DiscoverTab extends StatelessWidget {
     final primaryC = isDark ? GuidyColors.darkPrimary : GuidyColors.primary;
     final accentC = isDark ? GuidyColors.darkAccent : GuidyColors.accent;
 
-    return ListView(
-      padding: EdgeInsets.zero,
+    return Column(
       children: [
-        // ── 이달의 크리에이터 히어로 배너 ──
-        Padding(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
-          child: GestureDetector(
-            onTap: () => Navigator.pushNamed(context, '/creator/c1'),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: GuidyRadius.xlBorder,
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [primaryC, accentC],
-                ),
-                boxShadow: GuidyShadow.pop,
-              ),
-              child: Stack(
-                children: [
-                  // 배경 패턴
-                  Positioned.fill(
-                    child: CustomPaint(
-                      painter: _HeroBgPainter(isDark: isDark),
+        // ── 스크롤 컨텐츠 ──────────────────────────────
+        Expanded(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              // ── 이달의 크리에이터 히어로 배너 ──
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+                child: GestureDetector(
+                  onTap: () => Navigator.pushNamed(context, '/creator/c1'),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: GuidyRadius.xlBorder,
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [primaryC, accentC],
+                      ),
+                      boxShadow: GuidyShadow.pop,
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Stack(
                       children: [
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.25),
-                                borderRadius: GuidyRadius.pillBorder,
-                              ),
-                              child: const Text('이달의 크리에이터',
-                                style: TextStyle(color: Colors.white, fontSize: 10,
-                                  fontWeight: FontWeight.w800, letterSpacing: 0.5,
-                                  fontFamily: GuidyText.fontFamily),
-                              ),
-                            ),
-                          ],
+                        // 배경 패턴
+                        Positioned.fill(
+                          child: CustomPaint(
+                            painter: _HeroBgPainter(isDark: isDark),
+                          ),
                         ),
-                        const SizedBox(height: 16),
-                        Row(
-                          children: [
-                            Container(
-                              width: 56, height: 56,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.white.withValues(alpha: 0.2),
-                                border: Border.all(color: Colors.white, width: 2),
-                              ),
-                              child: const Center(
-                                child: Text('김', style: TextStyle(
-                                  color: Colors.white, fontSize: 22,
-                                  fontWeight: FontWeight.w800,
-                                  fontFamily: GuidyText.fontFamily,
-                                )),
-                              ),
-                            ),
-                            const SizedBox(width: 14),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                        Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
                                 children: [
-                                  const Text('김도슨트', style: TextStyle(
-                                    color: Colors.white, fontSize: 18,
-                                    fontWeight: FontWeight.w800,
-                                    fontFamily: GuidyText.fontFamily,
-                                    letterSpacing: -0.4,
-                                  )),
-                                  Text('미술사 큐레이터 · 가이드 14개',
-                                    style: TextStyle(
-                                      color: Colors.white.withValues(alpha: 0.8),
-                                      fontSize: 12, fontFamily: GuidyText.fontFamily,
-                                    )),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 3),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withValues(alpha: 0.25),
+                                      borderRadius: GuidyRadius.pillBorder,
+                                    ),
+                                    child: const Text('이달의 크리에이터',
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 10,
+                                          fontWeight: FontWeight.w800,
+                                          letterSpacing: 0.5,
+                                          fontFamily: GuidyText.fontFamily),
+                                    ),
+                                  ),
                                 ],
                               ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          children: [
-                            PillButton(label: '팔로우'),
-                            const SizedBox(width: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: GuidyRadius.pillBorder,
+                              const SizedBox(height: 16),
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 56, height: 56,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.white.withValues(alpha: 0.2),
+                                      border: Border.all(
+                                          color: Colors.white, width: 2),
+                                    ),
+                                    child: const Center(
+                                      child: Text('김', style: TextStyle(
+                                        color: Colors.white, fontSize: 22,
+                                        fontWeight: FontWeight.w800,
+                                        fontFamily: GuidyText.fontFamily,
+                                      )),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 14),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Text('김도슨트', style: TextStyle(
+                                          color: Colors.white, fontSize: 18,
+                                          fontWeight: FontWeight.w800,
+                                          fontFamily: GuidyText.fontFamily,
+                                          letterSpacing: -0.4,
+                                        )),
+                                        Text('미술사 큐레이터 · 가이드 14개',
+                                          style: TextStyle(
+                                            color: Colors.white
+                                                .withValues(alpha: 0.8),
+                                            fontSize: 12,
+                                            fontFamily: GuidyText.fontFamily,
+                                          )),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
-                              child: Text('가이드 보기', style: TextStyle(
-                                color: primaryC, fontSize: 12, fontWeight: FontWeight.w700,
-                                fontFamily: GuidyText.fontFamily,
-                              )),
-                            ),
-                          ],
+                              const SizedBox(height: 16),
+                              Row(
+                                children: [
+                                  PillButton(label: '팔로우'),
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 14, vertical: 8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: GuidyRadius.pillBorder,
+                                    ),
+                                    child: Text('가이드 보기', style: TextStyle(
+                                      color: primaryC, fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                      fontFamily: GuidyText.fontFamily,
+                                    )),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-
-        // ── 주목받는 크리에이터 ──
-        const SectionHeader(title: '주목받는 크리에이터', action: '더보기 →'),
-        SizedBox(
-          height: 170,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            itemCount: DummyData.creators.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 10),
-            itemBuilder: (context, i) {
-              final cr = DummyData.creators[i];
-              return GestureDetector(
-                onTap: () => Navigator.pushNamed(context, '/creator/${cr.id}'),
-                child: Container(
-                  width: 120,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: surfaceC,
-                    borderRadius: GuidyRadius.lgBorder,
-                    border: Border.all(color: lineC),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      CreatorAvatar(creator: cr, size: 52, showBadgeRing: true),
-                      const SizedBox(height: 8),
-                      Text(cr.name, style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w700),
-                        maxLines: 1, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center),
-                      const SizedBox(height: 2),
-                      Text(cr.title, style: GuidyText.small(muteC),
-                        maxLines: 1, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center),
-                      const SizedBox(height: 4),
-                      Text('팔로워 ${_formatNum(cr.followerCount)}',
-                        style: GuidyText.kicker(subC)),
-                    ],
                   ),
                 ),
-              );
-            },
-          ),
-        ),
-
-        const SizedBox(height: 28),
-
-        // ── 이번 주 새 가이드 ──
-        const SectionHeader(title: '이번 주 새 가이드', action: '더보기 →'),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.62,
-              crossAxisSpacing: 14,
-              mainAxisSpacing: 14,
-            ),
-            itemCount: DummyData.exhibitions.length,
-            itemBuilder: (context, i) {
-              return ExhibitionCard(
-                exhibition: DummyData.exhibitions[i],
-                onTap: () => Navigator.pushNamed(context, '/detail/${DummyData.exhibitions[i].id}'),
-              );
-            },
-          ),
-        ),
-
-        const SizedBox(height: 28),
-
-        // ── 크리에이터 CTA ──
-        Padding(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 28),
-          child: GestureDetector(
-            onTap: () => Navigator.pushNamed(context, '/creator-studio'),
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: isDark ? GuidyColors.darkBgAlt : GuidyColors.bgAlt,
-                borderRadius: GuidyRadius.xlBorder,
-                border: Border.all(color: lineC),
               ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 48, height: 48,
-                    decoration: BoxDecoration(
-                      color: accentC.withValues(alpha: 0.15),
-                      borderRadius: GuidyRadius.lgBorder,
-                    ),
-                    child: Icon(Icons.mic_rounded, color: accentC, size: 24),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('크리에이터가 되어보세요',
-                          style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w800)),
-                        const SizedBox(height: 2),
-                        Text('나만의 오디오 가이드를 만들고 수익을 창출하세요',
-                          style: GuidyText.small(subC)),
-                      ],
-                    ),
-                  ),
-                  Icon(Icons.arrow_forward_ios_rounded, size: 14, color: muteC),
-                ],
+
+              // ── 주목받는 크리에이터 ──
+              const SectionHeader(title: '주목받는 크리에이터', action: '더보기 →'),
+              SizedBox(
+                height: 170,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  itemCount: DummyData.creators.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: 10),
+                  itemBuilder: (context, i) {
+                    final cr = DummyData.creators[i];
+                    return GestureDetector(
+                      onTap: () =>
+                          Navigator.pushNamed(context, '/creator/${cr.id}'),
+                      child: Container(
+                        width: 120,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: surfaceC,
+                          borderRadius: GuidyRadius.lgBorder,
+                          border: Border.all(color: lineC),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CreatorAvatar(
+                                creator: cr, size: 52, showBadgeRing: true),
+                            const SizedBox(height: 8),
+                            Text(cr.name,
+                              style: GuidyText.body(textC)
+                                  .copyWith(fontWeight: FontWeight.w700),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center),
+                            const SizedBox(height: 2),
+                            Text(cr.title,
+                              style: GuidyText.small(muteC),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center),
+                            const SizedBox(height: 4),
+                            Text('팔로워 ${_formatNum(cr.followerCount)}',
+                              style: GuidyText.kicker(subC)),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ),
-            ),
+
+              const SizedBox(height: 28),
+
+              // ── 이번 주 새 가이드 ──
+              const SectionHeader(title: '이번 주 새 가이드', action: '더보기 →'),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate:
+                      const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 0.62,
+                    crossAxisSpacing: 14,
+                    mainAxisSpacing: 14,
+                  ),
+                  itemCount: DummyData.exhibitions.length,
+                  itemBuilder: (context, i) {
+                    return ExhibitionCard(
+                      exhibition: DummyData.exhibitions[i],
+                      onTap: () => Navigator.pushNamed(
+                          context,
+                          '/detail/${DummyData.exhibitions[i].id}'),
+                    );
+                  },
+                ),
+              ),
+
+              const SizedBox(height: 16),
+            ],
           ),
         ),
-        const SizedBox(height: 80), // 하단 네비 여백
+
+        // ── 하단 고정 띠 배너 ──────────────────────────
+        _CreatorNoticeBanner(
+          isDark: isDark,
+          textC: textC,
+          subC: subC,
+          surfaceC: surfaceC,
+          lineC: lineC,
+          primaryC: primaryC,
+          accentC: accentC,
+          onTap: () => Navigator.pushNamed(context, '/creator-apply'),
+        ),
       ],
     );
   }
@@ -373,6 +370,92 @@ class _DiscoverTab extends StatelessWidget {
   String _formatNum(int n) {
     if (n >= 1000) return '${(n / 1000).toStringAsFixed(1)}k';
     return n.toString();
+  }
+}
+
+// ─── 발견 탭 하단 고정 크리에이터 띠 배너 ────────────────────
+class _CreatorNoticeBanner extends StatelessWidget {
+  final bool isDark;
+  final Color textC, subC, surfaceC, lineC, primaryC, accentC;
+  final VoidCallback onTap;
+
+  const _CreatorNoticeBanner({
+    required this.isDark,
+    required this.textC,
+    required this.subC,
+    required this.surfaceC,
+    required this.lineC,
+    required this.primaryC,
+    required this.accentC,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        decoration: BoxDecoration(
+          color: surfaceC,
+          border: Border(top: BorderSide(color: lineC, width: 1)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 38, height: 38,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    accentC.withValues(alpha: 0.18),
+                    primaryC.withValues(alpha: 0.10),
+                  ],
+                ),
+                borderRadius: GuidyRadius.mdBorder,
+              ),
+              child: Icon(Icons.mic_rounded, size: 18, color: accentC),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    '크리에이터로 수익을 창출해보세요',
+                    style: GuidyText.body(textC)
+                        .copyWith(fontWeight: FontWeight.w700),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '나만의 오디오 가이드를 만들고 판매 수익의 70%를 받으세요',
+                    style: GuidyText.small(subC),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              width: 28, height: 28,
+              decoration: BoxDecoration(
+                color: accentC.withValues(alpha: 0.10),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 12,
+                color: accentC,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
