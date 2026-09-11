@@ -2,9 +2,35 @@
 // 크리에이터 신청 / 진행 상황 화면
 
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../theme/app_theme.dart';
 import '../../models/user_store.dart';
+
+// SharedPreferences 키 — CMS와 동일 키 사용
+const _kTermsService = 'guidy_terms_service';
+const _kTermsCreator = 'guidy_terms_creator';
+
+// 약관 로드 함수
+Future<String> _loadTerms(String key, String fallback) async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString(key) ?? fallback;
+}
+
+// 약관 모달 표시
+void _showTermsModal(
+  BuildContext context, {
+  required String title,
+  required Future<String> contentFuture,
+}) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (_) => _TermsModal(title: title, contentFuture: contentFuture),
+  );
+}
 
 class CreatorApplyScreen extends StatelessWidget {
   const CreatorApplyScreen({super.key});
@@ -308,16 +334,17 @@ class _ApplyFormViewState extends State<_ApplyFormView> {
                     ),
                     const SizedBox(height: 24),
 
-                    // 동의
-                    GestureDetector(
-                      onTap: () => setState(() => _agreed = !_agreed),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          AnimatedContainer(
+                    // 동의 + 약관 링크
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // 체크박스
+                        GestureDetector(
+                          onTap: () => setState(() => _agreed = !_agreed),
+                          child: AnimatedContainer(
                             duration: const Duration(milliseconds: 150),
                             width: 20, height: 20,
-                            margin: const EdgeInsets.only(top: 1),
+                            margin: const EdgeInsets.only(top: 2),
                             decoration: BoxDecoration(
                               color: _agreed ? primaryC : Colors.transparent,
                               borderRadius: BorderRadius.circular(5),
@@ -331,16 +358,57 @@ class _ApplyFormViewState extends State<_ApplyFormView> {
                                     size: 13, color: Colors.white)
                                 : null,
                           ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              '크리에이터 운영 정책 및 수익 정산 약관에 동의합니다.',
+                        ),
+                        const SizedBox(width: 10),
+                        // 약관 텍스트 (링크 포함)
+                        Expanded(
+                          child: RichText(
+                            text: TextSpan(
                               style: GuidyText.body(subC)
                                   .copyWith(fontWeight: FontWeight.w500),
+                              children: [
+                                const TextSpan(text: '크리에이터 운영 정책 및 '),
+                                TextSpan(
+                                  text: '수익·정산 약관',
+                                  style: GuidyText.body(primaryC).copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    decoration: TextDecoration.underline,
+                                    decorationColor: primaryC,
+                                  ),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () => _showTermsModal(
+                                      context,
+                                      title: '크리에이터 수익·정산 약관',
+                                      contentFuture: _loadTerms(
+                                        _kTermsCreator,
+                                        '약관을 불러오는 중입니다...\n관리자 페이지에서 약관을 등록해 주세요.',
+                                      ),
+                                    ),
+                                ),
+                                const TextSpan(text: ' 및 '),
+                                TextSpan(
+                                  text: '이용약관',
+                                  style: GuidyText.body(primaryC).copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    decoration: TextDecoration.underline,
+                                    decorationColor: primaryC,
+                                  ),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () => _showTermsModal(
+                                      context,
+                                      title: '서비스 이용약관',
+                                      contentFuture: _loadTerms(
+                                        _kTermsService,
+                                        '약관을 불러오는 중입니다...\n관리자 페이지에서 약관을 등록해 주세요.',
+                                      ),
+                                    ),
+                                ),
+                                const TextSpan(text: '에 동의합니다.'),
+                              ],
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 28),
 
@@ -939,4 +1007,124 @@ Widget _timelineItem({
       ],
     ),
   );
+}
+
+// ─── 약관 모달 ─────────────────────────────────────────────────
+class _TermsModal extends StatefulWidget {
+  final String title;
+  final Future<String> contentFuture;
+  const _TermsModal({required this.title, required this.contentFuture});
+
+  @override
+  State<_TermsModal> createState() => _TermsModalState();
+}
+
+class _TermsModalState extends State<_TermsModal> {
+  String? _content;
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.contentFuture.then((text) {
+      if (mounted) setState(() { _content = text; _loading = false; });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark    = Theme.of(context).brightness == Brightness.dark;
+    final bgC       = isDark ? GuidyColors.darkSurface : GuidyColors.surface;
+    final textC     = isDark ? GuidyColors.darkText    : GuidyColors.ink;
+    final subC      = isDark ? GuidyColors.darkSub     : GuidyColors.sub;
+    final lineC     = isDark ? GuidyColors.darkLine    : GuidyColors.line;
+    final primaryC  = isDark ? GuidyColors.darkPrimary : GuidyColors.primary;
+    final h         = MediaQuery.of(context).size.height;
+
+    return Container(
+      height: h * 0.85,
+      decoration: BoxDecoration(
+        color: bgC,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Column(
+        children: [
+          // 드래그 핸들
+          Container(
+            margin: const EdgeInsets.only(top: 10),
+            width: 40, height: 4,
+            decoration: BoxDecoration(
+              color: lineC,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          // 헤더
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 14, 16, 0),
+            child: Row(
+              children: [
+                Icon(Icons.gavel_rounded, color: primaryC, size: 18),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(widget.title,
+                      style: GuidyText.h3(textC)),
+                ),
+                IconButton(
+                  icon: Icon(Icons.close_rounded, color: subC, size: 20),
+                  onPressed: () => Navigator.pop(context),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(
+                    minWidth: 36, minHeight: 36,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Divider(color: lineC, height: 1),
+          // 내용
+          Expanded(
+            child: _loading
+                ? Center(
+                    child: CircularProgressIndicator(
+                        color: primaryC, strokeWidth: 2))
+                : SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+                    child: Text(
+                      _content ?? '',
+                      style: GuidyText.body(subC).copyWith(
+                        height: 1.8,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+          ),
+          // 확인 버튼
+          SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+              child: SizedBox(
+                width: double.infinity,
+                child: GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: primaryC,
+                      borderRadius: GuidyRadius.lgBorder,
+                    ),
+                    child: Center(
+                      child: Text('확인',
+                          style: GuidyText.body(Colors.white)
+                              .copyWith(fontWeight: FontWeight.w700)),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
