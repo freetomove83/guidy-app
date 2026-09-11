@@ -127,6 +127,9 @@ class Exhibition {
   final DateTime? archivedAt;
   final double rating;
   final int reviewCount;
+  /// true이면 아카이브 전시를 결제 없이 무료로 감상할 수 있음.
+  /// 추후 관리자가 개별 전시에 무료 접근을 허용할 때 사용.
+  final bool isFreeAccess;
 
   const Exhibition({
     required this.id,
@@ -145,6 +148,7 @@ class Exhibition {
     this.archivedAt,
     this.rating = 0,
     this.reviewCount = 0,
+    this.isFreeAccess = false,
   });
 }
 
@@ -370,8 +374,13 @@ class DummyData {
   static final List<Exhibition> exhibitions = [
     const Exhibition(id: 'e1', title: '빛과 표면', venue: '북서울미술관', description: '13인의 작가가 빛과 물질의 경계를 탐구합니다. 회화, 설치, 영상을 아우르는 대규모 기획전.', coverSeed: 0, channel: ChannelType.curation, workCount: 18, price: 8000, duration: '55분', isActive: true),
     const Exhibition(id: 'e2', title: '도시의 결', venue: '서울시립미술관', description: '도시의 일상적 풍경 속에서 발견한 패턴과 텍스처를 담은 사진 전시.', coverSeed: 1, channel: ChannelType.creator, creatorId: 'c1', creatorName: '김도슨트', workCount: 24, price: 6000, duration: '40분', isActive: true),
-    const Exhibition(id: 'e3', title: '기억의 지형', venue: '국립현대미술관', description: '종료된 전설적인 전시. 기억, 공간, 시간의 교차점을 탐구한 설치 미술.', coverSeed: 2, channel: ChannelType.archive, workCount: 12, price: 4900, duration: '35분', isActive: false),
+    const Exhibition(id: 'e3', title: '기억의 지형', venue: '국립현대미술관', description: '종료된 전설적인 전시. 기억, 공간, 시간의 교차점을 탐구한 설치 미술.', coverSeed: 2, channel: ChannelType.archive, workCount: 12, price: 4900, duration: '35분', isActive: false, rating: 4.8, reviewCount: 234, isFreeAccess: true),
     const Exhibition(id: 'e4', title: '침묵과 소음', venue: '아트선재센터', description: '소리를 시각화하고 침묵을 청각적으로 경험하는 실험적 전시.', coverSeed: 3, channel: ChannelType.creator, creatorId: 'c2', creatorName: '박수민', workCount: 15, price: 7000, duration: '45분', isActive: true),
+    const Exhibition(id: 'e5', title: '색채의 언어', venue: '리움미술관', description: '20세기 한국 추상화의 거장 4인의 색채 실험을 아카이브한 특별 소장전.', coverSeed: 5, channel: ChannelType.archive, workCount: 20, price: 5500, duration: '50분', isActive: false, rating: 4.6, reviewCount: 187, isFreeAccess: false),
+    const Exhibition(id: 'e6', title: '경계의 조각들', venue: '서울대학교미술관', description: '2023년 종료된 국제 조각 교류전. 한국·독일·일본 조각가 8인의 공간 해석.', coverSeed: 6, channel: ChannelType.archive, workCount: 16, price: 6000, duration: '45분', isActive: false, rating: 4.5, reviewCount: 156, isFreeAccess: false),
+    const Exhibition(id: 'e7', title: '사진의 시간', venue: '고은사진미술관', description: '다큐멘터리 사진 50년사를 되짚는 아카이브 전시. 국내외 보도사진 700여 점 수록.', coverSeed: 7, channel: ChannelType.archive, workCount: 28, price: 4000, duration: '60분', isActive: false, rating: 4.9, reviewCount: 312, isFreeAccess: true),
+    const Exhibition(id: 'e8', title: '도자의 귀환', venue: '이화여대박물관', description: '전통 도자 기법을 현대적 시각으로 재해석한 현대 도예가들의 아카이브 소장전.', coverSeed: 8, channel: ChannelType.archive, workCount: 10, price: 3500, duration: '30분', isActive: false, rating: 4.3, reviewCount: 98, isFreeAccess: false),
+    const Exhibition(id: 'e9', title: '판화의 역사', venue: '국립현대미술관 과천', description: '한국 현대 판화 60년의 역사를 담은 대규모 회고전 아카이브.', coverSeed: 9, channel: ChannelType.archive, workCount: 35, price: 5000, duration: '55분', isActive: false, rating: 4.7, reviewCount: 203, isFreeAccess: false),
   ];
 
   static final List<Artwork> artworks = [

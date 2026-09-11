@@ -31,6 +31,14 @@ class _DetailScreenState extends State<DetailScreen> {
     final userStore = context.watch<UserStore>();
     final isFav  = userStore.isFavorite(widget.exhibitionId);
     final isLiked = userStore.isLiked(widget.exhibitionId);
+    // 구매 여부 (취소되지 않은 구매)
+    final hasPurchased = userStore.purchases.any((p) =>
+        p.exhibitionId == widget.exhibitionId &&
+        p.status != PurchaseStatus.cancelled);
+    // 무료 감상 가능 = price==0 OR isFreeAccess
+    final canAccessFree = exhibition.price == 0 || exhibition.isFreeAccess;
+    // 이미 접근 가능 (=구매완료 or 무료)
+    final canPlay = hasPurchased || canAccessFree;
 
     final isDark    = Theme.of(context).brightness == Brightness.dark;
     final bgC       = isDark ? GuidyColors.darkBg      : GuidyColors.bg;
@@ -312,68 +320,126 @@ class _DetailScreenState extends State<DetailScreen> {
                 border: Border(top: BorderSide(color: lineC)),
                 boxShadow: GuidyShadow.up,
               ),
-              child: Row(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  PillButton(
-                    label: '미리듣기',
-                    size: 'md',
-                    onPressed: () => Navigator.pushNamed(context, '/player/$firstArtworkId'),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        // 구매 처리 (UserStore에 추가)
-                        final purchase = Purchase(
-                          id: 'p_${DateTime.now().millisecondsSinceEpoch}',
-                          exhibitionId: widget.exhibitionId,
-                          exhibitionTitle: exhibition.title,
-                          venueName: exhibition.venue,
-                          coverSeed: exhibition.coverSeed,
-                          pricePaid: exhibition.price,
-                          purchasedAt: DateTime.now(),
-                          status: PurchaseStatus.unused,
-                        );
-                        context.read<UserStore>().addPurchase(purchase);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('「${exhibition.title}」 구매가 완료되었습니다'),
-                            backgroundColor: GuidyColors.ok,
-                          ),
-                        );
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        decoration: BoxDecoration(
-                          color: isDark ? GuidyColors.darkText : GuidyColors.ink,
-                          borderRadius: GuidyRadius.pillBorder,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.shopping_bag_outlined,
-                              color: isDark ? GuidyColors.darkBg : Colors.white,
-                              size: 18),
-                            const SizedBox(width: 6),
-                            Text(
-                              exhibition.price == 0
-                                  ? '무료로 감상하기'
-                                  : '₩${_formatPrice(exhibition.price)} 구매',
-                              style: TextStyle(
-                                color: isDark ? GuidyColors.darkBg : Colors.white,
-                                fontSize: 15, fontWeight: FontWeight.w800,
-                                fontFamily: GuidyText.fontFamily,
-                              ),
+                  // 아카이브 무료 접근 안내 배너
+                  if (exhibition.channel == ChannelType.archive &&
+                      exhibition.isFreeAccess && !hasPurchased)
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: GuidyColors.ok.withValues(alpha: 0.10),
+                        borderRadius: GuidyRadius.mdBorder,
+                        border: Border.all(
+                            color: GuidyColors.ok.withValues(alpha: 0.3)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.lock_open_rounded,
+                              color: GuidyColors.ok, size: 14),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              '이 아카이브 전시는 무료로 감상할 수 있습니다.',
+                              style: GuidyText.small(GuidyColors.ok)
+                                  .copyWith(fontWeight: FontWeight.w600),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
+
+                  Row(
+                    children: [
+                      // 이미 접근 가능하면 미리듣기 버튼 불필요
+                      if (!canPlay) ...[
+                        PillButton(
+                          label: '미리듣기',
+                          size: 'md',
+                          onPressed: () => Navigator.pushNamed(
+                              context, '/player/$firstArtworkId'),
+                        ),
+                        const SizedBox(width: 10),
+                      ],
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            if (canPlay) {
+                              // 이미 접근 가능 → 바로 재생
+                              Navigator.pushNamed(
+                                  context, '/player/$firstArtworkId');
+                            } else {
+                              // 유료 구매 처리
+                              final purchase = Purchase(
+                                id: 'p_${DateTime.now().millisecondsSinceEpoch}',
+                                exhibitionId: widget.exhibitionId,
+                                exhibitionTitle: exhibition.title,
+                                venueName: exhibition.venue,
+                                coverSeed: exhibition.coverSeed,
+                                pricePaid: exhibition.price,
+                                purchasedAt: DateTime.now(),
+                                status: PurchaseStatus.unused,
+                              );
+                              context.read<UserStore>().addPurchase(purchase);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('「${exhibition.title}」 구매가 완료되었습니다'),
+                                  backgroundColor: GuidyColors.ok,
+                                ),
+                              );
+                            }
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            decoration: BoxDecoration(
+                              // 무료/이미구매 → 녹색, 유료구매 → 기본
+                              color: canPlay
+                                  ? GuidyColors.ok
+                                  : (isDark
+                                      ? GuidyColors.darkText
+                                      : GuidyColors.ink),
+                              borderRadius: GuidyRadius.pillBorder,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  canPlay
+                                      ? Icons.play_arrow_rounded
+                                      : Icons.shopping_bag_outlined,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  canPlay
+                                      ? '지금 바로 듣기'
+                                      : (exhibition.price == 0
+                                          ? '무료로 감상하기'
+                                          : '₩${_formatPrice(exhibition.price)} 구매'),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w800,
+                                    fontFamily: GuidyText.fontFamily,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
           ),
+
         ],
       ),
     );

@@ -433,13 +433,184 @@ class _ArchiveTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark    = Theme.of(context).brightness == Brightness.dark;
+    final bgC       = isDark ? GuidyColors.darkBg      : GuidyColors.bg;
+    final textC     = isDark ? GuidyColors.darkText     : GuidyColors.ink;
+    final subC      = isDark ? GuidyColors.darkSub      : GuidyColors.sub;
+    final muteC     = isDark ? GuidyColors.darkMute     : GuidyColors.mute;
+    final surfaceC  = isDark ? GuidyColors.darkSurface  : GuidyColors.surface;
+    final lineC     = isDark ? GuidyColors.darkLine     : GuidyColors.line;
+    final primaryC  = isDark ? GuidyColors.darkPrimary  : GuidyColors.primary;
+
     final archives = DummyData.exhibitions
         .where((e) => e.channel == ChannelType.archive)
         .toList();
 
-    return _ExhibitionListTab(
-      items: archives,
-      emptyMessage: '아카이브된 전시가 없습니다',
+    if (archives.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.inventory_2_outlined, size: 48, color: muteC),
+            const SizedBox(height: 12),
+            Text('아카이브된 전시가 없습니다', style: GuidyText.body(muteC)),
+          ],
+        ),
+      );
+    }
+
+    return CustomScrollView(
+      slivers: [
+        // ─── 상단 안내 배너 ─────────────────────────────
+        SliverToBoxAdapter(
+          child: Container(
+            margin: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: surfaceC,
+              borderRadius: GuidyRadius.lgBorder,
+              border: Border.all(color: lineC),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 32, height: 32,
+                  decoration: BoxDecoration(
+                    color: primaryC.withValues(alpha: 0.10),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(Icons.inventory_2_outlined,
+                      size: 16, color: primaryC),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('아카이브 전시',
+                          style: GuidyText.body(textC)
+                              .copyWith(fontWeight: FontWeight.w700)),
+                      const SizedBox(height: 3),
+                      Text(
+                        '종료된 전시의 오디오 가이드를 기록으로 보존합니다.\n'
+                        '일부 전시는 무료로 감상할 수 있습니다.',
+                        style: GuidyText.small(subC).copyWith(height: 1.5),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        // ─── 무료/유료 구분 범례 ─────────────────────────
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: GuidyColors.ok.withValues(alpha: 0.12),
+                    borderRadius: GuidyRadius.pillBorder,
+                    border: Border.all(
+                        color: GuidyColors.ok.withValues(alpha: 0.3)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.lock_open_rounded,
+                          size: 11, color: GuidyColors.ok),
+                      const SizedBox(width: 4),
+                      Text('무료 감상',
+                          style: GuidyText.kicker(GuidyColors.ok)
+                              .copyWith(fontWeight: FontWeight.w700)),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text('표시된 전시는 결제 없이 감상 가능',
+                    style: GuidyText.small(muteC)),
+              ],
+            ),
+          ),
+        ),
+
+        // ─── 전시 그리드 ─────────────────────────────────
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 100),
+          sliver: SliverGrid(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 0.62,
+              crossAxisSpacing: 14,
+              mainAxisSpacing: 14,
+            ),
+            delegate: SliverChildBuilderDelegate(
+              (context, i) => _ArchiveCard(
+                exhibition: archives[i],
+                onTap: () => Navigator.pushNamed(
+                    context, '/detail/${archives[i].id}'),
+              ),
+              childCount: archives.length,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ─── 아카이브 전용 카드 (무료 배지 오버레이) ─────────────────
+class _ArchiveCard extends StatelessWidget {
+  final Exhibition exhibition;
+  final VoidCallback onTap;
+  const _ArchiveCard({required this.exhibition, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        // 기본 ExhibitionCard
+        ExhibitionCard(exhibition: exhibition, onTap: onTap),
+        // 무료 감상 배지 오버레이
+        if (exhibition.isFreeAccess)
+          Positioned(
+            bottom: 10, left: 0, right: 0,
+            child: Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: GuidyColors.ok,
+                  borderRadius: GuidyRadius.pillBorder,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.15),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.lock_open_rounded,
+                        size: 11, color: Colors.white),
+                    const SizedBox(width: 4),
+                    Text('무료 감상',
+                        style: GuidyText.kicker(Colors.white)
+                            .copyWith(fontWeight: FontWeight.w800)),
+                  ],
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }
