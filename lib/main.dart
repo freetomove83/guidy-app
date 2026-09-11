@@ -7,6 +7,7 @@ import 'theme/app_theme.dart';
 import 'theme/theme_provider.dart';
 import 'services/audio_service.dart';
 import 'models/app_store.dart';
+import 'models/user_store.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/detail/detail_screen.dart';
 import 'screens/player/player_screen.dart';
@@ -21,18 +22,26 @@ import 'screens/auth/signup_screen.dart';
 import 'screens/search/search_screen.dart';
 import 'screens/splash/splash_screen.dart';
 import 'screens/notifications/notifications_screen.dart';
+import 'screens/creator_guides/creator_guides_screen.dart';
+import 'screens/section/section_detail_screen.dart';
+import 'screens/mypage/my_page_screen.dart';
 import 'widgets/common_widgets.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final appStore = AppStore();
-  await appStore.init(); // localStorage에서 CMS 추가 항목 불러오기
+  final appStore  = AppStore();
+  final userStore = UserStore();
+  await Future.wait([
+    appStore.init(),   // localStorage에서 CMS 추가 항목 불러오기
+    userStore.init(),  // localStorage에서 사용자 개인화 데이터 복원
+  ]);
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => GuidyAudioService()),
         ChangeNotifierProvider.value(value: appStore),
+        ChangeNotifierProvider.value(value: userStore),
       ],
       child: const GuidyApp(),
     ),
@@ -104,6 +113,14 @@ class GuidyApp extends StatelessWidget {
       page = const SearchScreen();
     } else if (name == '/notifications') {
       page = const NotificationsScreen();
+    } else if (name.startsWith('/creator-guides/')) {
+      final id = name.replaceFirst('/creator-guides/', '');
+      page = CreatorGuidesScreen(exhibitionId: id);
+    } else if (name.startsWith('/section/')) {
+      final id = name.replaceFirst('/section/', '');
+      page = SectionDetailScreen(sectionId: id);
+    } else if (name == '/mypage') {
+      page = const MyPageScreen();
     } else {
       page = const MainShell();
     }
@@ -287,7 +304,7 @@ class _SettingsPage extends StatelessWidget {
 
             // 프로필 카드 (탭 시 로그인 화면)
             GestureDetector(
-              onTap: () => Navigator.pushNamed(context, '/login'),
+              onTap: () => Navigator.pushNamed(context, '/mypage'),
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(

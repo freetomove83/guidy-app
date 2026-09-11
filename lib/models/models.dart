@@ -202,6 +202,49 @@ class CreatorGuide {
   });
 }
 
+// ─── 구매 내역 ───────────────────────────────────────────
+enum PurchaseStatus { active, unused, cancelled }
+
+class Purchase {
+  final String id;
+  final String exhibitionId;
+  final String exhibitionTitle;
+  final String venueName;
+  final int coverSeed;
+  final int pricePaid;
+  final DateTime purchasedAt;
+  final PurchaseStatus status;
+  final DateTime? cancelledAt;
+
+  const Purchase({
+    required this.id,
+    required this.exhibitionId,
+    required this.exhibitionTitle,
+    required this.venueName,
+    required this.coverSeed,
+    required this.pricePaid,
+    required this.purchasedAt,
+    this.status = PurchaseStatus.unused,
+    this.cancelledAt,
+  });
+
+  bool get isCancellable =>
+      status == PurchaseStatus.unused;
+
+  Purchase copyWith({PurchaseStatus? status, DateTime? cancelledAt}) =>
+      Purchase(
+        id: id,
+        exhibitionId: exhibitionId,
+        exhibitionTitle: exhibitionTitle,
+        venueName: venueName,
+        coverSeed: coverSeed,
+        pricePaid: pricePaid,
+        purchasedAt: purchasedAt,
+        status: status ?? this.status,
+        cancelledAt: cancelledAt ?? this.cancelledAt,
+      );
+}
+
 // ─── 더미 데이터 ─────────────────────────────────────────
 class DummyData {
   static final List<Creator> creators = [
@@ -247,5 +290,146 @@ class DummyData {
     FeedItem(id: 'f1', creator: creators[0], type: FeedItemType.newGuide, title: '새 가이드: 빛과 표면', description: '북서울미술관 기획전 오디오 가이드를 새로 출시했습니다. 13명 작가의 이야기를 55분 동안 담았어요.', exhibition: exhibitions[0], time: DateTime.now().subtract(const Duration(hours: 2)), likes: 128, plays: 892),
     FeedItem(id: 'f2', creator: creators[1], type: FeedItemType.announcement, title: '이번 주 라이브 해설', description: '이번 주 토요일 오후 2시, 서울시립미술관에서 라이브 해설 진행합니다. 현장에서 만나요!', time: DateTime.now().subtract(const Duration(hours: 6)), likes: 64, plays: 0),
     FeedItem(id: 'f3', creator: creators[2], type: FeedItemType.newGuide, title: '도시의 결 가이드 업데이트', description: '큐레이터 인터뷰 추가 및 작가 노트 보완. 더욱 깊은 감상 경험을 선사합니다.', exhibition: exhibitions[1], time: DateTime.now().subtract(const Duration(days: 1)), likes: 45, plays: 312),
+  ];
+
+  // ─── 섹션 더미 데이터 ──────────────────────────────────
+  static final List<ExhibitionSection> sections = [
+    // e1: 빛과 표면
+    const ExhibitionSection(
+      id: 's1', exhibitionId: 'e1', order: 1,
+      title: '입구 · 프롤로그',
+      description: '빛이 물질 위에 남기는 첫 번째 흔적. 전시의 시작점으로, 13인 작가가 공유하는 공통 질문을 소개합니다. 관람객이 이 공간에 들어서는 순간부터 감각이 열리기 시작합니다.',
+      imageSeed: 20,
+      artworkIds: ['a1'],
+    ),
+    const ExhibitionSection(
+      id: 's2', exhibitionId: 'e1', order: 2,
+      title: '메인 갤러리 · 물질의 기억',
+      description: '빛과 물질이 교차하는 핵심 작품들이 모인 공간. 오세열과 양혜규의 대형 설치작이 서로 대화를 나누듯 배치되어 있습니다. 두 작품 사이의 공간을 천천히 걷는 경험을 추천합니다.',
+      imageSeed: 21,
+      artworkIds: ['a1', 'a2'],
+    ),
+    const ExhibitionSection(
+      id: 's3', exhibitionId: 'e1', order: 3,
+      title: '특별전시실 · 빛의 언어',
+      description: '미디어 설치와 퍼포먼스 기록이 함께하는 특별 섹션. 참여 작가들의 작업 노트와 스케치가 함께 전시되어 창작 과정의 이면을 들여다볼 수 있습니다.',
+      imageSeed: 22,
+      artworkIds: ['a2'],
+    ),
+    // e2: 도시의 결
+    const ExhibitionSection(
+      id: 's4', exhibitionId: 'e2', order: 1,
+      title: '1부 · 도시의 표면',
+      description: '콘크리트, 아스팔트, 유리창에 새겨진 시간의 흔적. 임동식 작가가 10년간 기록한 서울의 표피를 대형 인화로 만납니다.',
+      imageSeed: 23,
+      artworkIds: [],
+    ),
+    const ExhibitionSection(
+      id: 's5', exhibitionId: 'e2', order: 2,
+      title: '2부 · 소음과 침묵 사이',
+      description: '도시의 소리를 색으로 번역한 시리즈. 사운드 스펙트럼을 시각 데이터로 변환해 캔버스 위에 펼쳐낸 독창적인 작업입니다.',
+      imageSeed: 24,
+      artworkIds: [],
+    ),
+  ];
+
+  // ─── 크리에이터 가이드 더미 데이터 ────────────────────
+  static final List<CreatorGuide> creatorGuides = [
+    // e1: 빛과 표면 — 크리에이터 가이드
+    const CreatorGuide(
+      id: 'cg1',
+      exhibitionId: 'e1',
+      creatorId: 'c1',
+      creatorName: '김도슨트',
+      creatorTitle: '미술사 큐레이터',
+      avatarColor: '#0B3D5C',
+      isVerified: true,
+      guideTitle: '빛과 표면: 큐레이터의 시선',
+      description: '13인 작가 개인 인터뷰 기반의 심층 해설. 전시 기획 의도부터 작품 배치의 숨은 맥락까지 담았습니다.',
+      durationSec: 3120,
+      plays: 4280,
+      rating: 4.9,
+      firstArtworkId: 'a1',
+    ),
+    const CreatorGuide(
+      id: 'cg2',
+      exhibitionId: 'e1',
+      creatorId: 'c2',
+      creatorName: '박수민',
+      creatorTitle: '아트 유튜버',
+      avatarColor: '#D97757',
+      isVerified: true,
+      guideTitle: '빛과 표면: 유튜버의 솔직 리뷰',
+      description: '2시간 현장 탐방의 솔직한 감상. MZ 관람객 관점에서 꼭 봐야 할 작품과 포토스팟을 알려드립니다.',
+      durationSec: 2400,
+      plays: 2150,
+      rating: 4.7,
+      firstArtworkId: 'a2',
+    ),
+    // e2: 도시의 결 — 크리에이터 가이드
+    const CreatorGuide(
+      id: 'cg3',
+      exhibitionId: 'e2',
+      creatorId: 'c3',
+      creatorName: '이현우',
+      creatorTitle: '갤러리 관장',
+      avatarColor: '#2F8F5C',
+      isVerified: false,
+      guideTitle: '도시의 결: 컬렉터의 관점',
+      description: '작품 가치와 시장성을 함께 분석. 컬렉터가 주목하는 신진 작가들의 숨은 가능성을 짚어드립니다.',
+      durationSec: 2640,
+      plays: 1890,
+      rating: 4.6,
+    ),
+    // e4: 침묵과 소음 — 크리에이터 가이드
+    const CreatorGuide(
+      id: 'cg4',
+      exhibitionId: 'e4',
+      creatorId: 'c4',
+      creatorName: '정재원',
+      creatorTitle: '독립 큐레이터',
+      avatarColor: '#7D6A94',
+      isVerified: false,
+      guideTitle: '침묵과 소음: 소외된 서사',
+      description: '주류 미술계가 외면한 작가들의 목소리. 사운드 아트의 역사적 맥락과 현재적 의미를 탐구합니다.',
+      durationSec: 2880,
+      plays: 980,
+      rating: 4.8,
+    ),
+  ];
+
+  // ─── 구매 더미 데이터 ──────────────────────────────────
+  static final List<Purchase> purchases = [
+    Purchase(
+      id: 'p1',
+      exhibitionId: 'e1',
+      exhibitionTitle: '빛과 표면',
+      venueName: '북서울미술관',
+      coverSeed: 0,
+      pricePaid: 8000,
+      purchasedAt: DateTime.now().subtract(const Duration(days: 3)),
+      status: PurchaseStatus.active,
+    ),
+    Purchase(
+      id: 'p2',
+      exhibitionId: 'e2',
+      exhibitionTitle: '도시의 결',
+      venueName: '서울시립미술관',
+      coverSeed: 1,
+      pricePaid: 6000,
+      purchasedAt: DateTime.now().subtract(const Duration(days: 10)),
+      status: PurchaseStatus.unused,
+    ),
+    Purchase(
+      id: 'p3',
+      exhibitionId: 'e3',
+      exhibitionTitle: '기억의 지형',
+      venueName: '국립현대미술관',
+      coverSeed: 2,
+      pricePaid: 4900,
+      purchasedAt: DateTime.now().subtract(const Duration(days: 30)),
+      status: PurchaseStatus.cancelled,
+      cancelledAt: DateTime.now().subtract(const Duration(days: 28)),
+    ),
   ];
 }

@@ -1,9 +1,12 @@
 // lib/screens/library/library_screen.dart
-// 내 서재 화면
+// 내 서재 화면 — 컬렉션 / 이어듣기 / 즐겨찾기 / 크리에이터
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../theme/app_theme.dart';
 import '../../models/models.dart';
+import '../../models/app_store.dart';
+import '../../models/user_store.dart';
 import '../../widgets/common_widgets.dart';
 
 class LibraryScreen extends StatefulWidget {
@@ -15,13 +18,13 @@ class LibraryScreen extends StatefulWidget {
 
 class _LibraryScreenState extends State<LibraryScreen> {
   int _tabIndex = 0;
-  final _tabs = ['컬렉션', '이어듣기', '즐겨찾기'];
+  final _tabs = ['컬렉션', '이어듣기', '즐겨찾기', '크리에이터'];
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgC = isDark ? GuidyColors.darkBg : GuidyColors.bg;
-    final lineC = isDark ? GuidyColors.darkLine : GuidyColors.line;
+    final bgC    = isDark ? GuidyColors.darkBg   : GuidyColors.bg;
+    final lineC  = isDark ? GuidyColors.darkLine  : GuidyColors.line;
 
     return Scaffold(
       backgroundColor: bgC,
@@ -40,11 +43,10 @@ class _LibraryScreenState extends State<LibraryScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
                   children: List.generate(_tabs.length, (i) {
-                    final isA = i == _tabIndex;
-                    final isDark2 = isDark;
-                    final textC = isDark2 ? GuidyColors.darkText : GuidyColors.ink;
-                    final muteC = isDark2 ? GuidyColors.darkMute : GuidyColors.mute;
-                    final primaryC = isDark2 ? GuidyColors.darkPrimary : GuidyColors.primary;
+                    final isA    = i == _tabIndex;
+                    final textC  = isDark ? GuidyColors.darkText  : GuidyColors.ink;
+                    final muteC  = isDark ? GuidyColors.darkMute  : GuidyColors.mute;
+                    final primaryC = isDark ? GuidyColors.darkPrimary : GuidyColors.primary;
                     return GestureDetector(
                       onTap: () => setState(() => _tabIndex = i),
                       child: Container(
@@ -74,6 +76,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
                   _CollectionTab(),
                   _ContinueTab(),
                   _FavoritesTab(),
+                  _CreatorsTab(),
                 ],
               ),
             ),
@@ -84,18 +87,20 @@ class _LibraryScreenState extends State<LibraryScreen> {
   }
 }
 
-// 컬렉션 탭
+// ─── 컬렉션 탭 ───────────────────────────────────────────
 class _CollectionTab extends StatelessWidget {
   const _CollectionTab();
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textC = isDark ? GuidyColors.darkText : GuidyColors.ink;
-    final subC = isDark ? GuidyColors.darkSub : GuidyColors.sub;
-    final muteC = isDark ? GuidyColors.darkMute : GuidyColors.mute;
-    final lineC = isDark ? GuidyColors.darkLine : GuidyColors.line;
+    final isDark   = Theme.of(context).brightness == Brightness.dark;
+    final textC    = isDark ? GuidyColors.darkText    : GuidyColors.ink;
+    final subC     = isDark ? GuidyColors.darkSub     : GuidyColors.sub;
+    final muteC    = isDark ? GuidyColors.darkMute    : GuidyColors.mute;
+    final lineC    = isDark ? GuidyColors.darkLine    : GuidyColors.line;
     final surfaceC = isDark ? GuidyColors.darkSurface : GuidyColors.surface;
+    final store    = context.read<AppStore>();
+    final exhibitions = store.exhibitions;
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(0, 16, 0, 100),
@@ -113,9 +118,9 @@ class _CollectionTab extends StatelessWidget {
               crossAxisSpacing: 14,
               mainAxisSpacing: 14,
             ),
-            itemCount: DummyData.exhibitions.where((e) => e.isActive).length,
+            itemCount: exhibitions.where((e) => e.isActive).length,
             itemBuilder: (context, i) {
-              final items = DummyData.exhibitions.where((e) => e.isActive).toList();
+              final items = exhibitions.where((e) => e.isActive).toList();
               return ExhibitionCard(
                 exhibition: items[i],
                 onTap: () => Navigator.pushNamed(context, '/detail/${items[i].id}'),
@@ -128,7 +133,7 @@ class _CollectionTab extends StatelessWidget {
 
         // 내 아카이브
         const SectionHeader(title: '내 아카이브'),
-        ...DummyData.exhibitions
+        ...exhibitions
             .where((e) => e.channel == ChannelType.archive)
             .map((e) => Container(
               margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
@@ -151,7 +156,8 @@ class _CollectionTab extends StatelessWidget {
                         children: [
                           const ChannelBadge(type: ChannelType.archive),
                           const SizedBox(height: 4),
-                          Text(e.title, style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w700),
+                          Text(e.title,
+                            style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w700),
                             maxLines: 1, overflow: TextOverflow.ellipsis),
                           Text(e.venue, style: GuidyText.small(subC)),
                         ],
@@ -167,23 +173,24 @@ class _CollectionTab extends StatelessWidget {
   }
 }
 
-// 이어듣기 탭
+// ─── 이어듣기 탭 ─────────────────────────────────────────
 class _ContinueTab extends StatelessWidget {
   const _ContinueTab();
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textC = isDark ? GuidyColors.darkText : GuidyColors.ink;
-    final subC = isDark ? GuidyColors.darkSub : GuidyColors.sub;
-    final muteC = isDark ? GuidyColors.darkMute : GuidyColors.mute;
-    final lineC = isDark ? GuidyColors.darkLine : GuidyColors.line;
+    final isDark   = Theme.of(context).brightness == Brightness.dark;
+    final textC    = isDark ? GuidyColors.darkText    : GuidyColors.ink;
+    final subC     = isDark ? GuidyColors.darkSub     : GuidyColors.sub;
+    final muteC    = isDark ? GuidyColors.darkMute    : GuidyColors.mute;
+    final lineC    = isDark ? GuidyColors.darkLine    : GuidyColors.line;
     final surfaceC = isDark ? GuidyColors.darkSurface : GuidyColors.surface;
-    final accentC = isDark ? GuidyColors.darkAccent : GuidyColors.accent;
+    final accentC  = isDark ? GuidyColors.darkAccent  : GuidyColors.accent;
+    final artworks = context.read<AppStore>().artworks;
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
-      children: DummyData.artworks.map((a) => Container(
+      children: artworks.map((a) => Container(
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
@@ -197,7 +204,8 @@ class _ContinueTab extends StatelessWidget {
             children: [
               Stack(
                 children: [
-                  GuidyCover(seed: a.imageSeed, width: 60, height: 60, borderRadius: GuidyRadius.lgBorder),
+                  GuidyCover(seed: a.imageSeed, width: 60, height: 60,
+                    borderRadius: GuidyRadius.lgBorder),
                   Positioned.fill(
                     child: Container(
                       decoration: BoxDecoration(
@@ -216,7 +224,8 @@ class _ContinueTab extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(a.title, style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w700)),
+                    Text(a.title,
+                      style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w700)),
                     Text(a.artist, style: GuidyText.small(subC)),
                     const SizedBox(height: 6),
                     ClipRRect(
@@ -242,30 +251,272 @@ class _ContinueTab extends StatelessWidget {
   }
 }
 
-// 즐겨찾기 탭
+// ─── 즐겨찾기 탭 ─────────────────────────────────────────
 class _FavoritesTab extends StatelessWidget {
   const _FavoritesTab();
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final muteC = isDark ? GuidyColors.darkMute : GuidyColors.mute;
+    final userStore  = context.watch<UserStore>();
+    final store      = context.read<AppStore>();
+    final favorites  = userStore.favorites;
+    final isDark     = Theme.of(context).brightness == Brightness.dark;
+    final textC      = isDark ? GuidyColors.darkText     : GuidyColors.ink;
+    final subC       = isDark ? GuidyColors.darkSub      : GuidyColors.sub;
+    final muteC      = isDark ? GuidyColors.darkMute     : GuidyColors.mute;
+    final lineC      = isDark ? GuidyColors.darkLine     : GuidyColors.line;
+    final surfaceC   = isDark ? GuidyColors.darkSurface  : GuidyColors.surface;
+    final accentC    = isDark ? GuidyColors.darkAccent   : GuidyColors.accent;
 
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.bookmark_outlined, size: 64, color: muteC),
-          const SizedBox(height: 12),
-          Text('즐겨찾기한 가이드가 없습니다', style: GuidyText.body(muteC)),
-          const SizedBox(height: 8),
-          PillButton(
-            label: '가이드 탐색하기',
-            primary: true,
-            onPressed: () => Navigator.pushNamed(context, '/'),
+    if (favorites.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.bookmark_outlined, size: 64, color: muteC),
+            const SizedBox(height: 12),
+            Text('즐겨찾기한 가이드가 없습니다', style: GuidyText.body(muteC)),
+            const SizedBox(height: 8),
+            Text('전시 상세에서 북마크 버튼을 눌러 저장하세요',
+              style: GuidyText.small(muteC)),
+            const SizedBox(height: 16),
+            PillButton(
+              label: '가이드 탐색하기',
+              primary: true,
+              onPressed: () => Navigator.pushNamed(context, '/'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final favExhibitions = favorites
+        .map((id) => store.exhibitionById(id))
+        .whereType<Exhibition>()
+        .toList();
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
+      children: [
+        Text('즐겨찾기한 전시 ${favExhibitions.length}개',
+          style: GuidyText.small(muteC)),
+        const SizedBox(height: 12),
+        ...favExhibitions.map((e) => Container(
+          margin: const EdgeInsets.only(bottom: 10),
+          decoration: BoxDecoration(
+            color: surfaceC,
+            borderRadius: GuidyRadius.lgBorder,
+            border: Border.all(color: lineC),
           ),
-        ],
-      ),
+          child: GestureDetector(
+            onTap: () => Navigator.pushNamed(context, '/detail/${e.id}'),
+            child: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: const BorderRadius.horizontal(
+                    left: Radius.circular(12),
+                  ),
+                  child: GuidyCover(
+                    seed: e.coverSeed,
+                    width: 80, height: 80,
+                    borderRadius: BorderRadius.zero,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ChannelBadge(type: e.channel),
+                      const SizedBox(height: 4),
+                      Text(e.title,
+                        style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w700),
+                        maxLines: 1, overflow: TextOverflow.ellipsis),
+                      Text(e.venue, style: GuidyText.small(subC)),
+                      const SizedBox(height: 4),
+                      Text(e.price == 0
+                        ? '무료'
+                        : '₩${_formatPrice(e.price)}',
+                        style: GuidyText.kicker(accentC)
+                          .copyWith(fontWeight: FontWeight.w700)),
+                    ],
+                  ),
+                ),
+                // 즐겨찾기 해제
+                GestureDetector(
+                  onTap: () => context.read<UserStore>().toggleFavorite(e.id),
+                  child: Padding(
+                    padding: const EdgeInsets.all(14),
+                    child: Icon(Icons.bookmark_rounded, color: accentC, size: 20),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        )),
+      ],
     );
+  }
+
+  String _formatPrice(int price) {
+    final s = price.toString();
+    final buf = StringBuffer();
+    for (int i = 0; i < s.length; i++) {
+      if (i > 0 && (s.length - i) % 3 == 0) buf.write(',');
+      buf.write(s[i]);
+    }
+    return buf.toString();
+  }
+}
+
+// ─── 크리에이터 탭 ───────────────────────────────────────
+class _CreatorsTab extends StatelessWidget {
+  const _CreatorsTab();
+
+  @override
+  Widget build(BuildContext context) {
+    final userStore  = context.watch<UserStore>();
+    final following  = userStore.following;
+    final isDark     = Theme.of(context).brightness == Brightness.dark;
+    final textC      = isDark ? GuidyColors.darkText     : GuidyColors.ink;
+    final subC       = isDark ? GuidyColors.darkSub      : GuidyColors.sub;
+    final muteC      = isDark ? GuidyColors.darkMute     : GuidyColors.mute;
+    final lineC      = isDark ? GuidyColors.darkLine     : GuidyColors.line;
+    final surfaceC   = isDark ? GuidyColors.darkSurface  : GuidyColors.surface;
+    final accentC    = isDark ? GuidyColors.darkAccent   : GuidyColors.accent;
+
+    if (following.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.people_outline_rounded, size: 64, color: muteC),
+            const SizedBox(height: 12),
+            Text('팔로우한 크리에이터가 없습니다', style: GuidyText.body(muteC)),
+            const SizedBox(height: 8),
+            Text('크리에이터 가이드에서 팔로우를 눌러보세요',
+              style: GuidyText.small(muteC)),
+          ],
+        ),
+      );
+    }
+
+    // 팔로우 중인 크리에이터 목록 (DummyData에서)
+    final followedCreators = DummyData.creators
+        .where((c) => following.contains(c.id))
+        .toList();
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
+      children: [
+        Text('팔로우 중인 크리에이터 ${followedCreators.length}명',
+          style: GuidyText.small(muteC)),
+        const SizedBox(height: 12),
+        ...followedCreators.map((creator) {
+          Color avatarColor;
+          try {
+            final hex = creator.avatarColor.replaceFirst('#', '');
+            avatarColor = Color(int.parse('FF$hex', radix: 16));
+          } catch (_) {
+            avatarColor = GuidyColors.primary;
+          }
+
+          return Container(
+            margin: const EdgeInsets.only(bottom: 10),
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: surfaceC,
+              borderRadius: GuidyRadius.lgBorder,
+              border: Border.all(color: lineC),
+            ),
+            child: GestureDetector(
+              onTap: () => Navigator.pushNamed(context, '/creator/${creator.id}'),
+              child: Row(
+                children: [
+                  Container(
+                    width: 52, height: 52,
+                    decoration: BoxDecoration(
+                      color: avatarColor.withValues(alpha: 0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Text(
+                        creator.name.isNotEmpty ? creator.name[0] : 'C',
+                        style: TextStyle(
+                          color: avatarColor,
+                          fontSize: 20, fontWeight: FontWeight.w800,
+                          fontFamily: GuidyText.fontFamily,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Text(creator.name,
+                              style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w700)),
+                            if (creator.isVerified) ...[
+                              const SizedBox(width: 4),
+                              const Icon(Icons.verified_rounded,
+                                size: 14, color: GuidyColors.accent),
+                            ],
+                          ],
+                        ),
+                        Text(creator.title, style: GuidyText.small(subC)),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            _stat(Icons.people_outline_rounded,
+                              _formatCount(creator.followerCount), muteC),
+                            const SizedBox(width: 10),
+                            _stat(Icons.headphones_outlined,
+                              '${creator.guideCount}개 가이드', muteC),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  // 언팔로우 버튼
+                  GestureDetector(
+                    onTap: () => context.read<UserStore>().toggleFollow(creator.id),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: surfaceC,
+                        borderRadius: GuidyRadius.pillBorder,
+                        border: Border.all(color: lineC),
+                      ),
+                      child: Text('팔로잉',
+                        style: GuidyText.kicker(muteC).copyWith(fontWeight: FontWeight.w700)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
+  Widget _stat(IconData icon, String label, Color color) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 12, color: color),
+        const SizedBox(width: 3),
+        Text(label, style: GuidyText.kicker(color)),
+      ],
+    );
+  }
+
+  String _formatCount(int n) {
+    if (n >= 10000) return '${(n / 10000).toStringAsFixed(1)}만';
+    if (n >= 1000)  return '${(n / 1000).toStringAsFixed(1)}천';
+    return n.toString();
   }
 }

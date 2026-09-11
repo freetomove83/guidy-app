@@ -10,6 +10,8 @@ const _kSharedArtworks = 'guidy_shared_artworks';
 class AppStore extends ChangeNotifier {
   final List<Exhibition> _exhibitions = List<Exhibition>.from(DummyData.exhibitions);
   final List<Artwork> _artworks = List<Artwork>.from(DummyData.artworks);
+  final List<ExhibitionSection> _sections = List<ExhibitionSection>.from(DummyData.sections);
+  final List<CreatorGuide> _creatorGuides = List<CreatorGuide>.from(DummyData.creatorGuides);
 
   // ── 초기화: localStorage에서 CMS 추가 항목 읽기 ──────────
   Future<void> init() async {
@@ -39,12 +41,23 @@ class AppStore extends ChangeNotifier {
   // ── Getters ────────────────────────────────────────────
   List<Exhibition> get exhibitions => List.unmodifiable(_exhibitions);
   List<Artwork> get artworks => List.unmodifiable(_artworks);
+  List<ExhibitionSection> get sections => List.unmodifiable(_sections);
+  List<CreatorGuide> get creatorGuides => List.unmodifiable(_creatorGuides);
 
   List<Exhibition> get activeExhibitions =>
       _exhibitions.where((e) => e.isActive).toList();
 
   List<Artwork> artworksFor(String exhibitionId) =>
       _artworks.where((a) => a.exhibitionId == exhibitionId).toList();
+
+  List<ExhibitionSection> sectionsFor(String exhibitionId) {
+    final list = _sections.where((s) => s.exhibitionId == exhibitionId).toList();
+    list.sort((a, b) => a.order.compareTo(b.order));
+    return list;
+  }
+
+  List<CreatorGuide> creatorGuidesFor(String exhibitionId) =>
+      _creatorGuides.where((g) => g.exhibitionId == exhibitionId).toList();
 
   Exhibition? exhibitionById(String id) {
     try { return _exhibitions.firstWhere((e) => e.id == id); }
@@ -54,6 +67,16 @@ class AppStore extends ChangeNotifier {
   Artwork? artworkById(String id) {
     try { return _artworks.firstWhere((a) => a.id == id); }
     catch (_) { return _artworks.isNotEmpty ? _artworks.first : null; }
+  }
+
+  ExhibitionSection? sectionById(String id) {
+    try { return _sections.firstWhere((s) => s.id == id); }
+    catch (_) { return null; }
+  }
+
+  Creator? creatorById(String id) {
+    try { return DummyData.creators.firstWhere((c) => c.id == id); }
+    catch (_) { return null; }
   }
 
   // ── JSON 역직렬화 (CmsStore와 동일한 포맷) ───────────────
@@ -71,3 +94,4 @@ class AppStore extends ChangeNotifier {
     captions: const [],
   );
 }
+
