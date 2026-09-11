@@ -149,7 +149,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
           const SizedBox(height: 12),
           _infoCard(surfaceC, lineC, textC, subC, muteC, [
             (Icons.person_rounded,       '계정 정보',       '이름, 이메일, 프로필 사진'),
-            (Icons.receipt_long_rounded,  '구매 내역',       '${purchaseCount}개 구매한 전시 이용 기록'),
+            (Icons.receipt_long_rounded,  '구매 내역',       '$purchaseCount개 구매한 전시 이용 기록'),
             (Icons.bookmark_rounded,      '즐겨찾기 목록',   '저장한 전시 ${userStore.favorites.length}개'),
             (Icons.people_rounded,        '팔로우 정보',     '크리에이터 팔로우 ${userStore.following.length}개'),
             (Icons.headphones_rounded,    '오디오 진행 기록', '이어듣기 및 재생 기록'),
@@ -264,7 +264,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
           ),
           const SizedBox(height: 20),
 
-          Text('탈퇴를 확인하려면\n아래에 "${_confirmText}"를 입력하세요',
+          Text('탈퇴를 확인하려면\n아래에 "$_confirmText"를 입력하세요',
               style: GuidyText.h3(textC).copyWith(height: 1.4)),
           const SizedBox(height: 16),
 

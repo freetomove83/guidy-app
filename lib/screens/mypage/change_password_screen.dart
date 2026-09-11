@@ -252,7 +252,7 @@ enum _PwStrength { none, weak, medium, good, strong }
 
 class _StrengthBar extends StatelessWidget {
   final _PwStrength strength;
-  const _StrengthBar({required this.strength, super.key});
+  const _StrengthBar({required this.strength});
 
   @override
   Widget build(BuildContext context) {

@@ -28,6 +28,9 @@ import 'screens/mypage/my_page_screen.dart';
 import 'screens/mypage/notification_settings_screen.dart';
 import 'screens/mypage/change_password_screen.dart';
 import 'screens/mypage/delete_account_screen.dart';
+import 'screens/mypage/help_screen.dart';
+import 'screens/mypage/about_screen.dart';
+import 'screens/creator/creator_apply_screen.dart';
 import 'widgets/common_widgets.dart';
 
 void main() async {
@@ -133,6 +136,12 @@ class GuidyApp extends StatelessWidget {
       page = const ChangePasswordScreen();
     } else if (name == '/delete-account') {
       page = const DeleteAccountScreen();
+    } else if (name == '/help') {
+      page = const HelpScreen();
+    } else if (name == '/about') {
+      page = const AboutScreen();
+    } else if (name == '/creator-apply') {
+      page = const CreatorApplyScreen();
     } else {
       page = const MainShell();
     }
@@ -358,7 +367,16 @@ class _SettingsPage extends StatelessWidget {
             const SizedBox(height: 24),
 
             // 설정 메뉴
-            _settingItem(Icons.mic_rounded, '크리에이터 되기', '오디오 가이드를 만들어 수익을 창출하세요', context, surfaceC, lineC, textC, subC, () => Navigator.pushNamed(context, '/creator-studio')),
+            _settingItem(Icons.mic_rounded, '크리에이터 되기', '오디오 가이드를 만들어 수익을 창출하세요', context, surfaceC, lineC, textC, subC, () {
+              final userStore = context.read<UserStore>();
+              if (userStore.isCreator) {
+                // 이미 크리에이터 → 스튜디오로
+                Navigator.pushNamed(context, '/creator-studio');
+              } else {
+                // 신청 전 or 대기 중 → 신청/진행 화면으로
+                Navigator.pushNamed(context, '/creator-apply');
+              }
+            }),
             const SizedBox(height: 8),
 
             // 다크 모드 토글
@@ -394,9 +412,13 @@ class _SettingsPage extends StatelessWidget {
             ),
             const SizedBox(height: 8),
 
-            _settingItem(Icons.help_outline_rounded, '도움말', '사용 방법 및 FAQ', context, surfaceC, lineC, textC, subC, null),
+            _settingItem(Icons.help_outline_rounded, '도움말', '사용 방법 및 FAQ', context, surfaceC, lineC, textC, subC, () {
+              Navigator.pushNamed(context, '/help');
+            }),
             const SizedBox(height: 8),
-            _settingItem(Icons.info_outline_rounded, 'Guidy 소개', '버전 1.0.0', context, surfaceC, lineC, textC, subC, null),
+            _settingItem(Icons.info_outline_rounded, 'Guidy 소개', '버전 1.0.0', context, surfaceC, lineC, textC, subC, () {
+              Navigator.pushNamed(context, '/about');
+            }),
 
             const SizedBox(height: 40),
 

@@ -6,27 +6,47 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'models.dart';
 
-const _kFavorites    = 'guidy_user_favorites';    // 즐겨찾기 전시 ID Set
-const _kLikes        = 'guidy_user_likes';         // 좋아요 전시 ID Set
-const _kFollowing    = 'guidy_user_following';     // 팔로우 크리에이터 ID Set
-const _kPurchases    = 'guidy_user_purchases';     // 구매 내역 JSON
-const _kUserName     = 'guidy_user_name';
-const _kUserEmail    = 'guidy_user_email';
+const _kFavorites        = 'guidy_user_favorites';
+const _kLikes            = 'guidy_user_likes';
+const _kFollowing        = 'guidy_user_following';
+const _kPurchases        = 'guidy_user_purchases';
+const _kUserName         = 'guidy_user_name';
+const _kUserEmail        = 'guidy_user_email';
+const _kCreatorStatus    = 'guidy_creator_status';
+const _kCreatorAppliedAt  = 'guidy_creator_applied_at';
+const _kCreatorApprovedAt = 'guidy_creator_approved_at';
+
+// 크리에이터 신청 상태 enum
+enum CreatorApplyStatus {
+  none,      // 신청 전
+  pending,   // 접수 → 승인 대기
+  approved,  // 승인 완료
+}
 
 class UserStore extends ChangeNotifier {
   // ── 개인 정보 ────────────────────────────────────────
   String _userName  = 'Guidy 사용자';
   String _userEmail = '';
 
+  // ── 크리에이터 신청 상태 ──────────────────────────────
+  CreatorApplyStatus _creatorStatus    = CreatorApplyStatus.none;
+  DateTime?          _creatorAppliedAt;
+  DateTime?          _creatorApprovedAt;
+
   // ── 개인화 데이터 ────────────────────────────────────
-  final Set<String> _favorites  = {};   // exhibitionId
-  final Set<String> _likes      = {};   // exhibitionId
-  final Set<String> _following  = {};   // creatorId
+  final Set<String> _favorites  = {};
+  final Set<String> _likes      = {};
+  final Set<String> _following  = {};
   final List<Purchase> _purchases = List.from(DummyData.purchases);
 
   // ── Getters ─────────────────────────────────────────
   String get userName  => _userName;
   String get userEmail => _userEmail;
+
+  CreatorApplyStatus get creatorStatus    => _creatorStatus;
+  DateTime?          get creatorAppliedAt  => _creatorAppliedAt;
+  DateTime?          get creatorApprovedAt => _creatorApprovedAt;
+  bool get isCreator => _creatorStatus == CreatorApplyStatus.approved;
 
   Set<String> get favorites  => Set.unmodifiable(_favorites);
   Set<String> get likes      => Set.unmodifiable(_likes);
@@ -71,8 +91,47 @@ class UserStore extends ChangeNotifier {
         _purchases.addAll(list.map((e) => _purchaseFromJson(e as Map<String, dynamic>)));
       }
 
+      // 크리에이터 신청 상태 복원
+      final statusIdx = prefs.getInt(_kCreatorStatus) ?? 0;
+      _creatorStatus = CreatorApplyStatus.values[statusIdx.clamp(0, 2)];
+      final appliedStr  = prefs.getString(_kCreatorAppliedAt);
+      final approvedStr = prefs.getString(_kCreatorApprovedAt);
+      if (appliedStr  != null) _creatorAppliedAt  = DateTime.parse(appliedStr);
+      if (approvedStr != null) _creatorApprovedAt = DateTime.parse(approvedStr);
+
       notifyListeners();
     } catch (_) {}
+  }
+
+  // ── 크리에이터 신청 ──────────────────────────────────
+  Future<void> applyCreator() async {
+    _creatorStatus    = CreatorApplyStatus.pending;
+    _creatorAppliedAt = DateTime.now();
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_kCreatorStatus, _creatorStatus.index);
+    await prefs.setString(_kCreatorAppliedAt, _creatorAppliedAt!.toIso8601String());
+  }
+
+  // (관리자 승인 시뮬레이션 — 테스트용)
+  Future<void> approveCreator() async {
+    _creatorStatus     = CreatorApplyStatus.approved;
+    _creatorApprovedAt = DateTime.now();
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_kCreatorStatus, _creatorStatus.index);
+    await prefs.setString(_kCreatorApprovedAt, _creatorApprovedAt!.toIso8601String());
+  }
+
+  Future<void> resetCreatorStatus() async {
+    _creatorStatus     = CreatorApplyStatus.none;
+    _creatorAppliedAt  = null;
+    _creatorApprovedAt = null;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_kCreatorStatus);
+    await prefs.remove(_kCreatorAppliedAt);
+    await prefs.remove(_kCreatorApprovedAt);
   }
 
   // ── 개인 정보 업데이트 ───────────────────────────────
