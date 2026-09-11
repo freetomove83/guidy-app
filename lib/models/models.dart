@@ -153,9 +153,10 @@ class ExhibitionSection {
   final int order;
   final String title;
   final String description;
-  final String? imageUrl;   // 대표 이미지 URL (CMS 업로드)
-  final int imageSeed;      // 이미지 없을 때 플레이스홀더용
-  final List<String> artworkIds; // 이 섹션에 속한 작품 ID 목록
+  final String? imageUrl;      // 대표 이미지 URL (Firebase Storage용 - 추후 연동)
+  final String? imageBase64;   // Base64 인코딩 이미지 (현재 사용 중)
+  final int imageSeed;         // 이미지 없을 때 플레이스홀더용
+  final List<String> artworkIds;
 
   const ExhibitionSection({
     required this.id,
@@ -164,6 +165,7 @@ class ExhibitionSection {
     required this.title,
     this.description = '',
     this.imageUrl,
+    this.imageBase64,
     this.imageSeed = 0,
     this.artworkIds = const [],
   });

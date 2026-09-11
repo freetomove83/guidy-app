@@ -1,6 +1,7 @@
 // lib/widgets/common_widgets.dart
 // Guidy 공통 컴포넌트 모음
 
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../models/models.dart';
@@ -843,5 +844,84 @@ class GuidyInputField extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+// ─── SectionImageWidget (Base64 or Seed 플레이스홀더) ────────
+/// CMS에서 업로드한 imageBase64가 있으면 실제 이미지,
+/// 없으면 imageSeed 기반 색상 플레이스홀더를 표시합니다.
+/// Firebase Storage 연동 시 imageUrl 우선 순위를 높여 교체 가능합니다.
+class SectionImageWidget extends StatelessWidget {
+  final String? imageBase64;
+  final int imageSeed;
+  final double? width;
+  final double? height;
+  final BorderRadius? borderRadius;
+
+  const SectionImageWidget({
+    super.key,
+    required this.imageBase64,
+    required this.imageSeed,
+    this.width,
+    this.height,
+    this.borderRadius,
+  });
+
+  // 섹션 전용 플레이스홀더 색상 팔레트
+  static const List<List<Color>> _palette = [
+    [Color(0xFF0B3D5C), Color(0xFF1A5A7A)],
+    [Color(0xFFD97757), Color(0xFFE89575)],
+    [Color(0xFF2F8F5C), Color(0xFF4AB07A)],
+    [Color(0xFF6B4FA0), Color(0xFF8E72C0)],
+    [Color(0xFF3A4A7C), Color(0xFF5968A8)],
+    [Color(0xFF8C4A2A), Color(0xFFB06040)],
+    [Color(0xFF2A6A5C), Color(0xFF40907E)],
+    [Color(0xFF7A3A50), Color(0xFFA05570)],
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    if (imageBase64 != null && imageBase64!.isNotEmpty) {
+      try {
+        final bytes = base64Decode(imageBase64!);
+        Widget img = Image.memory(
+          bytes,
+          width: width,
+          height: height,
+          fit: BoxFit.cover,
+          gaplessPlayback: true,
+        );
+        if (borderRadius != null) {
+          img = ClipRRect(borderRadius: borderRadius!, child: img);
+        }
+        return SizedBox(width: width, height: height, child: img);
+      } catch (_) {
+        // Base64 파싱 실패 시 seed로 폴백
+      }
+    }
+    // ── 플레이스홀더 ────────────────────────────────────────
+    final colors = _palette[imageSeed % _palette.length];
+    Widget placeholder = Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: colors,
+        ),
+      ),
+      child: Center(
+        child: Icon(
+          Icons.image_outlined,
+          color: Colors.white.withValues(alpha: 0.4),
+          size: (height != null && height! < 60) ? 18 : 28,
+        ),
+      ),
+    );
+    if (borderRadius != null) {
+      placeholder = ClipRRect(borderRadius: borderRadius!, child: placeholder);
+    }
+    return placeholder;
   }
 }

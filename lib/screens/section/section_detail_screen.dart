@@ -46,10 +46,15 @@ class SectionDetailScreen extends StatelessWidget {
               SliverToBoxAdapter(
                 child: Stack(
                   children: [
-                    GuidyCover(
-                      seed: section.imageSeed,
+                    // Base64 이미지 or 플레이스홀더
+                    AspectRatio(
                       aspectRatio: 4 / 3,
-                      borderRadius: BorderRadius.zero,
+                      child: SectionImageWidget(
+                        imageBase64: section.imageBase64,
+                        imageSeed:   section.imageSeed,
+                        width:       double.infinity,
+                        borderRadius: BorderRadius.zero,
+                      ),
                     ),
                     // 그라디언트 오버레이
                     Positioned.fill(

@@ -5,7 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'models.dart';
 
 /// CMS와 공유하는 localStorage key (같은 origin일 때 공유됨)
-const _kSharedArtworks = 'guidy_shared_artworks';
+const _kSharedArtworks  = 'guidy_shared_artworks';
+const _kCmsSections     = 'guidy_cms_sections';   // CMS 섹션 데이터 (imageBase64 포함)
 
 class AppStore extends ChangeNotifier {
   final List<Exhibition> _exhibitions = List<Exhibition>.from(DummyData.exhibitions);
@@ -17,24 +18,69 @@ class AppStore extends ChangeNotifier {
   Future<void> init() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final raw = prefs.getString(_kSharedArtworks);
-      if (raw != null) {
-        final List<dynamic> list = jsonDecode(raw);
+
+      // 1. 아트워크 동기화 (CMS 업로드 오디오)
+      final rawArtworks = prefs.getString(_kSharedArtworks);
+      if (rawArtworks != null) {
+        final List<dynamic> list = jsonDecode(rawArtworks);
         final existingIds = _artworks.map((a) => a.id).toSet();
         for (final item in list) {
           final j = item as Map<String, dynamic>;
-          final artwork = _fromJson(j);
+          final artwork = _artworkFromJson(j);
           if (!existingIds.contains(artwork.id)) {
             _artworks.add(artwork);
             existingIds.add(artwork.id);
           } else {
-            // audioUrl 업데이트 (CMS에서 교체된 경우)
             final idx = _artworks.indexWhere((a) => a.id == artwork.id);
             if (idx >= 0) _artworks[idx] = artwork;
           }
         }
-        notifyListeners();
       }
+
+      // 2. 섹션 동기화 (CMS 섹션 imageBase64 포함)
+      final rawSections = prefs.getString(_kCmsSections);
+      if (rawSections != null) {
+        final List<dynamic> list = jsonDecode(rawSections);
+        final cmsData = list.map((e) => e as Map<String, dynamic>).toList();
+
+        for (final j in cmsData) {
+          final sectionId   = j['id'] as String;
+          final imageBase64 = j['imageBase64'] as String?;
+          final idx = _sections.indexWhere((s) => s.id == sectionId);
+
+          if (idx >= 0) {
+            // 기존 섹션 업데이트 (imageBase64 반영)
+            final existing = _sections[idx];
+            _sections[idx] = ExhibitionSection(
+              id:            existing.id,
+              exhibitionId:  existing.exhibitionId,
+              order:         j['order'] as int? ?? existing.order,
+              title:         j['title'] as String? ?? existing.title,
+              description:   j['description'] as String? ?? existing.description,
+              imageSeed:     j['imageSeed'] as int? ?? existing.imageSeed,
+              imageBase64:   imageBase64,
+              artworkIds:    (j['artworkIds'] as List<dynamic>?)
+                              ?.map((e) => e as String).toList()
+                             ?? existing.artworkIds,
+            );
+          } else {
+            // CMS에서 새로 추가된 섹션
+            _sections.add(ExhibitionSection(
+              id:           sectionId,
+              exhibitionId: j['exhibitionId'] as String,
+              order:        j['order'] as int? ?? 99,
+              title:        j['title'] as String? ?? '',
+              description:  j['description'] as String? ?? '',
+              imageSeed:    j['imageSeed'] as int? ?? 0,
+              imageBase64:  imageBase64,
+              artworkIds:   (j['artworkIds'] as List<dynamic>?)
+                              ?.map((e) => e as String).toList() ?? [],
+            ));
+          }
+        }
+      }
+
+      notifyListeners();
     } catch (_) {}
   }
 
@@ -79,8 +125,8 @@ class AppStore extends ChangeNotifier {
     catch (_) { return null; }
   }
 
-  // ── JSON 역직렬화 (CmsStore와 동일한 포맷) ───────────────
-  static Artwork _fromJson(Map<String, dynamic> j) => Artwork(
+  // ── JSON 역직렬화 ────────────────────────────────────────
+  static Artwork _artworkFromJson(Map<String, dynamic> j) => Artwork(
     id: j['id'] as String,
     exhibitionId: j['exhibitionId'] as String,
     title: j['title'] as String,

@@ -474,14 +474,12 @@ class _SectionCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // 썸네일
-          ClipRRect(
+          // 썸네일 — Base64 이미지 or 플레이스홀더
+          SectionImageWidget(
+            imageBase64: section.imageBase64,
+            imageSeed:   section.imageSeed,
+            width: 52, height: 52,
             borderRadius: GuidyRadius.mdBorder,
-            child: GuidyCover(
-              seed: section.imageSeed,
-              width: 52, height: 52,
-              borderRadius: GuidyRadius.mdBorder,
-            ),
           ),
           const SizedBox(width: 12),
           Expanded(
