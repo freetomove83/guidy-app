@@ -5,14 +5,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'models.dart';
 
 /// CMS와 공유하는 localStorage key (같은 origin일 때 공유됨)
-const _kSharedArtworks  = 'guidy_shared_artworks';
-const _kCmsSections     = 'guidy_cms_sections';   // CMS 섹션 데이터 (imageBase64 포함)
+const _kSharedArtworks   = 'guidy_shared_artworks';
+const _kCmsSections      = 'guidy_cms_sections';
+const _kCreatorActivities = 'guidy_creator_activities';  // 크리에이터 활동 데이터
 
 class AppStore extends ChangeNotifier {
   final List<Exhibition> _exhibitions = List<Exhibition>.from(DummyData.exhibitions);
   final List<Artwork> _artworks = List<Artwork>.from(DummyData.artworks);
   final List<ExhibitionSection> _sections = List<ExhibitionSection>.from(DummyData.sections);
   final List<CreatorGuide> _creatorGuides = List<CreatorGuide>.from(DummyData.creatorGuides);
+  // 크리에이터 데이터 (activities 편집 가능하도록 mutable copy)
+  final List<Creator> _creators = List<Creator>.from(DummyData.creators);
 
   // ── 초기화: localStorage에서 CMS 추가 항목 읽기 ──────────
   Future<void> init() async {
@@ -49,7 +52,6 @@ class AppStore extends ChangeNotifier {
           final idx = _sections.indexWhere((s) => s.id == sectionId);
 
           if (idx >= 0) {
-            // 기존 섹션 업데이트 (imageBase64 반영)
             final existing = _sections[idx];
             _sections[idx] = ExhibitionSection(
               id:            existing.id,
@@ -64,7 +66,6 @@ class AppStore extends ChangeNotifier {
                              ?? existing.artworkIds,
             );
           } else {
-            // CMS에서 새로 추가된 섹션
             _sections.add(ExhibitionSection(
               id:           sectionId,
               exhibitionId: j['exhibitionId'] as String,
@@ -80,6 +81,21 @@ class AppStore extends ChangeNotifier {
         }
       }
 
+      // 3. 크리에이터 활동 동기화
+      final rawActivities = prefs.getString(_kCreatorActivities);
+      if (rawActivities != null) {
+        final Map<String, dynamic> map = jsonDecode(rawActivities);
+        map.forEach((creatorId, activitiesJson) {
+          final idx = _creators.indexWhere((c) => c.id == creatorId);
+          if (idx >= 0) {
+            final activities = (activitiesJson as List<dynamic>)
+                .map((e) => CreatorActivity.fromJson(e as Map<String, dynamic>))
+                .toList();
+            _creators[idx] = _creators[idx].copyWith(activities: activities);
+          }
+        });
+      }
+
       notifyListeners();
     } catch (_) {}
   }
@@ -89,6 +105,7 @@ class AppStore extends ChangeNotifier {
   List<Artwork> get artworks => List.unmodifiable(_artworks);
   List<ExhibitionSection> get sections => List.unmodifiable(_sections);
   List<CreatorGuide> get creatorGuides => List.unmodifiable(_creatorGuides);
+  List<Creator> get creators => List.unmodifiable(_creators);
 
   List<Exhibition> get activeExhibitions =>
       _exhibitions.where((e) => e.isActive).toList();
@@ -121,8 +138,33 @@ class AppStore extends ChangeNotifier {
   }
 
   Creator? creatorById(String id) {
-    try { return DummyData.creators.firstWhere((c) => c.id == id); }
+    try { return _creators.firstWhere((c) => c.id == id); }
     catch (_) { return null; }
+  }
+
+  // ── 크리에이터 활동 업데이트 ─────────────────────────────
+  Future<void> updateCreatorActivities(
+    String creatorId,
+    List<CreatorActivity> activities,
+  ) async {
+    final idx = _creators.indexWhere((c) => c.id == creatorId);
+    if (idx < 0) return;
+    _creators[idx] = _creators[idx].copyWith(activities: activities);
+    notifyListeners();
+    await _saveCreatorActivities();
+  }
+
+  Future<void> _saveCreatorActivities() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final Map<String, dynamic> map = {};
+      for (final c in _creators) {
+        if (c.activities.isNotEmpty) {
+          map[c.id] = c.activities.map((a) => a.toJson()).toList();
+        }
+      }
+      await prefs.setString(_kCreatorActivities, jsonEncode(map));
+    } catch (_) {}
   }
 
   // ── JSON 역직렬화 ────────────────────────────────────────
@@ -140,4 +182,3 @@ class AppStore extends ChangeNotifier {
     captions: const [],
   );
 }
-

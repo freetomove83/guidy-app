@@ -5,6 +5,55 @@ enum ChannelType { curation, creator, archive }
 enum GuideStatus { draft, review, published }
 enum CreatorStatus { pending, approved, rejected }
 
+// ─── 크리에이터 활동 항목 ────────────────────────────────
+enum ActivityType { youtube, instagram, blog, podcast, lecture, career, other }
+
+class CreatorActivity {
+  final String id;
+  final ActivityType type;
+  final String label;      // 표시 이름 (예: "YouTube")
+  final String detail;     // 부제 (예: "구독자 3.7만명")
+  final String? url;       // 링크 (null이면 탭 불가)
+
+  const CreatorActivity({
+    required this.id,
+    required this.type,
+    required this.label,
+    required this.detail,
+    this.url,
+  });
+
+  CreatorActivity copyWith({
+    ActivityType? type,
+    String? label,
+    String? detail,
+    String? url,
+    bool clearUrl = false,
+  }) => CreatorActivity(
+    id: id,
+    type: type ?? this.type,
+    label: label ?? this.label,
+    detail: detail ?? this.detail,
+    url: clearUrl ? null : (url ?? this.url),
+  );
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'type': type.index,
+    'label': label,
+    'detail': detail,
+    'url': url,
+  };
+
+  factory CreatorActivity.fromJson(Map<String, dynamic> j) => CreatorActivity(
+    id: j['id'] as String,
+    type: ActivityType.values[j['type'] as int? ?? 0],
+    label: j['label'] as String,
+    detail: j['detail'] as String,
+    url: j['url'] as String?,
+  );
+}
+
 // ─── 크리에이터 ──────────────────────────────────────────
 class Creator {
   final String id;
@@ -19,6 +68,7 @@ class Creator {
   final double monthlyRevenue;
   final bool isVerified;
   final CreatorStatus status;
+  final List<CreatorActivity> activities;   // 크리에이터가 직접 관리하는 활동 목록
 
   const Creator({
     required this.id,
@@ -33,7 +83,30 @@ class Creator {
     this.monthlyRevenue = 0,
     this.isVerified = false,
     this.status = CreatorStatus.approved,
+    this.activities = const [],
   });
+
+  Creator copyWith({
+    String? name,
+    String? title,
+    String? bio,
+    int? followerCount,
+    List<CreatorActivity>? activities,
+  }) => Creator(
+    id: id,
+    name: name ?? this.name,
+    title: title ?? this.title,
+    bio: bio ?? this.bio,
+    avatarUrl: avatarUrl,
+    avatarColor: avatarColor,
+    followerCount: followerCount ?? this.followerCount,
+    totalPlays: totalPlays,
+    guideCount: guideCount,
+    monthlyRevenue: monthlyRevenue,
+    isVerified: isVerified,
+    status: status,
+    activities: activities ?? this.activities,
+  );
 }
 
 // ─── 전시/가이드 ─────────────────────────────────────────
@@ -267,10 +340,31 @@ class Purchase {
 // ─── 더미 데이터 ─────────────────────────────────────────
 class DummyData {
   static final List<Creator> creators = [
-    const Creator(id: 'c1', name: '김도슨트', title: '미술사 큐레이터', bio: '국립현대미술관 10년 경력의 도슨트. 현대미술의 복잡한 맥락을 쉽고 감동적으로 풀어드립니다.', avatarColor: '#0B3D5C', followerCount: 12400, totalPlays: 89300, guideCount: 14, isVerified: true),
-    const Creator(id: 'c2', name: '박수민', title: '아트 유튜버', bio: '구독자 28만의 아트 유튜버. 작가와의 직접 인터뷰로 만드는 독점 오디오 가이드.', avatarColor: '#D97757', followerCount: 8200, totalPlays: 51200, guideCount: 9, isVerified: true),
-    const Creator(id: 'c3', name: '이현우', title: '갤러리 관장', bio: '강남 갤러리 현 관장. 컬렉터 관점의 깊이 있는 해설을 제공합니다.', avatarColor: '#2F8F5C', followerCount: 5100, totalPlays: 34700, guideCount: 7),
-    const Creator(id: 'c4', name: '정재원', title: '독립 큐레이터', bio: '독립 큐레이터이자 미술 평론가. 소외된 작가들의 이야기를 발굴합니다.', avatarColor: '#7D6A94', followerCount: 3800, totalPlays: 22100, guideCount: 5),
+    Creator(id: 'c1', name: '김도슨트', title: '미술사 큐레이터', bio: '국립현대미술관 10년 경력의 도슨트. 현대미술의 복잡한 맥락을 쉽고 감동적으로 풀어드립니다.', avatarColor: '#0B3D5C', followerCount: 12400, totalPlays: 89300, guideCount: 14, isVerified: true,
+      activities: const [
+        CreatorActivity(id: 'ca1_1', type: ActivityType.youtube, label: 'YouTube', detail: '구독자 3.7만명', url: 'https://youtube.com/@kimdocent'),
+        CreatorActivity(id: 'ca1_2', type: ActivityType.blog, label: '블로그', detail: '월 2.5만회 방문', url: 'https://blog.naver.com/kimdocent'),
+        CreatorActivity(id: 'ca1_3', type: ActivityType.lecture, label: '강연', detail: '연간 28회'),
+      ],
+    ),
+    Creator(id: 'c2', name: '박수민', title: '아트 유튜버', bio: '구독자 28만의 아트 유튜버. 작가와의 직접 인터뷰로 만드는 독점 오디오 가이드.', avatarColor: '#D97757', followerCount: 8200, totalPlays: 51200, guideCount: 9, isVerified: true,
+      activities: const [
+        CreatorActivity(id: 'ca2_1', type: ActivityType.youtube, label: 'YouTube', detail: '구독자 28만명', url: 'https://youtube.com/@parksumin'),
+        CreatorActivity(id: 'ca2_2', type: ActivityType.instagram, label: 'Instagram', detail: '팔로워 4.2만명', url: 'https://instagram.com/parksumin.art'),
+      ],
+    ),
+    Creator(id: 'c3', name: '이현우', title: '갤러리 관장', bio: '강남 갤러리 현 관장. 컬렉터 관점의 깊이 있는 해설을 제공합니다.', avatarColor: '#2F8F5C', followerCount: 5100, totalPlays: 34700, guideCount: 7,
+      activities: const [
+        CreatorActivity(id: 'ca3_1', type: ActivityType.career, label: '갤러리 HW 관장', detail: '2019년~ 현재'),
+        CreatorActivity(id: 'ca3_2', type: ActivityType.lecture, label: '강연', detail: '연간 12회'),
+      ],
+    ),
+    Creator(id: 'c4', name: '정재원', title: '독립 큐레이터', bio: '독립 큐레이터이자 미술 평론가. 소외된 작가들의 이야기를 발굴합니다.', avatarColor: '#7D6A94', followerCount: 3800, totalPlays: 22100, guideCount: 5,
+      activities: const [
+        CreatorActivity(id: 'ca4_1', type: ActivityType.blog, label: '아트 뉴스레터', detail: '구독자 6,200명', url: 'https://stibee.com/jungjaewon'),
+        CreatorActivity(id: 'ca4_2', type: ActivityType.podcast, label: '팟캐스트', detail: '미술관 옆 수다', url: 'https://podcasts.apple.com/jungjaewon'),
+      ],
+    ),
   ];
 
   static final List<Exhibition> exhibitions = [

@@ -1,41 +1,45 @@
 // lib/screens/creator/creator_profile_screen.dart
-// 크리에이터 프로필 화면
+// 크리에이터 프로필 화면 — 팔로우 수치 실시간 반영 + 활동 링크 + 메시지 버튼 제거
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../theme/app_theme.dart';
 import '../../models/models.dart';
+import '../../models/app_store.dart';
+import '../../models/user_store.dart';
 import '../../widgets/common_widgets.dart';
 
-class CreatorProfileScreen extends StatefulWidget {
+class CreatorProfileScreen extends StatelessWidget {
   final String creatorId;
   const CreatorProfileScreen({super.key, required this.creatorId});
 
   @override
-  State<CreatorProfileScreen> createState() => _CreatorProfileScreenState();
-}
-
-class _CreatorProfileScreenState extends State<CreatorProfileScreen> {
-  bool _isFollowing = false;
-
-  @override
   Widget build(BuildContext context) {
-    final creator = DummyData.creators.firstWhere(
-      (c) => c.id == widget.creatorId,
-      orElse: () => DummyData.creators.first,
-    );
-    final creatorGuides = DummyData.exhibitions
+    // AppStore에서 최신 Creator 데이터 (activities 포함) 읽기
+    final appStore  = context.watch<AppStore>();
+    final userStore = context.watch<UserStore>();
+
+    final creator = appStore.creatorById(creatorId)
+        ?? DummyData.creators.first;
+    final isFollowing = userStore.isFollowing(creatorId);
+
+    // 팔로우 수치: 실제 팔로잉 여부에 따라 +1
+    final displayFollowers = creator.followerCount + (isFollowing ? 1 : 0);
+
+    final creatorGuides = appStore.exhibitions
         .where((e) => e.creatorId == creator.id)
         .toList();
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgC = isDark ? GuidyColors.darkBg : GuidyColors.bg;
-    final textC = isDark ? GuidyColors.darkText : GuidyColors.ink;
-    final subC = isDark ? GuidyColors.darkSub : GuidyColors.sub;
-    final muteC = isDark ? GuidyColors.darkMute : GuidyColors.mute;
-    final surfaceC = isDark ? GuidyColors.darkSurface : GuidyColors.surface;
-    final lineC = isDark ? GuidyColors.darkLine : GuidyColors.line;
-    final primaryC = isDark ? GuidyColors.darkPrimary : GuidyColors.primary;
-    final accentC = isDark ? GuidyColors.darkAccent : GuidyColors.accent;
+    final isDark    = Theme.of(context).brightness == Brightness.dark;
+    final bgC       = isDark ? GuidyColors.darkBg      : GuidyColors.bg;
+    final textC     = isDark ? GuidyColors.darkText     : GuidyColors.ink;
+    final subC      = isDark ? GuidyColors.darkSub      : GuidyColors.sub;
+    final muteC     = isDark ? GuidyColors.darkMute     : GuidyColors.mute;
+    final surfaceC  = isDark ? GuidyColors.darkSurface  : GuidyColors.surface;
+    final lineC     = isDark ? GuidyColors.darkLine     : GuidyColors.line;
+    final primaryC  = isDark ? GuidyColors.darkPrimary  : GuidyColors.primary;
+    final accentC   = isDark ? GuidyColors.darkAccent   : GuidyColors.accent;
 
     return Scaffold(
       backgroundColor: bgC,
@@ -46,7 +50,7 @@ class _CreatorProfileScreenState extends State<CreatorProfileScreen> {
             SliverToBoxAdapter(
               child: Column(
                 children: [
-                  // 헤더
+                  // ── 헤더 (뒤로가기 + 공유) ──────────────────
                   Padding(
                     padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
                     child: Row(
@@ -61,7 +65,8 @@ class _CreatorProfileScreenState extends State<CreatorProfileScreen> {
                               borderRadius: GuidyRadius.mdBorder,
                               border: Border.all(color: lineC),
                             ),
-                            child: Icon(Icons.arrow_back_ios_new_rounded, size: 16, color: textC),
+                            child: Icon(Icons.arrow_back_ios_new_rounded,
+                                size: 16, color: textC),
                           ),
                         ),
                         Icon(Icons.share_outlined, color: textC, size: 22),
@@ -71,7 +76,7 @@ class _CreatorProfileScreenState extends State<CreatorProfileScreen> {
 
                   const SizedBox(height: 24),
 
-                  // 프로필 헤더 (중앙 정렬)
+                  // ── 프로필 헤더 ──────────────────────────────
                   Column(
                     children: [
                       CreatorAvatar(creator: creator, size: 80, showBadgeRing: true),
@@ -79,7 +84,8 @@ class _CreatorProfileScreenState extends State<CreatorProfileScreen> {
                       if (creator.isVerified)
                         Container(
                           margin: const EdgeInsets.only(bottom: 6),
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
                             color: primaryC.withValues(alpha: 0.1),
                             borderRadius: GuidyRadius.pillBorder,
@@ -87,9 +93,11 @@ class _CreatorProfileScreenState extends State<CreatorProfileScreen> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.verified_rounded, color: primaryC, size: 12),
+                              Icon(Icons.verified_rounded,
+                                  color: primaryC, size: 12),
                               const SizedBox(width: 4),
-                              Text('인증 크리에이터', style: GuidyText.kicker(primaryC)),
+                              Text('인증 크리에이터',
+                                  style: GuidyText.kicker(primaryC)),
                             ],
                           ),
                         ),
@@ -98,13 +106,13 @@ class _CreatorProfileScreenState extends State<CreatorProfileScreen> {
                       Text(creator.title, style: GuidyText.body(subC)),
                       const SizedBox(height: 16),
 
-                      // 통계
+                      // ── 통계 ──────────────────────────────────
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           _statItem('가이드', '${creator.guideCount}', textC, subC),
                           _divider(lineC),
-                          _statItem('팔로워', _formatNum(creator.followerCount), textC, subC),
+                          _statItem('팔로워', _formatNum(displayFollowers), textC, subC),
                           _divider(lineC),
                           _statItem('총 청취', _formatNum(creator.totalPlays), textC, subC),
                         ],
@@ -112,52 +120,45 @@ class _CreatorProfileScreenState extends State<CreatorProfileScreen> {
 
                       const SizedBox(height: 16),
 
-                      // CTA
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          GestureDetector(
-                            onTap: () => setState(() => _isFollowing = !_isFollowing),
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 11),
-                              decoration: BoxDecoration(
-                                color: _isFollowing ? lineC : textC,
-                                borderRadius: GuidyRadius.pillBorder,
+                      // ── 팔로우 버튼 (메시지 버튼 제거) ─────────
+                      GestureDetector(
+                        onTap: () => userStore.toggleFollow(creatorId),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 40, vertical: 12),
+                          decoration: BoxDecoration(
+                            color: isFollowing ? lineC : textC,
+                            borderRadius: GuidyRadius.pillBorder,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                isFollowing
+                                    ? Icons.person_remove_outlined
+                                    : Icons.person_add_outlined,
+                                color: isFollowing ? textC : bgC,
+                                size: 16,
                               ),
-                              child: Text(
-                                _isFollowing ? '팔로잉' : '팔로우',
+                              const SizedBox(width: 6),
+                              Text(
+                                isFollowing ? '팔로잉' : '팔로우',
                                 style: TextStyle(
-                                  color: _isFollowing ? textC : bgC,
-                                  fontSize: 14, fontWeight: FontWeight.w800,
+                                  color: isFollowing ? textC : bgC,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w800,
                                   fontFamily: GuidyText.fontFamily,
                                 ),
                               ),
-                            ),
+                            ],
                           ),
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 11),
-                            decoration: BoxDecoration(
-                              color: surfaceC,
-                              borderRadius: GuidyRadius.pillBorder,
-                              border: Border.all(color: lineC),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.mail_outline_rounded, size: 16, color: textC),
-                                const SizedBox(width: 6),
-                                Text('메시지', style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w700)),
-                              ],
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
 
                       const SizedBox(height: 16),
 
-                      // 자기 소개
+                      // ── 소개글 ──────────────────────────────
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 32),
                         child: Container(
@@ -165,10 +166,12 @@ class _CreatorProfileScreenState extends State<CreatorProfileScreen> {
                           decoration: BoxDecoration(
                             color: surfaceC,
                             borderRadius: GuidyRadius.lgBorder,
-                            border: Border(left: BorderSide(color: accentC, width: 3)),
+                            border: Border(
+                                left: BorderSide(color: accentC, width: 3)),
                           ),
                           child: Text('"${creator.bio}"',
-                            style: GuidyText.body(subC), textAlign: TextAlign.center),
+                              style: GuidyText.body(subC),
+                              textAlign: TextAlign.center),
                         ),
                       ),
                     ],
@@ -176,7 +179,7 @@ class _CreatorProfileScreenState extends State<CreatorProfileScreen> {
 
                   const SizedBox(height: 28),
 
-                  // 대표 가이드
+                  // ── 대표 가이드 ──────────────────────────────
                   const SectionHeader(title: '대표 가이드'),
                   if (creatorGuides.isNotEmpty)
                     Padding(
@@ -184,7 +187,8 @@ class _CreatorProfileScreenState extends State<CreatorProfileScreen> {
                       child: GridView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
                           childAspectRatio: 0.65,
                           crossAxisSpacing: 12,
@@ -193,7 +197,8 @@ class _CreatorProfileScreenState extends State<CreatorProfileScreen> {
                         itemCount: creatorGuides.length,
                         itemBuilder: (context, i) => ExhibitionCard(
                           exhibition: creatorGuides[i],
-                          onTap: () => Navigator.pushNamed(context, '/detail/${creatorGuides[i].id}'),
+                          onTap: () => Navigator.pushNamed(
+                              context, '/detail/${creatorGuides[i].id}'),
                         ),
                       ),
                     )
@@ -203,9 +208,11 @@ class _CreatorProfileScreenState extends State<CreatorProfileScreen> {
                       child: Center(
                         child: Column(
                           children: [
-                            Icon(Icons.library_music_outlined, size: 48, color: muteC),
+                            Icon(Icons.library_music_outlined,
+                                size: 48, color: muteC),
                             const SizedBox(height: 8),
-                            Text('아직 출시된 가이드가 없습니다', style: GuidyText.body(muteC)),
+                            Text('아직 출시된 가이드가 없습니다',
+                                style: GuidyText.body(muteC)),
                           ],
                         ),
                       ),
@@ -213,20 +220,31 @@ class _CreatorProfileScreenState extends State<CreatorProfileScreen> {
 
                   const SizedBox(height: 28),
 
-                  // 다른 활동
-                  const SectionHeader(title: '다른 활동'),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Column(
-                      children: [
-                        _activityItem(Icons.smart_display_outlined, 'YouTube', '구독자 ${_formatNum(creator.followerCount * 3)}명', lineC, textC, subC, muteC),
-                        const SizedBox(height: 8),
-                        _activityItem(Icons.article_outlined, '블로그', '월 ${_formatNum(creator.followerCount * 2)}회 방문', lineC, textC, subC, muteC),
-                        const SizedBox(height: 8),
-                        _activityItem(Icons.mic_external_on_outlined, '강연', '연간 ${creator.guideCount * 2}회', lineC, textC, subC, muteC),
-                      ],
+                  // ── 다른 활동 ──────────────────────────────
+                  if (creator.activities.isNotEmpty) ...[
+                    const SectionHeader(title: '다른 활동'),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Column(
+                        children: creator.activities.asMap().entries.map((e) {
+                          final i = e.key;
+                          final act = e.value;
+                          return Padding(
+                            padding: EdgeInsets.only(
+                                bottom: i < creator.activities.length - 1 ? 8 : 0),
+                            child: _ActivityTile(
+                              activity: act,
+                              lineC: lineC,
+                              textC: textC,
+                              subC: subC,
+                              muteC: muteC,
+                            ),
+                          );
+                        }).toList(),
+                      ),
                     ),
-                  ),
+                  ],
+
                   const SizedBox(height: 80),
                 ],
               ),
@@ -249,39 +267,81 @@ class _CreatorProfileScreenState extends State<CreatorProfileScreen> {
     );
   }
 
-  Widget _divider(Color lineC) {
-    return Container(width: 1, height: 28, color: lineC);
-  }
-
-  Widget _activityItem(IconData icon, String title, String sub, Color lineC, Color textC, Color subC, Color muteC) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        borderRadius: GuidyRadius.lgBorder,
-        border: Border.all(color: lineC),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, size: 20, color: muteC),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w600)),
-                Text(sub, style: GuidyText.small(subC)),
-              ],
-            ),
-          ),
-          Icon(Icons.arrow_forward_ios_rounded, size: 12, color: muteC),
-        ],
-      ),
-    );
-  }
+  Widget _divider(Color lineC) =>
+      Container(width: 1, height: 28, color: lineC);
 
   String _formatNum(int n) {
     if (n >= 10000) return '${(n / 10000).toStringAsFixed(1)}만';
     if (n >= 1000) return '${(n / 1000).toStringAsFixed(1)}k';
     return n.toString();
+  }
+}
+
+// ─── 활동 타일 ────────────────────────────────────────────
+class _ActivityTile extends StatelessWidget {
+  final CreatorActivity activity;
+  final Color lineC, textC, subC, muteC;
+
+  const _ActivityTile({
+    required this.activity,
+    required this.lineC,
+    required this.textC,
+    required this.subC,
+    required this.muteC,
+  });
+
+  static IconData _iconFor(ActivityType type) {
+    switch (type) {
+      case ActivityType.youtube:   return Icons.smart_display_outlined;
+      case ActivityType.instagram: return Icons.camera_alt_outlined;
+      case ActivityType.blog:      return Icons.article_outlined;
+      case ActivityType.podcast:   return Icons.podcasts_rounded;
+      case ActivityType.lecture:   return Icons.mic_external_on_outlined;
+      case ActivityType.career:    return Icons.work_outline_rounded;
+      case ActivityType.other:     return Icons.link_rounded;
+    }
+  }
+
+  Future<void> _launch() async {
+    if (activity.url == null) return;
+    final uri = Uri.parse(activity.url!);
+    if (await canLaunchUrl(uri)) await launchUrl(uri);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final hasLink = activity.url != null && activity.url!.isNotEmpty;
+    return GestureDetector(
+      onTap: hasLink ? _launch : null,
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          borderRadius: GuidyRadius.lgBorder,
+          border: Border.all(color: lineC),
+        ),
+        child: Row(
+          children: [
+            Icon(_iconFor(activity.type), size: 20, color: muteC),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(activity.label,
+                      style: GuidyText.body(textC)
+                          .copyWith(fontWeight: FontWeight.w600)),
+                  if (activity.detail.isNotEmpty)
+                    Text(activity.detail, style: GuidyText.small(subC)),
+                ],
+              ),
+            ),
+            if (hasLink)
+              Icon(Icons.arrow_forward_ios_rounded, size: 12, color: muteC)
+            else
+              const SizedBox.shrink(),
+          ],
+        ),
+      ),
+    );
   }
 }

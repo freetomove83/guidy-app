@@ -1,9 +1,11 @@
 // lib/screens/creator/creator_studio_screen.dart
-// 크리에이터 스튜디오 화면 (대시보드 + 가이드 편집 + 온보딩)
+// 크리에이터 스튜디오 화면 (대시보드 + 가이드 편집 + 온보딩 + 프로필 활동 편집)
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../theme/app_theme.dart';
 import '../../models/models.dart';
+import '../../models/app_store.dart';
 import '../../widgets/common_widgets.dart';
 
 // ─── 크리에이터 스튜디오 메인 ─────────────────────────────
@@ -194,6 +196,14 @@ class _CreatorDashboard extends StatelessWidget {
                 ),
               );
             }),
+
+            const SizedBox(height: 20),
+
+            // ── 프로필 활동 관리 ───────────────────────────
+            _ActivityManagementSection(
+              bgC: bgC, textC: textC, subC: subC,
+              muteC: muteC, surfaceC: surfaceC, lineC: lineC,
+            ),
 
             const SizedBox(height: 20),
 
@@ -772,4 +782,383 @@ class _MiniChartPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter old) => false;
+}
+
+
+// ─── 프로필 활동 관리 섹션 ────────────────────────────────
+class _ActivityManagementSection extends StatelessWidget {
+  final Color bgC, textC, subC, muteC, surfaceC, lineC;
+
+  const _ActivityManagementSection({
+    required this.bgC,
+    required this.textC,
+    required this.subC,
+    required this.muteC,
+    required this.surfaceC,
+    required this.lineC,
+  });
+
+  static const String _mockCreatorId = 'c1';
+
+  @override
+  Widget build(BuildContext context) {
+    final appStore = context.watch<AppStore>();
+    final creator  = appStore.creatorById(_mockCreatorId);
+    if (creator == null) return const SizedBox.shrink();
+
+    final activities = creator.activities;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primaryC = isDark ? GuidyColors.darkPrimary : GuidyColors.primary;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+          child: Row(
+            children: [
+              Text('프로필 활동', style: GuidyText.h3(textC)),
+              const Spacer(),
+              GestureDetector(
+                onTap: () => _showAddDialog(context, creator),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: primaryC.withValues(alpha: 0.1),
+                    borderRadius: GuidyRadius.pillBorder,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.add_rounded, color: primaryC, size: 14),
+                      const SizedBox(width: 4),
+                      Text('추가', style: GuidyText.kicker(primaryC)
+                          .copyWith(fontWeight: FontWeight.w700)),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (activities.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: surfaceC,
+                borderRadius: GuidyRadius.lgBorder,
+                border: Border.all(color: lineC),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.link_rounded, color: muteC, size: 18),
+                  const SizedBox(width: 10),
+                  Text('유튜브, 인스타그램, 강연 등 활동을 추가하세요',
+                      style: GuidyText.small(subC)),
+                ],
+              ),
+            ),
+          )
+        else
+          ...activities.asMap().entries.map((entry) {
+            final i = entry.key;
+            final act = entry.value;
+            return Container(
+              margin: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              decoration: BoxDecoration(
+                color: surfaceC,
+                borderRadius: GuidyRadius.lgBorder,
+                border: Border.all(color: lineC),
+              ),
+              child: Row(
+                children: [
+                  Icon(_iconFor(act.type), size: 18, color: muteC),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(act.label,
+                            style: GuidyText.body(textC)
+                                .copyWith(fontWeight: FontWeight.w600)),
+                        if (act.detail.isNotEmpty)
+                          Text(act.detail, style: GuidyText.small(subC)),
+                        if (act.url != null && act.url!.isNotEmpty)
+                          Text(act.url!,
+                              style: GuidyText.kicker(muteC),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: () => _showEditDialog(context, creator, act, i),
+                    child: Icon(Icons.edit_outlined, size: 16, color: muteC),
+                  ),
+                  const SizedBox(width: 12),
+                  GestureDetector(
+                    onTap: () {
+                      final newList = List<CreatorActivity>.from(activities)
+                        ..removeAt(i);
+                      context.read<AppStore>()
+                          .updateCreatorActivities(_mockCreatorId, newList);
+                    },
+                    child: Icon(Icons.delete_outline_rounded,
+                        size: 16, color: GuidyColors.danger),
+                  ),
+                ],
+              ),
+            );
+          }),
+      ],
+    );
+  }
+
+  IconData _iconFor(ActivityType type) {
+    switch (type) {
+      case ActivityType.youtube:   return Icons.smart_display_outlined;
+      case ActivityType.instagram: return Icons.camera_alt_outlined;
+      case ActivityType.blog:      return Icons.article_outlined;
+      case ActivityType.podcast:   return Icons.podcasts_rounded;
+      case ActivityType.lecture:   return Icons.mic_external_on_outlined;
+      case ActivityType.career:    return Icons.work_outline_rounded;
+      case ActivityType.other:     return Icons.link_rounded;
+    }
+  }
+
+  void _showAddDialog(BuildContext ctx, Creator creator) => showDialog(
+    context: ctx,
+    builder: (_) => _ActivityDialog(
+      creatorId: creator.id,
+      existing: null,
+      existingList: creator.activities,
+    ),
+  );
+
+  void _showEditDialog(BuildContext ctx, Creator creator, CreatorActivity act, int idx) =>
+    showDialog(
+      context: ctx,
+      builder: (_) => _ActivityDialog(
+        creatorId: creator.id,
+        existing: act,
+        existingList: creator.activities,
+        editIndex: idx,
+      ),
+    );
+}
+
+// ─── 활동 추가/수정 다이얼로그 ───────────────────────────
+class _ActivityDialog extends StatefulWidget {
+  final String creatorId;
+  final CreatorActivity? existing;
+  final List<CreatorActivity> existingList;
+  final int? editIndex;
+
+  const _ActivityDialog({
+    required this.creatorId,
+    required this.existing,
+    required this.existingList,
+    this.editIndex,
+  });
+
+  @override
+  State<_ActivityDialog> createState() => _ActivityDialogState();
+}
+
+class _ActivityDialogState extends State<_ActivityDialog> {
+  late ActivityType _type;
+  late TextEditingController _labelCtrl;
+  late TextEditingController _detailCtrl;
+  late TextEditingController _urlCtrl;
+
+  static const _typeLabels = {
+    ActivityType.youtube:   'YouTube',
+    ActivityType.instagram: 'Instagram',
+    ActivityType.blog:      '블로그',
+    ActivityType.podcast:   '팟캐스트',
+    ActivityType.lecture:   '강연',
+    ActivityType.career:    '경력',
+    ActivityType.other:     '기타',
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    final ex = widget.existing;
+    _type       = ex?.type   ?? ActivityType.youtube;
+    _labelCtrl  = TextEditingController(text: ex?.label  ?? '');
+    _detailCtrl = TextEditingController(text: ex?.detail ?? '');
+    _urlCtrl    = TextEditingController(text: ex?.url    ?? '');
+  }
+
+  @override
+  void dispose() {
+    _labelCtrl.dispose();
+    _detailCtrl.dispose();
+    _urlCtrl.dispose();
+    super.dispose();
+  }
+
+  void _save() {
+    if (_labelCtrl.text.trim().isEmpty) return;
+    final activity = CreatorActivity(
+      id: widget.existing?.id ?? 'act_${DateTime.now().millisecondsSinceEpoch}',
+      type: _type,
+      label: _labelCtrl.text.trim(),
+      detail: _detailCtrl.text.trim(),
+      url: _urlCtrl.text.trim().isEmpty ? null : _urlCtrl.text.trim(),
+    );
+    final newList = List<CreatorActivity>.from(widget.existingList);
+    if (widget.editIndex != null) {
+      newList[widget.editIndex!] = activity;
+    } else {
+      newList.add(activity);
+    }
+    context.read<AppStore>().updateCreatorActivities(widget.creatorId, newList);
+    Navigator.pop(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark   = Theme.of(context).brightness == Brightness.dark;
+    final surfaceC = isDark ? GuidyColors.darkSurface : GuidyColors.surface;
+    final textC    = isDark ? GuidyColors.darkText     : GuidyColors.ink;
+    final subC     = isDark ? GuidyColors.darkSub      : GuidyColors.sub;
+    final lineC    = isDark ? GuidyColors.darkLine     : GuidyColors.line;
+    final primaryC = isDark ? GuidyColors.darkPrimary  : GuidyColors.primary;
+    final bgC      = isDark ? GuidyColors.darkBg       : GuidyColors.bg;
+    final isEdit   = widget.existing != null;
+
+    return Dialog(
+      backgroundColor: surfaceC,
+      shape: RoundedRectangleBorder(borderRadius: GuidyRadius.xlBorder),
+      child: Container(
+        width: 400,
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(isEdit ? '활동 수정' : '활동 추가', style: GuidyText.h3(textC)),
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: const Icon(Icons.close_rounded, color: GuidyColors.mute, size: 20),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+
+            Text('종류', style: GuidyText.small(subC)),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 6, runSpacing: 6,
+              children: ActivityType.values.map((t) {
+                final selected = _type == t;
+                return GestureDetector(
+                  onTap: () => setState(() {
+                    _type = t;
+                    if (_labelCtrl.text.isEmpty ||
+                        _typeLabels.values.contains(_labelCtrl.text)) {
+                      _labelCtrl.text = _typeLabels[t] ?? '';
+                    }
+                  }),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: selected ? primaryC.withValues(alpha: 0.12) : bgC,
+                      borderRadius: GuidyRadius.pillBorder,
+                      border: Border.all(
+                        color: selected ? primaryC : lineC,
+                        width: selected ? 1.5 : 1,
+                      ),
+                    ),
+                    child: Text(_typeLabels[t] ?? '',
+                      style: GuidyText.kicker(selected ? primaryC : subC)
+                          .copyWith(fontWeight: FontWeight.w600)),
+                  ),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 16),
+
+            Text('표시 이름 *', style: GuidyText.small(subC)),
+            const SizedBox(height: 6),
+            _field(_labelCtrl, '예: YouTube', bgC, lineC, textC, subC),
+            const SizedBox(height: 12),
+
+            Text('부제 (구독자 수, 방문 수 등)', style: GuidyText.small(subC)),
+            const SizedBox(height: 6),
+            _field(_detailCtrl, '예: 구독자 3.7만명', bgC, lineC, textC, subC),
+            const SizedBox(height: 12),
+
+            Text('링크 URL (선택)', style: GuidyText.small(subC)),
+            const SizedBox(height: 6),
+            _field(_urlCtrl, 'https://...', bgC, lineC, textC, subC),
+            const SizedBox(height: 24),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: surfaceC,
+                      borderRadius: GuidyRadius.mdBorder,
+                      border: Border.all(color: lineC),
+                    ),
+                    child: Text('취소', style: GuidyText.small(textC)
+                        .copyWith(fontWeight: FontWeight.w600)),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                GestureDetector(
+                  onTap: _save,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: primaryC,
+                      borderRadius: GuidyRadius.mdBorder,
+                    ),
+                    child: Text(isEdit ? '저장' : '추가',
+                        style: GuidyText.small(Colors.white)
+                            .copyWith(fontWeight: FontWeight.w600)),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _field(TextEditingController ctrl, String hint,
+      Color bgC, Color lineC, Color textC, Color subC) {
+    return Container(
+      decoration: BoxDecoration(
+        color: bgC,
+        borderRadius: GuidyRadius.mdBorder,
+        border: Border.all(color: lineC),
+      ),
+      child: TextField(
+        controller: ctrl,
+        style: GuidyText.body(textC),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: GuidyText.body(subC),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          border: InputBorder.none,
+        ),
+      ),
+    );
+  }
 }
