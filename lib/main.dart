@@ -25,6 +25,9 @@ import 'screens/notifications/notifications_screen.dart';
 import 'screens/creator_guides/creator_guides_screen.dart';
 import 'screens/section/section_detail_screen.dart';
 import 'screens/mypage/my_page_screen.dart';
+import 'screens/mypage/notification_settings_screen.dart';
+import 'screens/mypage/change_password_screen.dart';
+import 'screens/mypage/delete_account_screen.dart';
 import 'widgets/common_widgets.dart';
 
 void main() async {
@@ -102,7 +105,10 @@ class GuidyApp extends StatelessWidget {
       final id = name.replaceFirst('/archive/', '');
       page = ArchiveScreen(exhibitionId: id);
     } else if (name == '/library') {
-      page = const LibraryScreen();
+      final args = settings.arguments;
+      final initialTab = (args is Map && args['tab'] is int)
+          ? args['tab'] as int : 0;
+      page = LibraryScreen(initialTab: initialTab);
     } else if (name == '/scan') {
       page = const ScanScreen();
     } else if (name == '/login') {
@@ -121,6 +127,12 @@ class GuidyApp extends StatelessWidget {
       page = SectionDetailScreen(sectionId: id);
     } else if (name == '/mypage') {
       page = const MyPageScreen();
+    } else if (name == '/notification-settings') {
+      page = const NotificationSettingsScreen();
+    } else if (name == '/change-password') {
+      page = const ChangePasswordScreen();
+    } else if (name == '/delete-account') {
+      page = const DeleteAccountScreen();
     } else {
       page = const MainShell();
     }

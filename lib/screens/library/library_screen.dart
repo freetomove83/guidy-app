@@ -10,15 +10,22 @@ import '../../models/user_store.dart';
 import '../../widgets/common_widgets.dart';
 
 class LibraryScreen extends StatefulWidget {
-  const LibraryScreen({super.key});
+  final int initialTab;
+  const LibraryScreen({super.key, this.initialTab = 0});
 
   @override
   State<LibraryScreen> createState() => _LibraryScreenState();
 }
 
 class _LibraryScreenState extends State<LibraryScreen> {
-  int _tabIndex = 0;
+  late int _tabIndex;
   final _tabs = ['컬렉션', '이어듣기', '즐겨찾기', '크리에이터'];
+
+  @override
+  void initState() {
+    super.initState();
+    _tabIndex = widget.initialTab.clamp(0, 3);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -383,7 +390,6 @@ class _CreatorsTab extends StatelessWidget {
     final muteC      = isDark ? GuidyColors.darkMute     : GuidyColors.mute;
     final lineC      = isDark ? GuidyColors.darkLine     : GuidyColors.line;
     final surfaceC   = isDark ? GuidyColors.darkSurface  : GuidyColors.surface;
-    final accentC    = isDark ? GuidyColors.darkAccent   : GuidyColors.accent;
 
     if (following.isEmpty) {
       return Center(

@@ -7,6 +7,9 @@ import '../../theme/app_theme.dart';
 import '../../models/models.dart';
 import '../../models/user_store.dart';
 import '../../widgets/common_widgets.dart';
+import 'notification_settings_screen.dart';
+import 'change_password_screen.dart';
+import 'delete_account_screen.dart';
 
 class MyPageScreen extends StatefulWidget {
   const MyPageScreen({super.key});
@@ -18,6 +21,9 @@ class MyPageScreen extends StatefulWidget {
 class _MyPageScreenState extends State<MyPageScreen> {
   int _tabIndex = 0;
   final _tabs = ['개인정보', '이용내역'];
+
+  // 외부에서 탭을 전환할 수 있도록 콜백 제공
+  void switchToHistory() => setState(() => _tabIndex = 1);
 
   @override
   Widget build(BuildContext context) {
@@ -96,9 +102,9 @@ class _MyPageScreenState extends State<MyPageScreen> {
             Expanded(
               child: IndexedStack(
                 index: _tabIndex,
-                children: const [
-                  _ProfileTab(),
-                  _PurchaseHistoryTab(),
+                children: [
+                  _ProfileTab(onGoHistory: () => setState(() => _tabIndex = 1)),
+                  const _PurchaseHistoryTab(),
                 ],
               ),
             ),
@@ -111,7 +117,8 @@ class _MyPageScreenState extends State<MyPageScreen> {
 
 // ─── 개인정보 탭 ─────────────────────────────────────────
 class _ProfileTab extends StatefulWidget {
-  const _ProfileTab();
+  final VoidCallback onGoHistory;
+  const _ProfileTab({required this.onGoHistory});
 
   @override
   State<_ProfileTab> createState() => _ProfileTabState();
@@ -125,9 +132,21 @@ class _ProfileTabState extends State<_ProfileTab> {
   @override
   void initState() {
     super.initState();
+    // didChangeDependencies에서 초기화하여 BuildContext 안전성 확보
     final userStore = context.read<UserStore>();
     _nameCtrl  = TextEditingController(text: userStore.userName);
     _emailCtrl = TextEditingController(text: userStore.userEmail);
+  }
+
+  @override
+  void didUpdateWidget(covariant _ProfileTab oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // _editing이 false일 때만 외부 변경값 동기화 (수정 중 덮어쓰기 방지)
+    if (!_editing) {
+      final userStore = context.read<UserStore>();
+      _nameCtrl.text  = userStore.userName;
+      _emailCtrl.text = userStore.userEmail;
+    }
   }
 
   @override
@@ -205,7 +224,7 @@ class _ProfileTabState extends State<_ProfileTab> {
         ),
         const SizedBox(height: 24),
 
-        // 통계 카드
+        // 통계 카드 (각 항목 클릭 → 해당 화면 이동)
         Container(
           padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
@@ -216,12 +235,31 @@ class _ProfileTabState extends State<_ProfileTab> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _statItem('${userStore.purchases.where((p) => p.status != PurchaseStatus.cancelled).length}',
-                '구매한 전시', textC, muteC),
+              // 구매한 전시 → 이용내역 탭
+              GestureDetector(
+                onTap: widget.onGoHistory,
+                child: _statItem(
+                  '${userStore.purchases.where((p) => p.status != PurchaseStatus.cancelled).length}',
+                  '구매한 전시', textC, muteC,
+                ),
+              ),
               Container(width: 1, height: 32, color: lineC),
-              _statItem('${userStore.favorites.length}', '즐겨찾기', textC, muteC),
+              // 즐겨찾기 → 서재 즐겨찾기 탭 (index 2)
+              GestureDetector(
+                onTap: () => Navigator.pushNamed(context, '/library',
+                    arguments: {'tab': 2}),
+                child: _statItem(
+                  '${userStore.favorites.length}', '즐겨찾기', textC, muteC,
+                ),
+              ),
               Container(width: 1, height: 32, color: lineC),
-              _statItem('${userStore.following.length}', '팔로우', textC, muteC),
+              // 팔로우 → 팔로잉 화면
+              GestureDetector(
+                onTap: () => Navigator.pushNamed(context, '/following'),
+                child: _statItem(
+                  '${userStore.following.length}', '팔로우', textC, muteC,
+                ),
+              ),
             ],
           ),
         ),
@@ -265,17 +303,29 @@ class _ProfileTabState extends State<_ProfileTab> {
 
         _infoField('이름', _nameCtrl, _editing, textC, subC, surfaceC, lineC, muteC),
         const SizedBox(height: 10),
-        _infoField('이메일', _emailCtrl, _editing, textC, subC, surfaceC, lineC, muteC,
-          keyboardType: TextInputType.emailAddress),
+        // 이메일: SSO 로그인 시 자동 입력, 항상 읽기전용
+        _infoField('이메일', _emailCtrl, false, textC, subC, surfaceC, lineC, muteC,
+          keyboardType: TextInputType.emailAddress,
+          trailingHint: userStore.userEmail.isEmpty
+              ? 'Google · Apple 로그인 시 자동으로 가져옵니다' : null),
+
 
         const SizedBox(height: 24),
 
         // 계정 관리
         Text('계정 관리', style: GuidyText.h3(textC)),
         const SizedBox(height: 12),
-        _menuItem(Icons.notifications_outlined, '알림 설정', surfaceC, lineC, textC, subC, null),
+        _menuItem(Icons.notifications_outlined, '알림 설정', surfaceC, lineC, textC, subC, () {
+          Navigator.push(context, MaterialPageRoute(
+            builder: (_) => const NotificationSettingsScreen(),
+          ));
+        }),
         const SizedBox(height: 8),
-        _menuItem(Icons.lock_outline_rounded, '비밀번호 변경', surfaceC, lineC, textC, subC, null),
+        _menuItem(Icons.lock_outline_rounded, '비밀번호 변경', surfaceC, lineC, textC, subC, () {
+          Navigator.push(context, MaterialPageRoute(
+            builder: (_) => const ChangePasswordScreen(),
+          ));
+        }),
         const SizedBox(height: 8),
         _menuItem(Icons.logout_rounded, '로그아웃', surfaceC, lineC, textC, subC, () {
           showDialog(
@@ -303,7 +353,9 @@ class _ProfileTabState extends State<_ProfileTab> {
         }),
         const SizedBox(height: 8),
         _menuItem(Icons.delete_outline_rounded, '회원 탈퇴', surfaceC, lineC, textC, subC,
-          null, dangerous: true),
+          () => Navigator.push(context, MaterialPageRoute(
+            builder: (_) => const DeleteAccountScreen(),
+          )), dangerous: true),
       ],
     );
   }
@@ -324,24 +376,56 @@ class _ProfileTabState extends State<_ProfileTab> {
     bool enabled,
     Color textC, Color subC, Color surfaceC, Color lineC, Color muteC, {
     TextInputType keyboardType = TextInputType.text,
+    String? trailingHint,
   }) {
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 8, 14, 8),
       decoration: BoxDecoration(
-        color: surfaceC,
+        color: enabled ? surfaceC : surfaceC.withValues(alpha: 0.7),
         borderRadius: GuidyRadius.lgBorder,
-        border: Border.all(color: lineC),
+        border: Border.all(
+          color: enabled ? GuidyColors.primary.withValues(alpha: 0.4) : lineC,
+          width: enabled ? 1.5 : 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: GuidyText.kicker(muteC)),
+          Row(
+            children: [
+              Text(label, style: GuidyText.kicker(muteC)),
+              if (!enabled && trailingHint != null) ...
+                [const SizedBox(width: 6),
+                Expanded(
+                  child: Text(trailingHint,
+                    style: GuidyText.kicker(muteC.withValues(alpha: 0.7)),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                )],
+              if (!enabled && label == '이메일')
+                Padding(
+                  padding: const EdgeInsets.only(left: 4),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                    decoration: BoxDecoration(
+                      color: GuidyColors.primarySoft,
+                      borderRadius: GuidyRadius.pillBorder,
+                    ),
+                    child: Text('읽기전용',
+                      style: GuidyText.kicker(GuidyColors.primary)
+                          .copyWith(fontSize: 9)),
+                  ),
+                ),
+            ],
+          ),
           const SizedBox(height: 2),
           TextField(
             controller: ctrl,
             enabled: enabled,
             keyboardType: keyboardType,
-            style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w500),
+            style: GuidyText.body(
+              enabled ? textC : muteC,
+            ).copyWith(fontWeight: FontWeight.w500),
             decoration: const InputDecoration(
               border: InputBorder.none,
               isDense: true,
