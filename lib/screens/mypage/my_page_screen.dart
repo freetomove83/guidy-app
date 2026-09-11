@@ -10,6 +10,7 @@ import '../../widgets/common_widgets.dart';
 import 'notification_settings_screen.dart';
 import 'change_password_screen.dart';
 import 'delete_account_screen.dart';
+import 'referral_screen.dart';
 
 class MyPageScreen extends StatefulWidget {
   const MyPageScreen({super.key});
@@ -315,6 +316,19 @@ class _ProfileTabState extends State<_ProfileTab> {
         // 계정 관리
         Text('계정 관리', style: GuidyText.h3(textC)),
         const SizedBox(height: 12),
+        // 초대 링크 (무료 이용권 배지 포함)
+        _menuItemWithBadge(
+          Icons.card_giftcard_rounded,
+          '친구 초대',
+          '초대하고 무료 이용권 받기',
+          surfaceC, lineC, textC, subC,
+          userStore.freeTickets,
+          GuidyColors.ok,
+          () => Navigator.push(context, MaterialPageRoute(
+            builder: (_) => const ReferralScreen(),
+          )),
+        ),
+        const SizedBox(height: 8),
         _menuItem(Icons.notifications_outlined, '알림 설정', surfaceC, lineC, textC, subC, () {
           Navigator.push(context, MaterialPageRoute(
             builder: (_) => const NotificationSettingsScreen(),
@@ -459,6 +473,68 @@ class _ProfileTabState extends State<_ProfileTab> {
                   .copyWith(fontWeight: FontWeight.w500)),
             ),
             const Icon(Icons.chevron_right_rounded, color: GuidyColors.mute, size: 18),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _menuItemWithBadge(
+    IconData icon, String title, String subtitle,
+    Color surfaceC, Color lineC, Color textC, Color subC,
+    int badgeCount, Color badgeColor,
+    VoidCallback? onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: surfaceC,
+          borderRadius: GuidyRadius.lgBorder,
+          border: Border.all(
+            color: badgeCount > 0
+                ? badgeColor.withValues(alpha: 0.4)
+                : lineC,
+            width: badgeCount > 0 ? 1.5 : 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 36, height: 36,
+              decoration: BoxDecoration(
+                color: badgeColor.withValues(alpha: 0.12),
+                borderRadius: GuidyRadius.mdBorder,
+              ),
+              child: Icon(icon, size: 18, color: badgeColor),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title,
+                      style: GuidyText.body(textC)
+                          .copyWith(fontWeight: FontWeight.w600)),
+                  Text(subtitle, style: GuidyText.small(subC)),
+                ],
+              ),
+            ),
+            if (badgeCount > 0)
+              Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: badgeColor,
+                  borderRadius: GuidyRadius.pillBorder,
+                ),
+                child: Text('🎟 $badgeCount장',
+                    style: GuidyText.kicker(Colors.white)
+                        .copyWith(fontWeight: FontWeight.w700)),
+              )
+            else
+              const Icon(Icons.chevron_right_rounded,
+                  color: GuidyColors.mute, size: 18),
           ],
         ),
       ),

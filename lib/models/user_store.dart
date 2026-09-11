@@ -15,6 +15,11 @@ const _kUserEmail        = 'guidy_user_email';
 const _kCreatorStatus    = 'guidy_creator_status';
 const _kCreatorAppliedAt  = 'guidy_creator_applied_at';
 const _kCreatorApprovedAt = 'guidy_creator_approved_at';
+// 추천인 관련 키
+const _kMyReferralCode   = 'guidy_my_referral_code';
+const _kReferredByCode   = 'guidy_referred_by_code';
+const _kReferralCount    = 'guidy_referral_count';
+const _kFreeTickets      = 'guidy_free_tickets';
 
 // 크리에이터 신청 상태 enum
 enum CreatorApplyStatus {
@@ -33,6 +38,12 @@ class UserStore extends ChangeNotifier {
   DateTime?          _creatorAppliedAt;
   DateTime?          _creatorApprovedAt;
 
+  // ── 추천인 시스템 ─────────────────────────────────────
+  String  _myReferralCode = '';   // 내 초대 코드 (6자리 대문자)
+  String  _referredByCode = '';   // 내가 가입 시 입력한 추천인 코드
+  int     _referralCount  = 0;    // 내 코드로 가입한 신규 회원 수
+  int     _freeTickets    = 0;    // 보유 무료 이용권 수
+
   // ── 개인화 데이터 ────────────────────────────────────
   final Set<String> _favorites  = {};
   final Set<String> _likes      = {};
@@ -47,6 +58,13 @@ class UserStore extends ChangeNotifier {
   DateTime?          get creatorAppliedAt  => _creatorAppliedAt;
   DateTime?          get creatorApprovedAt => _creatorApprovedAt;
   bool get isCreator => _creatorStatus == CreatorApplyStatus.approved;
+
+  // 추천인 관련 getters
+  String get myReferralCode  => _myReferralCode;
+  String get referredByCode  => _referredByCode;
+  int    get referralCount   => _referralCount;
+  int    get freeTickets     => _freeTickets;
+  bool   get hasFreeTicket   => _freeTickets > 0;
 
   Set<String> get favorites  => Set.unmodifiable(_favorites);
   Set<String> get likes      => Set.unmodifiable(_likes);
@@ -99,8 +117,38 @@ class UserStore extends ChangeNotifier {
       if (appliedStr  != null) _creatorAppliedAt  = DateTime.parse(appliedStr);
       if (approvedStr != null) _creatorApprovedAt = DateTime.parse(approvedStr);
 
+      // 추천인 상태 복원
+      _myReferralCode = prefs.getString(_kMyReferralCode) ?? _generateCode(_userEmail);
+      _referredByCode = prefs.getString(_kReferredByCode) ?? '';
+      _referralCount  = prefs.getInt(_kReferralCount) ?? 0;
+      _freeTickets    = prefs.getInt(_kFreeTickets)   ?? 0;
+
+      // 내 코드가 없으면 새로 생성 후 저장
+      if ((prefs.getString(_kMyReferralCode) ?? '').isEmpty) {
+        await prefs.setString(_kMyReferralCode, _myReferralCode);
+      }
+
       notifyListeners();
     } catch (_) {}
+  }
+
+  /// 6자리 대문자 랜덤 추천 코드 생성
+  String _generateCode(String seed) {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    final base = seed.isEmpty
+        ? DateTime.now().millisecondsSinceEpoch.toString()
+        : seed;
+    // JavaScript-safe 해시 (비트 연산 없이 단순 곱셈+모듈러)
+    int h = 5381;
+    for (final c in base.codeUnits) {
+      h = ((h * 33) + c) % 2147483647; // 2^31-1 (JS-safe 양수)
+    }
+    final buf = StringBuffer();
+    for (int i = 0; i < 6; i++) {
+      buf.write(chars[h % chars.length]);
+      h = (h * 1103515245 + 12345) % 2147483647;
+    }
+    return buf.toString();
   }
 
   // ── 크리에이터 신청 ──────────────────────────────────
@@ -143,6 +191,44 @@ class UserStore extends ChangeNotifier {
     await prefs.setString(_kUserName,  _userName);
     await prefs.setString(_kUserEmail, _userEmail);
   }
+
+  // ── 추천인 코드 설정 (가입 시) ───────────────────────
+  /// 가입 시 입력한 추천인 코드를 저장.
+  /// 실제 백엔드 연동 시 서버에서 코드 유효성 검증 후 처리.
+  Future<bool> applyReferralCode(String code) async {
+    final trimmed = code.trim().toUpperCase();
+    if (trimmed.isEmpty) return false;
+    // 본인 코드는 사용 불가
+    if (trimmed == _myReferralCode) return false;
+    _referredByCode = trimmed;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_kReferredByCode, _referredByCode);
+    return true;
+  }
+
+  /// 신규 회원 유치 시 무료 이용권 +1 지급 (서버 콜백 대용 — 데모용)
+  Future<void> addReferralReward() async {
+    _referralCount += 1;
+    _freeTickets   += 1;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_kReferralCount, _referralCount);
+    await prefs.setInt(_kFreeTickets,   _freeTickets);
+  }
+
+  /// 무료 이용권 사용
+  Future<bool> useFreeTicket() async {
+    if (_freeTickets <= 0) return false;
+    _freeTickets -= 1;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_kFreeTickets, _freeTickets);
+    return true;
+  }
+
+  /// 테스트용: 추천 보상 수동 추가
+  Future<void> debugAddReward() => addReferralReward();
 
   // ── 즐겨찾기 토글 ────────────────────────────────────
   Future<void> toggleFavorite(String exhibitionId) async {

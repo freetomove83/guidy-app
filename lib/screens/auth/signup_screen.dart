@@ -1,7 +1,9 @@
 // lib/screens/auth/signup_screen.dart
-// 회원가입 화면 - 이메일 + 소셜
+// 회원가입 화면 - 이메일 + 소셜 + 추천인 코드
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../models/user_store.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/common_widgets.dart';
 
@@ -17,11 +19,14 @@ class _SignupScreenState extends State<SignupScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
+  final _referralController = TextEditingController(); // 추천인 코드
   bool _obscurePassword = true;
   bool _obscureConfirm = true;
   bool _agreeTerms = false;
   bool _agreeMarketing = false;
   bool _isLoading = false;
+  bool _referralVerified = false; // 추천인 코드 확인 상태
+  String? _referralError;
 
   @override
   void dispose() {
@@ -29,7 +34,23 @@ class _SignupScreenState extends State<SignupScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmController.dispose();
+    _referralController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // 딥링크/쿼리파라미터로 추천인 코드 자동 입력 지원
+    // 예: Navigator.pushNamed(context, '/signup', arguments: {'referralCode': 'ABC123'})
+    final args = ModalRoute.of(context)?.settings.arguments;
+    if (args is Map && args.containsKey('referralCode')) {
+      final code = args['referralCode'] as String;
+      if (code.isNotEmpty && _referralController.text.isEmpty) {
+        _referralController.text = code.toUpperCase();
+        setState(() => _referralVerified = false);
+      }
+    }
   }
 
   @override
@@ -174,9 +195,125 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 14),
 
-                    // 약관 동의
+                    // ─── 추천인 코드 (선택) ───────────────────
+                    Row(
+                      children: [
+                        GuidyInputLabel(label: '추천인 코드', textC: textC),
+                        const SizedBox(width: 6),
+                        Text('(선택)', style: GuidyText.small(muteC)),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              GuidyInputField(
+                                controller: _referralController,
+                                hint: '초대 코드 6자리 입력 (예: GUIDY1)',
+                                surfaceC: _referralVerified
+                                    ? GuidyColors.ok.withValues(alpha: 0.08)
+                                    : surfaceC,
+                                lineC: _referralVerified
+                                    ? GuidyColors.ok
+                                    : (_referralError != null
+                                        ? Colors.red.shade300
+                                        : lineC),
+                                textC: textC,
+                                subC: subC,
+                                suffix: _referralVerified
+                                    ? const Icon(
+                                        Icons.check_circle_rounded,
+                                        color: GuidyColors.ok,
+                                        size: 18,
+                                      )
+                                    : null,
+                                onChanged: (v) {
+                                  if (_referralVerified || _referralError != null) {
+                                    setState(() {
+                                      _referralVerified = false;
+                                      _referralError = null;
+                                    });
+                                  }
+                                  // 6자리 자동 대문자
+                                  final up = v.toUpperCase();
+                                  if (up != v) {
+                                    _referralController.value =
+                                        _referralController.value.copyWith(
+                                      text: up,
+                                      selection: TextSelection.collapsed(
+                                          offset: up.length),
+                                    );
+                                  }
+                                },
+                              ),
+                              if (_referralError != null)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 4, left: 2),
+                                  child: Text(_referralError!,
+                                      style: GuidyText.kicker(
+                                          Colors.red.shade400)),
+                                ),
+                              if (_referralVerified)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 4, left: 2),
+                                  child: Text('추천인 코드가 확인되었습니다 🎉',
+                                      style: GuidyText.kicker(GuidyColors.ok)),
+                                ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        GestureDetector(
+                          onTap: _referralVerified ? null : _verifyReferralCode,
+                          child: Container(
+                            height: 50,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16),
+                            decoration: BoxDecoration(
+                              color: _referralVerified
+                                  ? GuidyColors.ok.withValues(alpha: 0.15)
+                                  : primaryC,
+                              borderRadius: GuidyRadius.lgBorder,
+                            ),
+                            child: Center(
+                              child: Text(
+                                _referralVerified ? '확인됨' : '확인',
+                                style: TextStyle(
+                                  fontFamily: GuidyText.fontFamily,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                  color: _referralVerified
+                                      ? GuidyColors.ok
+                                      : Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    // 추천인 혜택 안내
+                    if (!_referralVerified)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Row(
+                          children: [
+                            Icon(Icons.card_giftcard_rounded,
+                                size: 13, color: muteC),
+                            const SizedBox(width: 5),
+                            Text('친구의 초대 코드를 입력하면 가입 혜택이 제공됩니다',
+                                style: GuidyText.kicker(muteC)),
+                          ],
+                        ),
+                      ),
+
+                    const SizedBox(height: 20),
                     _CheckItem(
                       value: _agreeTerms,
                       label: '[필수] 이용약관 및 개인정보처리방침 동의',
@@ -240,6 +377,24 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
+  void _verifyReferralCode() {
+    final code = _referralController.text.trim().toUpperCase();
+    if (code.isEmpty) {
+      setState(() => _referralError = '코드를 입력해주세요');
+      return;
+    }
+    if (code.length != 6) {
+      setState(() => _referralError = '6자리 코드를 입력해주세요');
+      return;
+    }
+    // 실제 환경에서는 서버 API 호출로 검증.
+    // 데모에서는 길이 6자리 = 유효한 코드로 처리
+    setState(() {
+      _referralVerified = true;
+      _referralError = null;
+    });
+  }
+
   void _handleSocialSignup(BuildContext context, String provider) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -282,12 +437,23 @@ class _SignupScreenState extends State<SignupScreen> {
     }
 
     setState(() => _isLoading = true);
-    Future.delayed(const Duration(milliseconds: 1500), () {
+    Future.delayed(const Duration(milliseconds: 1500), () async {
+      if (!mounted) return;
+
+      // 추천인 코드가 확인된 경우 UserStore에 저장
+      if (_referralVerified && _referralController.text.isNotEmpty) {
+        final userStore = context.read<UserStore>();
+        await userStore.applyReferralCode(_referralController.text.trim());
+      }
+
       if (!mounted) return;
       setState(() => _isLoading = false);
+      final isVerified = _referralVerified;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('회원가입 기능 연동 준비 중입니다'),
+          content: Text(isVerified
+              ? '가입 완료! 추천인 코드가 적용되었습니다 🎉'
+              : '회원가입 기능 연동 준비 중입니다'),
           backgroundColor: GuidyColors.primary,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: GuidyRadius.lgBorder),
