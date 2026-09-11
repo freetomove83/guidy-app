@@ -186,6 +186,7 @@ class CreatorGuide {
   final int plays;
   final double rating;
   final String? firstArtworkId;
+  final int price;   // 개별 가이드 가격 (0이면 무료)
 
   const CreatorGuide({
     required this.id,
@@ -201,11 +202,15 @@ class CreatorGuide {
     this.plays = 0,
     this.rating = 0,
     this.firstArtworkId,
+    this.price = 0,
   });
 }
 
 // ─── 구매 내역 ───────────────────────────────────────────
 enum PurchaseStatus { active, unused, cancelled }
+
+// 구매 타입: exhibition(전시 통합), guide(크리에이터 가이드 개별)
+enum PurchaseType { exhibition, guide }
 
 class Purchase {
   final String id;
@@ -217,6 +222,10 @@ class Purchase {
   final DateTime purchasedAt;
   final PurchaseStatus status;
   final DateTime? cancelledAt;
+  final PurchaseType type;       // 구매 타입
+  final String? guideId;         // 크리에이터 가이드 ID (type==guide 일 때)
+  final String? guideTitle;      // 가이드 제목
+  final String? creatorName;     // 크리에이터 이름
 
   const Purchase({
     required this.id,
@@ -228,10 +237,14 @@ class Purchase {
     required this.purchasedAt,
     this.status = PurchaseStatus.unused,
     this.cancelledAt,
+    this.type = PurchaseType.exhibition,
+    this.guideId,
+    this.guideTitle,
+    this.creatorName,
   });
 
-  bool get isCancellable =>
-      status == PurchaseStatus.unused;
+  bool get isCancellable => status == PurchaseStatus.unused;
+  bool get isGuide       => type == PurchaseType.guide;
 
   Purchase copyWith({PurchaseStatus? status, DateTime? cancelledAt}) =>
       Purchase(
@@ -244,6 +257,10 @@ class Purchase {
         purchasedAt: purchasedAt,
         status: status ?? this.status,
         cancelledAt: cancelledAt ?? this.cancelledAt,
+        type: type,
+        guideId: guideId,
+        guideTitle: guideTitle,
+        creatorName: creatorName,
       );
 }
 
@@ -347,6 +364,7 @@ class DummyData {
       avatarColor: '#0B3D5C',
       isVerified: true,
       guideTitle: '빛과 표면: 큐레이터의 시선',
+      price: 3900,
       description: '13인 작가 개인 인터뷰 기반의 심층 해설. 전시 기획 의도부터 작품 배치의 숨은 맥락까지 담았습니다.',
       durationSec: 3120,
       plays: 4280,
@@ -363,6 +381,7 @@ class DummyData {
       isVerified: true,
       guideTitle: '빛과 표면: 유튜버의 솔직 리뷰',
       description: '2시간 현장 탐방의 솔직한 감상. MZ 관람객 관점에서 꼭 봐야 할 작품과 포토스팟을 알려드립니다.',
+      price: 2900,
       durationSec: 2400,
       plays: 2150,
       rating: 4.7,
@@ -379,6 +398,7 @@ class DummyData {
       isVerified: false,
       guideTitle: '도시의 결: 컬렉터의 관점',
       description: '작품 가치와 시장성을 함께 분석. 컬렉터가 주목하는 신진 작가들의 숨은 가능성을 짚어드립니다.',
+      price: 3500,
       durationSec: 2640,
       plays: 1890,
       rating: 4.6,
@@ -394,6 +414,7 @@ class DummyData {
       isVerified: false,
       guideTitle: '침묵과 소음: 소외된 서사',
       description: '주류 미술계가 외면한 작가들의 목소리. 사운드 아트의 역사적 맥락과 현재적 의미를 탐구합니다.',
+      price: 2500,
       durationSec: 2880,
       plays: 980,
       rating: 4.8,

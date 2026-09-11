@@ -36,6 +36,13 @@ class UserStore extends ChangeNotifier {
   List<Purchase> get activePurchases =>
       _purchases.where((p) => p.status != PurchaseStatus.cancelled).toList();
 
+  List<Purchase> get guidePurchases =>
+      _purchases.where((p) => p.isGuide).toList();
+
+  bool hasPurchasedGuide(String guideId) => _purchases.any(
+    (p) => p.guideId == guideId && p.status != PurchaseStatus.cancelled,
+  );
+
   bool isFavorite(String exhibitionId) => _favorites.contains(exhibitionId);
   bool isLiked(String exhibitionId)    => _likes.contains(exhibitionId);
   bool isFollowing(String creatorId)   => _following.contains(creatorId);
@@ -157,6 +164,10 @@ class UserStore extends ChangeNotifier {
     'purchasedAt': p.purchasedAt.toIso8601String(),
     'status': p.status.index,
     'cancelledAt': p.cancelledAt?.toIso8601String(),
+    'type': p.type.index,
+    'guideId': p.guideId,
+    'guideTitle': p.guideTitle,
+    'creatorName': p.creatorName,
   };
 
   static Purchase _purchaseFromJson(Map<String, dynamic> j) => Purchase(
@@ -171,5 +182,9 @@ class UserStore extends ChangeNotifier {
     cancelledAt: j['cancelledAt'] != null
         ? DateTime.parse(j['cancelledAt'] as String)
         : null,
+    type: PurchaseType.values[j['type'] as int? ?? 0],
+    guideId: j['guideId'] as String?,
+    guideTitle: j['guideTitle'] as String?,
+    creatorName: j['creatorName'] as String?,
   );
 }
