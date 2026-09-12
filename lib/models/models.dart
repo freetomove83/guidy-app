@@ -453,6 +453,108 @@ class DummyData {
       imageSeed: 24,
       artworkIds: [],
     ),
+    // e3: 기억의 지형 (아카이브)
+    const ExhibitionSection(
+      id: 's6', exhibitionId: 'e3', order: 1,
+      title: '입구 · 소개',
+      description: '전시 기획 의도와 참여 작가 소개. 기억과 공간이 어떻게 교차하는지 큰 그림을 제시합니다.',
+      imageSeed: 25, artworkIds: [],
+    ),
+    const ExhibitionSection(
+      id: 's7', exhibitionId: 'e3', order: 2,
+      title: '메인 갤러리',
+      description: '기억을 형상화한 핵심 설치 작품군. 관람객이 직접 걸으며 경험하는 공간적 서사.',
+      imageSeed: 26, artworkIds: [],
+    ),
+    const ExhibitionSection(
+      id: 's8', exhibitionId: 'e3', order: 3,
+      title: '아카이브 룸',
+      description: '전시 기간 중 수집된 관람객 기억 조각들. 포스트잇, 편지, 사진이 벽을 가득 채웁니다.',
+      imageSeed: 27, artworkIds: [],
+    ),
+    // e7: 사진의 시간 (아카이브)
+    const ExhibitionSection(
+      id: 's9', exhibitionId: 'e7', order: 1,
+      title: '입구 · 소개',
+      description: '다큐멘터리 사진 50년사의 흐름을 연대기 순으로 안내합니다.',
+      imageSeed: 30, artworkIds: [],
+    ),
+    const ExhibitionSection(
+      id: 's10', exhibitionId: 'e7', order: 2,
+      title: '메인 갤러리',
+      description: '국내외 주요 보도사진 700여 점이 집결한 대형 전시실. 역사의 결정적 순간들.',
+      imageSeed: 31, artworkIds: [],
+    ),
+    const ExhibitionSection(
+      id: 's11', exhibitionId: 'e7', order: 3,
+      title: '특별전시 · 현장의 목소리',
+      description: '사진작가 인터뷰 영상과 미공개 원본 필름 아카이브.',
+      imageSeed: 32, artworkIds: [],
+    ),
+    // e5: 색채의 언어 (아카이브)
+    const ExhibitionSection(
+      id: 's12', exhibitionId: 'e5', order: 1,
+      title: '입구 · 소개', imageSeed: 33,
+      description: '20세기 한국 추상화 거장 4인의 색채 실험을 소개합니다.',
+      artworkIds: [],
+    ),
+    const ExhibitionSection(
+      id: 's13', exhibitionId: 'e5', order: 2,
+      title: '메인 갤러리', imageSeed: 34,
+      description: '색채를 언어로 삼아 시대를 기록한 대형 유화 컬렉션.',
+      artworkIds: [],
+    ),
+    // e6: 경계의 조각들 (아카이브)
+    const ExhibitionSection(
+      id: 's14', exhibitionId: 'e6', order: 1,
+      title: '입구 · 소개', imageSeed: 35,
+      description: '한국·독일·일본 조각가 8인의 국제 교류전 배경 소개.',
+      artworkIds: [],
+    ),
+    const ExhibitionSection(
+      id: 's15', exhibitionId: 'e6', order: 2,
+      title: '조각 광장', imageSeed: 36,
+      description: '국경을 넘어 대화하는 조각들의 공간. 소재와 형태의 경계를 허뭅니다.',
+      artworkIds: [],
+    ),
+    const ExhibitionSection(
+      id: 's16', exhibitionId: 'e6', order: 3,
+      title: '특별전시실', imageSeed: 37,
+      description: '작가들의 제작 과정 영상과 스케치 원본.',
+      artworkIds: [],
+    ),
+    // e8: 도자의 귀환 (아카이브)
+    const ExhibitionSection(
+      id: 's17', exhibitionId: 'e8', order: 1,
+      title: '입구 · 소개', imageSeed: 38,
+      description: '전통 도자 기법과 현대 해석의 만남을 소개합니다.',
+      artworkIds: [],
+    ),
+    const ExhibitionSection(
+      id: 's18', exhibitionId: 'e8', order: 2,
+      title: '메인 갤러리', imageSeed: 39,
+      description: '현대 도예가 12인의 작품으로 구성된 대형 전시실.',
+      artworkIds: [],
+    ),
+    // e9: 판화의 역사 (아카이브)
+    const ExhibitionSection(
+      id: 's19', exhibitionId: 'e9', order: 1,
+      title: '입구 · 소개', imageSeed: 40,
+      description: '한국 현대 판화 60년의 역사를 시기별로 안내합니다.',
+      artworkIds: [],
+    ),
+    const ExhibitionSection(
+      id: 's20', exhibitionId: 'e9', order: 2,
+      title: '메인 갤러리', imageSeed: 41,
+      description: '목판화, 동판화, 석판화, 실크스크린 등 장르별 대표작.',
+      artworkIds: [],
+    ),
+    const ExhibitionSection(
+      id: 's21', exhibitionId: 'e9', order: 3,
+      title: '특별전시 · 현대 판화의 지평', imageSeed: 42,
+      description: '디지털 기술과 접목된 현대 판화의 가능성을 탐구합니다.',
+      artworkIds: [],
+    ),
   ];
 
   // ─── 크리에이터 가이드 더미 데이터 ────────────────────

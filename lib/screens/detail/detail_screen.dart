@@ -2,6 +2,7 @@
 // 전시 상세 화면 — 즐겨찾기/좋아요/크리에이터 가이드 배너/섹션 실제 데이터 연결
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../theme/app_theme.dart';
 import '../../models/models.dart';
@@ -123,14 +124,27 @@ class _DetailScreenState extends State<DetailScreen> {
                                   ),
                                   const SizedBox(width: 8),
                                   // 공유 버튼
-                                  Container(
-                                    width: 36, height: 36,
-                                    decoration: BoxDecoration(
-                                      color: Colors.black.withValues(alpha: 0.4),
-                                      borderRadius: GuidyRadius.mdBorder,
+                                  GestureDetector(
+                                    onTap: () => _showShareSheet(
+                                      context,
+                                      exhibition,
+                                      isDark: isDark,
+                                      bgC: bgC,
+                                      textC: textC,
+                                      subC: subC,
+                                      muteC: muteC,
+                                      lineC: lineC,
+                                      surfaceC: surfaceC,
                                     ),
-                                    child: const Icon(Icons.share_outlined,
-                                      color: Colors.white, size: 18),
+                                    child: Container(
+                                      width: 36, height: 36,
+                                      decoration: BoxDecoration(
+                                        color: Colors.black.withValues(alpha: 0.4),
+                                        borderRadius: GuidyRadius.mdBorder,
+                                      ),
+                                      child: const Icon(Icons.share_outlined,
+                                        color: Colors.white, size: 18),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -285,7 +299,7 @@ class _DetailScreenState extends State<DetailScreen> {
                           Text('섹션 구성', style: GuidyText.h3(textC)),
                           const SizedBox(height: 12),
                           if (sections.isEmpty)
-                            // 더미 섹션 표시 (섹션 데이터 없을 때)
+                            // 더미 섹션 표시 (섹션 데이터 없을 때) — 탭 불가
                             ...List.generate(3, (i) =>
                               _sectionItemDummy(i + 1, textC, subC, lineC, surfaceC))
                           else
@@ -455,6 +469,40 @@ class _DetailScreenState extends State<DetailScreen> {
     return result.toString();
   }
 
+  // ─── 공유 바텀시트 ────────────────────────────────────
+  void _showShareSheet(
+    BuildContext context,
+    Exhibition exhibition, {
+    required bool isDark,
+    required Color bgC,
+    required Color textC,
+    required Color subC,
+    required Color muteC,
+    required Color lineC,
+    required Color surfaceC,
+  }) {
+    // 도메인 구매 전: 임시 URL 패턴 사용
+    // guidy.co.kr 도메인 연결 후 아래 baseUrl을 'https://guidy.co.kr'로 변경
+    const baseUrl = 'https://guidy.app';
+    final shareUrl = '$baseUrl/guide/${exhibition.id}';
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _ExhibitionShareSheet(
+        exhibition: exhibition,
+        shareUrl: shareUrl,
+        isDark: isDark,
+        bgC: bgC,
+        textC: textC,
+        subC: subC,
+        muteC: muteC,
+        lineC: lineC,
+        surfaceC: surfaceC,
+      ),
+    );
+  }
+
   Widget _metaItem(IconData icon, String label, String value, Color textC, Color muteC) {
     return Expanded(
       child: Row(
@@ -589,6 +637,292 @@ class _SectionCard extends StatelessWidget {
             ),
           ),
           const Icon(Icons.chevron_right_rounded, color: GuidyColors.mute, size: 18),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── 전시 공유 바텀시트 ───────────────────────────────────
+class _ExhibitionShareSheet extends StatelessWidget {
+  final Exhibition exhibition;
+  final String shareUrl;
+  final bool isDark;
+  final Color bgC, textC, subC, muteC, lineC, surfaceC;
+
+  const _ExhibitionShareSheet({
+    required this.exhibition,
+    required this.shareUrl,
+    required this.isDark,
+    required this.bgC,
+    required this.textC,
+    required this.subC,
+    required this.muteC,
+    required this.lineC,
+    required this.surfaceC,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final primaryC = isDark ? GuidyColors.darkPrimary : GuidyColors.primary;
+
+    return Container(
+      margin: const EdgeInsets.fromLTRB(12, 0, 12, 24),
+      decoration: BoxDecoration(
+        color: bgC,
+        borderRadius: GuidyRadius.xlBorder,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // 핸들바
+          Container(
+            margin: const EdgeInsets.only(top: 10),
+            width: 36, height: 4,
+            decoration: BoxDecoration(
+              color: lineC,
+              borderRadius: GuidyRadius.pillBorder,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+            child: Row(
+              children: [
+                Text('전시 공유하기', style: GuidyText.h3(textC)),
+              ],
+            ),
+          ),
+          // 전시 미리보기 카드
+          Container(
+            margin: const EdgeInsets.fromLTRB(20, 14, 20, 0),
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: surfaceC,
+              borderRadius: GuidyRadius.lgBorder,
+              border: Border.all(color: lineC),
+            ),
+            child: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: GuidyRadius.mdBorder,
+                  child: GuidyCover(
+                    seed: exhibition.coverSeed,
+                    width: 52, height: 52,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(exhibition.title,
+                          style: GuidyText.body(textC)
+                              .copyWith(fontWeight: FontWeight.w700),
+                          maxLines: 1, overflow: TextOverflow.ellipsis),
+                      Text(exhibition.venue, style: GuidyText.small(subC)),
+                    ],
+                  ),
+                ),
+                ChannelBadge(type: exhibition.channel, size: 'sm'),
+              ],
+            ),
+          ),
+          // URL 복사 영역
+          GestureDetector(
+            onTap: () {
+              Clipboard.setData(ClipboardData(text: shareUrl));
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: const Text('링크가 클립보드에 복사되었습니다'),
+                backgroundColor: GuidyColors.primary,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                    borderRadius: GuidyRadius.lgBorder),
+                margin: const EdgeInsets.all(16),
+                duration: const Duration(seconds: 2),
+              ));
+              Navigator.pop(context);
+            },
+            child: Container(
+              margin: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              decoration: BoxDecoration(
+                color: isDark ? GuidyColors.darkBgAlt : GuidyColors.bgAlt,
+                borderRadius: GuidyRadius.lgBorder,
+                border: Border.all(color: lineC),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.link_rounded, size: 16, color: muteC),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(shareUrl,
+                      style: GuidyText.small(subC),
+                      overflow: TextOverflow.ellipsis),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: primaryC,
+                      borderRadius: GuidyRadius.pillBorder,
+                    ),
+                    child: Text('복사',
+                        style: GuidyText.kicker(Colors.white)
+                            .copyWith(fontWeight: FontWeight.w700)),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // 공유 채널 버튼들
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _ShareBtn(
+                  icon: Icons.message_rounded,
+                  label: '메시지',
+                  color: const Color(0xFF00C300),
+                  onTap: () {
+                    Clipboard.setData(ClipboardData(text: shareUrl));
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: const Text('링크가 복사되었습니다. 메시지 앱에서 붙여넣기 하세요'),
+                      backgroundColor: GuidyColors.primary,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: GuidyRadius.lgBorder),
+                      margin: const EdgeInsets.all(16),
+                    ));
+                    Navigator.pop(context);
+                  },
+                ),
+                _ShareBtn(
+                  icon: Icons.chat_bubble_rounded,
+                  label: '카카오톡',
+                  color: const Color(0xFFFEE500),
+                  iconColor: const Color(0xFF191919),
+                  onTap: () {
+                    Clipboard.setData(ClipboardData(text: shareUrl));
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: const Text('링크가 복사되었습니다. 카카오톡에서 붙여넣기 하세요'),
+                      backgroundColor: GuidyColors.primary,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: GuidyRadius.lgBorder),
+                      margin: const EdgeInsets.all(16),
+                    ));
+                    Navigator.pop(context);
+                  },
+                ),
+                _ShareBtn(
+                  icon: Icons.camera_alt_rounded,
+                  label: '인스타그램',
+                  color: const Color(0xFFE1306C),
+                  onTap: () {
+                    Clipboard.setData(ClipboardData(text: shareUrl));
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: const Text('인스타그램 앱에서 링크를 붙여넣기 하세요'),
+                      backgroundColor: GuidyColors.primary,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: GuidyRadius.lgBorder),
+                      margin: const EdgeInsets.all(16),
+                    ));
+                    Navigator.pop(context);
+                  },
+                ),
+                _ShareBtn(
+                  icon: Icons.copy_rounded,
+                  label: '링크 복사',
+                  color: primaryC,
+                  onTap: () {
+                    Clipboard.setData(ClipboardData(text: shareUrl));
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: const Text('링크가 복사되었습니다'),
+                      backgroundColor: GuidyColors.primary,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: GuidyRadius.lgBorder),
+                      margin: const EdgeInsets.all(16),
+                      duration: const Duration(seconds: 2),
+                    ));
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Container(
+              margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              decoration: BoxDecoration(
+                color: surfaceC,
+                borderRadius: GuidyRadius.lgBorder,
+                border: Border.all(color: lineC),
+              ),
+              child: Text('닫기',
+                  style: GuidyText.body(subC),
+                  textAlign: TextAlign.center),
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── 공유 채널 버튼 ───────────────────────────────────────
+class _ShareBtn extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final Color? iconColor;
+  final VoidCallback onTap;
+
+  const _ShareBtn({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+    this.iconColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 52, height: 52,
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: color.withValues(alpha: 0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Icon(icon, color: iconColor ?? Colors.white, size: 22),
+          ),
+          const SizedBox(height: 6),
+          Text(label,
+              style: const TextStyle(
+                fontFamily: GuidyText.fontFamily,
+                fontSize: 11,
+                color: GuidyColors.mute,
+              )),
         ],
       ),
     );

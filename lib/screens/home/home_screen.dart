@@ -321,31 +321,35 @@ class _DiscoverTab extends StatelessWidget {
 
               const SizedBox(height: 28),
 
-              // ── 이번 주 새 가이드 ──
+              // ── 이번 주 새 가이드 (아카이브 제외) ──
               const SectionHeader(title: '이번 주 새 가이드', action: '더보기 →'),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 0.62,
-                    crossAxisSpacing: 14,
-                    mainAxisSpacing: 14,
+              Builder(builder: (context) {
+                final newGuides = DummyData.exhibitions
+                    .where((e) => e.channel != ChannelType.archive)
+                    .toList();
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 0.62,
+                      crossAxisSpacing: 14,
+                      mainAxisSpacing: 14,
+                    ),
+                    itemCount: newGuides.length,
+                    itemBuilder: (context, i) {
+                      return ExhibitionCard(
+                        exhibition: newGuides[i],
+                        onTap: () => Navigator.pushNamed(
+                            context, '/detail/${newGuides[i].id}'),
+                      );
+                    },
                   ),
-                  itemCount: DummyData.exhibitions.length,
-                  itemBuilder: (context, i) {
-                    return ExhibitionCard(
-                      exhibition: DummyData.exhibitions[i],
-                      onTap: () => Navigator.pushNamed(
-                          context,
-                          '/detail/${DummyData.exhibitions[i].id}'),
-                    );
-                  },
-                ),
-              ),
+                );
+              }),
 
               const SizedBox(height: 16),
             ],
