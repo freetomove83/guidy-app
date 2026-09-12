@@ -481,9 +481,7 @@ class _DetailScreenState extends State<DetailScreen> {
     required Color lineC,
     required Color surfaceC,
   }) {
-    // 도메인 구매 전: 임시 URL 패턴 사용
-    // guidy.co.kr 도메인 연결 후 아래 baseUrl을 'https://guidy.co.kr'로 변경
-    const baseUrl = 'https://guidy.app';
+    const baseUrl = 'https://guidy.co.kr';
     final shareUrl = '$baseUrl/guide/${exhibition.id}';
     showModalBottomSheet(
       context: context,

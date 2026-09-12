@@ -24,7 +24,7 @@ class ReferralScreen extends StatelessWidget {
     final primaryC  = isDark ? GuidyColors.darkPrimary  : GuidyColors.primary;
 
     final myCode     = userStore.myReferralCode;
-    final inviteLink = 'https://guidy.app/join?ref=$myCode';
+    final inviteLink = 'https://guidy.co.kr/join?ref=$myCode';
 
     return Scaffold(
       backgroundColor: bgC,

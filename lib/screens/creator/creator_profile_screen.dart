@@ -304,7 +304,7 @@ class CreatorProfileScreen extends StatelessWidget {
     required Color surfaceC,
     required Color primaryC,
   }) {
-    final shareUrl = 'https://guidy.app/creator/${creator.id}';
+    final shareUrl = 'https://guidy.co.kr/creator/${creator.id}';
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
