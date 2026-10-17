@@ -395,10 +395,10 @@ class _ProfileTabState extends State<_ProfileTab> {
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 8, 14, 8),
       decoration: BoxDecoration(
-        color: enabled ? surfaceC : surfaceC.withOpacity(0.7),
+        color: enabled ? surfaceC : surfaceC.withValues(alpha: 0.7),
         borderRadius: GuidyRadius.lgBorder,
         border: Border.all(
-          color: enabled ? GuidyColors.primary.withOpacity(0.4) : lineC,
+          color: enabled ? GuidyColors.primary.withValues(alpha: 0.4) : lineC,
           width: enabled ? 1.5 : 1,
         ),
       ),
@@ -412,7 +412,7 @@ class _ProfileTabState extends State<_ProfileTab> {
                 [const SizedBox(width: 6),
                 Expanded(
                   child: Text(trailingHint,
-                    style: GuidyText.kicker(muteC.withOpacity(0.7)),
+                    style: GuidyText.kicker(muteC.withValues(alpha: 0.7)),
                     overflow: TextOverflow.ellipsis,
                   ),
                 )],
@@ -493,7 +493,7 @@ class _ProfileTabState extends State<_ProfileTab> {
           borderRadius: GuidyRadius.lgBorder,
           border: Border.all(
             color: badgeCount > 0
-                ? badgeColor.withOpacity(0.4)
+                ? badgeColor.withValues(alpha: 0.4)
                 : lineC,
             width: badgeCount > 0 ? 1.5 : 1,
           ),
@@ -503,7 +503,7 @@ class _ProfileTabState extends State<_ProfileTab> {
             Container(
               width: 36, height: 36,
               decoration: BoxDecoration(
-                color: badgeColor.withOpacity(0.12),
+                color: badgeColor.withValues(alpha: 0.12),
                 borderRadius: GuidyRadius.mdBorder,
               ),
               child: Icon(icon, size: 18, color: badgeColor),
@@ -643,7 +643,7 @@ class _PurchaseCard extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
-                              color: statusColor.withOpacity(0.12),
+                              color: statusColor.withValues(alpha: 0.12),
                               borderRadius: GuidyRadius.pillBorder,
                             ),
                             child: Text(statusLabel,
@@ -686,9 +686,9 @@ class _PurchaseCard extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: Colors.red.withOpacity(0.08),
+                        color: Colors.red.withValues(alpha: 0.08),
                         borderRadius: GuidyRadius.pillBorder,
-                        border: Border.all(color: Colors.red.withOpacity(0.3)),
+                        border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
                       ),
                       child: Text('구매 취소',
                         style: GuidyText.small(Colors.red)

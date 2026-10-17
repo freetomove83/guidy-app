@@ -65,7 +65,7 @@ class SectionDetailScreen extends StatelessWidget {
                             end: Alignment.bottomCenter,
                             colors: [
                               Colors.transparent,
-                              bgC.withOpacity(0.9),
+                              bgC.withValues(alpha: 0.9),
                             ],
                             stops: const [0.4, 1.0],
                           ),
@@ -81,7 +81,7 @@ class SectionDetailScreen extends StatelessWidget {
                         child: Container(
                           width: 36, height: 36,
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.4),
+                            color: Colors.black.withValues(alpha: 0.4),
                             borderRadius: GuidyRadius.mdBorder,
                           ),
                           child: const Icon(Icons.arrow_back_ios_new_rounded,
@@ -95,7 +95,7 @@ class SectionDetailScreen extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         decoration: BoxDecoration(
-                          color: GuidyColors.primary.withOpacity(0.9),
+                          color: GuidyColors.primary.withValues(alpha: 0.9),
                           borderRadius: GuidyRadius.pillBorder,
                         ),
                         child: Text(

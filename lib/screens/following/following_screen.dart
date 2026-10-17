@@ -166,7 +166,7 @@ class _FeedCardState extends State<_FeedCard> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: item.type == FeedItemType.newGuide ? accentC.withOpacity(0.15) : lineC,
+                  color: item.type == FeedItemType.newGuide ? accentC.withValues(alpha: 0.15) : lineC,
                   borderRadius: GuidyRadius.pillBorder,
                 ),
                 child: Text(

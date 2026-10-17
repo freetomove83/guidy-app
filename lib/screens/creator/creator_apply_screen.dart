@@ -760,7 +760,7 @@ class _ApprovedView extends StatelessWidget {
                     Container(
                       width: 80, height: 80,
                       decoration: BoxDecoration(
-                        color: GuidyColors.ok.withOpacity(0.12),
+                        color: GuidyColors.ok.withValues(alpha: 0.12),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(Icons.verified_rounded,
@@ -783,10 +783,10 @@ class _ApprovedView extends StatelessWidget {
                       width: double.infinity,
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: GuidyColors.ok.withOpacity(0.06),
+                        color: GuidyColors.ok.withValues(alpha: 0.06),
                         borderRadius: GuidyRadius.lgBorder,
                         border: Border.all(
-                            color: GuidyColors.ok.withOpacity(0.2)),
+                            color: GuidyColors.ok.withValues(alpha: 0.2)),
                       ),
                       child: Column(
                         children: [
@@ -926,7 +926,7 @@ class _PulsingIconState extends State<_PulsingIcon>
         child: Container(
           width: 80, height: 80,
           decoration: BoxDecoration(
-            color: widget.primaryC.withOpacity(0.10 + 0.05 * _anim.value),
+            color: widget.primaryC.withValues(alpha: 0.10 + 0.05 * _anim.value),
             shape: BoxShape.circle,
           ),
           child: Icon(Icons.manage_search_rounded,
@@ -961,9 +961,9 @@ Widget _timelineItem({
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: isDone
-                    ? color.withOpacity(0.12)
+                    ? color.withValues(alpha: 0.12)
                     : isActive
-                        ? color.withOpacity(0.12)
+                        ? color.withValues(alpha: 0.12)
                         : Colors.transparent,
                 border: Border.all(
                   color: isDone || isActive ? color : lineC,
@@ -977,7 +977,7 @@ Widget _timelineItem({
                 child: Container(
                   width: 2,
                   margin: const EdgeInsets.symmetric(vertical: 3),
-                  color: isDone ? color.withOpacity(0.4) : lineC,
+                  color: isDone ? color.withValues(alpha: 0.4) : lineC,
                 ),
               ),
           ],

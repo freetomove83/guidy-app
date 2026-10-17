@@ -233,7 +233,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                       child: ClipRRect(
                         borderRadius: GuidyRadius.xlBorder,
                         child: Container(
-                          color: Colors.black.withOpacity(0.45),
+                          color: Colors.black.withValues(alpha: 0.45),
                           child: const Center(
                             child: CircularProgressIndicator(
                               color: Colors.white,
@@ -249,7 +249,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                       child: ClipRRect(
                         borderRadius: GuidyRadius.xlBorder,
                         child: Container(
-                          color: Colors.black.withOpacity(0.6),
+                          color: Colors.black.withValues(alpha: 0.6),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -265,7 +265,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 16, vertical: 8),
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.2),
+                                    color: Colors.white.withValues(alpha: 0.2),
                                     borderRadius: GuidyRadius.pillBorder,
                                   ),
                                   child: Text('다시 시도',
@@ -288,7 +288,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                         child: Container(
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.82),
+                            color: Colors.black.withValues(alpha: 0.82),
                             borderRadius: GuidyRadius.lgBorder,
                           ),
                           child: Column(
@@ -309,7 +309,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                                 Text('♪  재생 중...',
                                     style: TextStyle(
                                         color: Colors.white
-                                            .withOpacity(0.5),
+                                            .withValues(alpha: 0.5),
                                         fontSize: 13,
                                         fontFamily:
                                             GuidyText.fontFamily)),
@@ -319,7 +319,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                                   _nextCaption(positionSec)!.text,
                                   style: TextStyle(
                                     color: Colors.white
-                                        .withOpacity(0.45),
+                                        .withValues(alpha: 0.45),
                                     fontSize: 12,
                                     fontFamily: GuidyText.fontFamily,
                                   ),
@@ -498,7 +498,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                         color: textC, shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: textC.withOpacity(0.25),
+                            color: textC.withValues(alpha: 0.25),
                             blurRadius: 20,
                             offset: const Offset(0, 6),
                           ),
@@ -718,7 +718,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                 const EdgeInsets.fromLTRB(12, 10, 12, 10),
             decoration: BoxDecoration(
               color: isActive
-                  ? primaryC.withOpacity(0.08)
+                  ? primaryC.withValues(alpha: 0.08)
                   : Colors.transparent,
               borderRadius: GuidyRadius.mdBorder,
               border: Border(

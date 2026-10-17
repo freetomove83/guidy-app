@@ -110,16 +110,16 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.red.withOpacity(0.06),
+              color: Colors.red.withValues(alpha: 0.06),
               borderRadius: GuidyRadius.lgBorder,
-              border: Border.all(color: Colors.red.withOpacity(0.2)),
+              border: Border.all(color: Colors.red.withValues(alpha: 0.2)),
             ),
             child: Row(
               children: [
                 Container(
                   width: 40, height: 40,
                   decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.10),
+                    color: Colors.red.withValues(alpha: 0.10),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.warning_amber_rounded,
@@ -222,7 +222,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                 height: 50,
                 decoration: BoxDecoration(
                   color: _agreed
-                      ? Colors.red.withOpacity(0.9)
+                      ? Colors.red.withValues(alpha: 0.9)
                       : lineC,
                   borderRadius: GuidyRadius.lgBorder,
                 ),
@@ -255,7 +255,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.red.withOpacity(0.06),
+              color: Colors.red.withValues(alpha: 0.06),
               borderRadius: GuidyRadius.mdBorder,
             ),
             child: Text('최종 확인 단계',
@@ -317,7 +317,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                 height: 50,
                 decoration: BoxDecoration(
                   color: inputOk
-                      ? Colors.red.withOpacity(0.9)
+                      ? Colors.red.withValues(alpha: 0.9)
                       : lineC,
                   borderRadius: GuidyRadius.lgBorder,
                 ),
@@ -361,7 +361,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                 child: Row(
                   children: [
                     Icon(item.$1, size: 17,
-                        color: Colors.red.withOpacity(0.7)),
+                        color: Colors.red.withValues(alpha: 0.7)),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Column(

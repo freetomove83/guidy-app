@@ -242,7 +242,7 @@ class _SocialLoginButton extends StatelessWidget {
           border: borderColor != null ? Border.all(color: borderColor!) : null,
           boxShadow: borderColor == null ? [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withValues(alpha: 0.06),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),

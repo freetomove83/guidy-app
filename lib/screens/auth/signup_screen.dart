@@ -217,7 +217,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                 controller: _referralController,
                                 hint: '초대 코드 6자리 입력 (예: GUIDY1)',
                                 surfaceC: _referralVerified
-                                    ? GuidyColors.ok.withOpacity(0.08)
+                                    ? GuidyColors.ok.withValues(alpha: 0.08)
                                     : surfaceC,
                                 lineC: _referralVerified
                                     ? GuidyColors.ok
@@ -277,7 +277,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                 horizontal: 16),
                             decoration: BoxDecoration(
                               color: _referralVerified
-                                  ? GuidyColors.ok.withOpacity(0.15)
+                                  ? GuidyColors.ok.withValues(alpha: 0.15)
                                   : primaryC,
                               borderRadius: GuidyRadius.lgBorder,
                             ),
@@ -532,7 +532,7 @@ class _SocialIconButton extends StatelessWidget {
                 color: bgColor,
                 shape: BoxShape.circle,
                 border: borderColor != null ? Border.all(color: borderColor!) : null,
-                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 6, offset: const Offset(0, 2))],
+                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 6, offset: const Offset(0, 2))],
               ),
               child: Center(child: child),
             ),

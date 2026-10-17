@@ -179,7 +179,7 @@ class _HowToUseTab extends StatelessWidget {
               Container(
                 width: 40, height: 40,
                 decoration: BoxDecoration(
-                  color: primaryC.withOpacity(0.10),
+                  color: primaryC.withValues(alpha: 0.10),
                   borderRadius: GuidyRadius.mdBorder,
                 ),
                 child: Stack(
@@ -310,7 +310,7 @@ class _FaqTabState extends State<_FaqTab> {
               color: surfaceC,
               borderRadius: GuidyRadius.lgBorder,
               border: Border.all(
-                color: isOpen ? primaryC.withOpacity(0.4) : lineC,
+                color: isOpen ? primaryC.withValues(alpha: 0.4) : lineC,
                 width: isOpen ? 1.5 : 1,
               ),
             ),
@@ -329,7 +329,7 @@ class _FaqTabState extends State<_FaqTab> {
                         decoration: BoxDecoration(
                           color: isOpen
                               ? primaryC
-                              : primaryC.withOpacity(0.10),
+                              : primaryC.withValues(alpha: 0.10),
                           shape: BoxShape.circle,
                         ),
                         child: Center(
@@ -372,7 +372,7 @@ class _FaqTabState extends State<_FaqTab> {
                           width: 22, height: 22,
                           margin: const EdgeInsets.only(right: 10, top: 1),
                           decoration: BoxDecoration(
-                            color: GuidyColors.ok.withOpacity(0.12),
+                            color: GuidyColors.ok.withValues(alpha: 0.12),
                             shape: BoxShape.circle,
                           ),
                           child: Center(

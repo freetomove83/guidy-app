@@ -50,7 +50,7 @@ class ArchiveScreen extends StatelessWidget {
                               gradient: LinearGradient(
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
-                                colors: [Colors.transparent, bgC.withOpacity(0.9)],
+                                colors: [Colors.transparent, bgC.withValues(alpha: 0.9)],
                                 stops: const [0.4, 1.0],
                               ),
                             ),
@@ -68,7 +68,7 @@ class ArchiveScreen extends StatelessWidget {
                                 child: Container(
                                   width: 36, height: 36,
                                   decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.4),
+                                    color: Colors.black.withValues(alpha: 0.4),
                                     borderRadius: GuidyRadius.mdBorder,
                                   ),
                                   child: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 16),
@@ -78,7 +78,7 @@ class ArchiveScreen extends StatelessWidget {
                                 Container(
                                   width: 36, height: 36,
                                   decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.4),
+                                    color: Colors.black.withValues(alpha: 0.4),
                                     borderRadius: GuidyRadius.mdBorder,
                                   ),
                                   child: const Icon(Icons.favorite_border_rounded, color: Colors.white, size: 18),
@@ -87,7 +87,7 @@ class ArchiveScreen extends StatelessWidget {
                                 Container(
                                   width: 36, height: 36,
                                   decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.4),
+                                    color: Colors.black.withValues(alpha: 0.4),
                                     borderRadius: GuidyRadius.mdBorder,
                                   ),
                                   child: const Icon(Icons.share_outlined, color: Colors.white, size: 18),
@@ -106,7 +106,7 @@ class ArchiveScreen extends StatelessWidget {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.5),
+                                  color: Colors.black.withValues(alpha: 0.5),
                                   borderRadius: GuidyRadius.pillBorder,
                                 ),
                                 child: const Text('2024', style: TextStyle(
@@ -224,13 +224,13 @@ class ArchiveScreen extends StatelessWidget {
                                   child: Container(
                                     decoration: BoxDecoration(
                                       borderRadius: GuidyRadius.mdBorder,
-                                      color: Colors.black.withOpacity(0.2),
+                                      color: Colors.black.withValues(alpha: 0.2),
                                     ),
                                     child: Center(
                                       child: Container(
                                         width: 28, height: 28,
                                         decoration: BoxDecoration(
-                                          color: Colors.white.withOpacity(0.9),
+                                          color: Colors.white.withValues(alpha: 0.9),
                                           shape: BoxShape.circle,
                                         ),
                                         child: const Icon(Icons.play_arrow_rounded, size: 16, color: Colors.black87),

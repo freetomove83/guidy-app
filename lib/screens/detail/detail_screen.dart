@@ -50,7 +50,7 @@ class _DetailScreenState extends State<DetailScreen> {
     final lineC     = isDark ? GuidyColors.darkLine     : GuidyColors.line;
     final accentC   = isDark ? GuidyColors.darkAccent   : GuidyColors.accent;
     final accentSoftC = isDark
-        ? GuidyColors.darkAccent.withOpacity(0.14)
+        ? GuidyColors.darkAccent.withValues(alpha: 0.14)
         : GuidyColors.accentSoft;
 
     return Scaffold(
@@ -77,7 +77,7 @@ class _DetailScreenState extends State<DetailScreen> {
                               gradient: LinearGradient(
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
-                                colors: [Colors.transparent, bgC.withOpacity(0.8)],
+                                colors: [Colors.transparent, bgC.withValues(alpha: 0.8)],
                                 stops: const [0.5, 1.0],
                               ),
                             ),
@@ -95,7 +95,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                 child: Container(
                                   width: 36, height: 36,
                                   decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.4),
+                                    color: Colors.black.withValues(alpha: 0.4),
                                     borderRadius: GuidyRadius.mdBorder,
                                   ),
                                   child: const Icon(Icons.arrow_back_ios_new_rounded,
@@ -111,8 +111,8 @@ class _DetailScreenState extends State<DetailScreen> {
                                       width: 36, height: 36,
                                       decoration: BoxDecoration(
                                         color: isFav
-                                            ? GuidyColors.accent.withOpacity(0.85)
-                                            : Colors.black.withOpacity(0.4),
+                                            ? GuidyColors.accent.withValues(alpha: 0.85)
+                                            : Colors.black.withValues(alpha: 0.4),
                                         borderRadius: GuidyRadius.mdBorder,
                                       ),
                                       child: Icon(
@@ -139,7 +139,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                     child: Container(
                                       width: 36, height: 36,
                                       decoration: BoxDecoration(
-                                        color: Colors.black.withOpacity(0.4),
+                                        color: Colors.black.withValues(alpha: 0.4),
                                         borderRadius: GuidyRadius.mdBorder,
                                       ),
                                       child: const Icon(Icons.share_outlined,
@@ -169,7 +169,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                   decoration: BoxDecoration(
-                                    color: GuidyColors.ok.withOpacity(0.15),
+                                    color: GuidyColors.ok.withValues(alpha: 0.15),
                                     borderRadius: GuidyRadius.pillBorder,
                                   ),
                                   child: const Text('진행 중', style: TextStyle(
@@ -188,12 +188,12 @@ class _DetailScreenState extends State<DetailScreen> {
                                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                   decoration: BoxDecoration(
                                     color: isLiked
-                                        ? Colors.red.withOpacity(0.12)
+                                        ? Colors.red.withValues(alpha: 0.12)
                                         : surfaceC,
                                     borderRadius: GuidyRadius.pillBorder,
                                     border: Border.all(
                                       color: isLiked
-                                          ? Colors.red.withOpacity(0.4)
+                                          ? Colors.red.withValues(alpha: 0.4)
                                           : lineC,
                                     ),
                                   ),
@@ -269,7 +269,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                 decoration: BoxDecoration(
                                   color: accentSoftC,
                                   borderRadius: GuidyRadius.lgBorder,
-                                  border: Border.all(color: accentC.withOpacity(0.3)),
+                                  border: Border.all(color: accentC.withValues(alpha: 0.3)),
                                 ),
                                 child: Row(
                                   children: [
@@ -345,10 +345,10 @@ class _DetailScreenState extends State<DetailScreen> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
-                        color: GuidyColors.ok.withOpacity(0.10),
+                        color: GuidyColors.ok.withValues(alpha: 0.10),
                         borderRadius: GuidyRadius.mdBorder,
                         border: Border.all(
-                            color: GuidyColors.ok.withOpacity(0.3)),
+                            color: GuidyColors.ok.withValues(alpha: 0.3)),
                       ),
                       child: Row(
                         children: [
@@ -906,7 +906,7 @@ class _ShareBtn extends StatelessWidget {
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: color.withOpacity(0.3),
+                  color: color.withValues(alpha: 0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 3),
                 ),

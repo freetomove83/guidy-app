@@ -56,7 +56,7 @@ class _CreatorDashboard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: isDark ? GuidyColors.darkCreator.withOpacity(0.2) : GuidyColors.creatorSoft,
+                      color: isDark ? GuidyColors.darkCreator.withValues(alpha: 0.2) : GuidyColors.creatorSoft,
                       borderRadius: GuidyRadius.pillBorder,
                     ),
                     child: Text('크리에이터 스튜디오', style: GuidyText.kicker(isDark ? GuidyColors.darkCreator : GuidyColors.creator)),
@@ -83,7 +83,7 @@ class _CreatorDashboard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('이달 예상 수익', style: GuidyText.small(Colors.white.withOpacity(0.6))),
+                    Text('이달 예상 수익', style: GuidyText.small(Colors.white.withValues(alpha: 0.6))),
                     const SizedBox(height: 8),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
@@ -98,7 +98,7 @@ class _CreatorDashboard extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
-                              color: GuidyColors.ok.withOpacity(0.2),
+                              color: GuidyColors.ok.withValues(alpha: 0.2),
                               borderRadius: GuidyRadius.pillBorder,
                             ),
                             child: const Text('+18%', style: TextStyle(
@@ -119,7 +119,7 @@ class _CreatorDashboard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    Text('다음 정산: 매월 15일', style: GuidyText.small(Colors.white.withOpacity(0.6))),
+                    Text('다음 정산: 매월 15일', style: GuidyText.small(Colors.white.withValues(alpha: 0.6))),
                   ],
                 ),
               ),
@@ -172,7 +172,7 @@ class _CreatorDashboard extends StatelessWidget {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: statusColors[idx].withOpacity(0.15),
+                                  color: statusColors[idx].withValues(alpha: 0.15),
                                   borderRadius: GuidyRadius.pillBorder,
                                 ),
                                 child: Text(statusLabels[idx],
@@ -222,7 +222,7 @@ class _CreatorDashboard extends StatelessWidget {
                     Container(
                       width: 40, height: 40,
                       decoration: BoxDecoration(
-                        color: accentC.withOpacity(0.15),
+                        color: accentC.withValues(alpha: 0.15),
                         borderRadius: GuidyRadius.lgBorder,
                       ),
                       child: Icon(Icons.account_balance_wallet_outlined, color: accentC, size: 20),
@@ -381,9 +381,9 @@ class _GuideEditScreenState extends State<GuideEditScreen> {
                       margin: const EdgeInsets.only(bottom: 8),
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: st == '없음' ? GuidyColors.warn.withOpacity(0.08) : surfaceC,
+                        color: st == '없음' ? GuidyColors.warn.withValues(alpha: 0.08) : surfaceC,
                         borderRadius: GuidyRadius.lgBorder,
-                        border: Border.all(color: st == '없음' ? GuidyColors.warn.withOpacity(0.3) : lineC),
+                        border: Border.all(color: st == '없음' ? GuidyColors.warn.withValues(alpha: 0.3) : lineC),
                       ),
                       child: Row(
                         children: [
@@ -443,10 +443,10 @@ class _GuideEditScreenState extends State<GuideEditScreen> {
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [primaryC.withOpacity(0.1), accentC.withOpacity(0.1)],
+                        colors: [primaryC.withValues(alpha: 0.1), accentC.withValues(alpha: 0.1)],
                       ),
                       borderRadius: GuidyRadius.lgBorder,
-                      border: Border.all(color: primaryC.withOpacity(0.3)),
+                      border: Border.all(color: primaryC.withValues(alpha: 0.3)),
                     ),
                     child: Row(
                       children: [
@@ -556,7 +556,7 @@ class _CreatorOnboardingScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.25),
+                        color: Colors.white.withValues(alpha: 0.25),
                         borderRadius: GuidyRadius.pillBorder,
                       ),
                       child: const Text('PENDING', style: TextStyle(
@@ -571,14 +571,14 @@ class _CreatorOnboardingScreen extends StatelessWidget {
                     )),
                     const SizedBox(height: 4),
                     Text('평균 3~5일 내에 결과를 알려드립니다', style: TextStyle(
-                      color: Colors.white.withOpacity(0.85), fontSize: 13,
+                      color: Colors.white.withValues(alpha: 0.85), fontSize: 13,
                       fontFamily: GuidyText.fontFamily,
                     )),
                     const SizedBox(height: 12),
                     Row(children: [
-                      Icon(Icons.calendar_today_outlined, color: Colors.white.withOpacity(0.7), size: 14),
+                      Icon(Icons.calendar_today_outlined, color: Colors.white.withValues(alpha: 0.7), size: 14),
                       const SizedBox(width: 4),
-                      Text('신청일: 2026.09.01', style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12, fontFamily: GuidyText.fontFamily)),
+                      Text('신청일: 2026.09.01', style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 12, fontFamily: GuidyText.fontFamily)),
                     ]),
                   ],
                 ),
@@ -649,7 +649,7 @@ class _CreatorOnboardingScreen extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 14),
               decoration: BoxDecoration(
-                color: GuidyColors.ok.withOpacity(0.15),
+                color: GuidyColors.ok.withValues(alpha: 0.15),
                 borderRadius: GuidyRadius.pillBorder,
                 border: Border.all(color: GuidyColors.ok),
               ),
@@ -687,7 +687,7 @@ class _CreatorOnboardingScreen extends StatelessWidget {
               Container(
                 width: 24, height: 24,
                 decoration: BoxDecoration(
-                  color: dotColor.withOpacity(isDone || isActive ? 1 : 0.2),
+                  color: dotColor.withValues(alpha: isDone || isActive ? 1 : 0.2),
                   shape: BoxShape.circle,
                 ),
                 child: Center(
@@ -699,7 +699,7 @@ class _CreatorOnboardingScreen extends StatelessWidget {
                 ),
               ),
               if (i < items.length - 1)
-                Container(width: 1.5, height: 36, color: isDone ? GuidyColors.ok.withOpacity(0.3) : lineC),
+                Container(width: 1.5, height: 36, color: isDone ? GuidyColors.ok.withValues(alpha: 0.3) : lineC),
             ],
           ),
           const SizedBox(width: 12),
@@ -737,7 +737,7 @@ class _CreatorOnboardingScreen extends StatelessWidget {
 class _HeroBgPainterStudio extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final p = Paint()..color = Colors.white.withOpacity(0.08);
+    final p = Paint()..color = Colors.white.withValues(alpha: 0.08);
     canvas.drawCircle(Offset(size.width * 0.9, size.height * 0.2), 60, p);
   }
   @override
@@ -752,7 +752,7 @@ class _MiniChartPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final points = [0.3, 0.5, 0.4, 0.7, 0.6, 0.8, 0.75, 0.9];
     final paint = Paint()
-      ..color = color.withOpacity(0.6)
+      ..color = color.withValues(alpha: 0.6)
       ..strokeWidth = 1.5
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
@@ -774,7 +774,7 @@ class _MiniChartPainter extends CustomPainter {
       ..shader = LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
-        colors: [color.withOpacity(0.3), color.withOpacity(0)],
+        colors: [color.withValues(alpha: 0.3), color.withValues(alpha: 0)],
       ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
     final fillPath = Path.from(path)
       ..lineTo(size.width, size.height)
@@ -827,7 +827,7 @@ class _ActivityManagementSection extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
-                    color: primaryC.withOpacity(0.1),
+                    color: primaryC.withValues(alpha: 0.1),
                     borderRadius: GuidyRadius.pillBorder,
                   ),
                   child: Row(
@@ -1075,7 +1075,7 @@ class _ActivityDialogState extends State<_ActivityDialog> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color: selected ? primaryC.withOpacity(0.12) : bgC,
+                      color: selected ? primaryC.withValues(alpha: 0.12) : bgC,
                       borderRadius: GuidyRadius.pillBorder,
                       border: Border.all(
                         color: selected ? primaryC : lineC,

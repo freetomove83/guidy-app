@@ -183,7 +183,7 @@ class _DiscoverTab extends StatelessWidget {
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 8, vertical: 3),
                                     decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.25),
+                                      color: Colors.white.withValues(alpha: 0.25),
                                       borderRadius: GuidyRadius.pillBorder,
                                     ),
                                     child: const Text('이달의 크리에이터',
@@ -203,7 +203,7 @@ class _DiscoverTab extends StatelessWidget {
                                     width: 56, height: 56,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: Colors.white.withOpacity(0.2),
+                                      color: Colors.white.withValues(alpha: 0.2),
                                       border: Border.all(
                                           color: Colors.white, width: 2),
                                     ),
@@ -230,7 +230,7 @@ class _DiscoverTab extends StatelessWidget {
                                         Text('미술사 큐레이터 · 가이드 14개',
                                           style: TextStyle(
                                             color: Colors.white
-                                                .withOpacity(0.8),
+                                                .withValues(alpha: 0.8),
                                             fontSize: 12,
                                             fontFamily: GuidyText.fontFamily,
                                           )),
@@ -414,8 +414,8 @@ class _CreatorNoticeBanner extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    accentC.withOpacity(0.18),
-                    primaryC.withOpacity(0.10),
+                    accentC.withValues(alpha: 0.18),
+                    primaryC.withValues(alpha: 0.10),
                   ],
                 ),
                 borderRadius: GuidyRadius.mdBorder,
@@ -447,7 +447,7 @@ class _CreatorNoticeBanner extends StatelessWidget {
             Container(
               width: 28, height: 28,
               decoration: BoxDecoration(
-                color: accentC.withOpacity(0.10),
+                color: accentC.withValues(alpha: 0.10),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -470,9 +470,9 @@ class _HeroBgPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final p = Paint()..color = Colors.white.withOpacity(0.06);
+    final p = Paint()..color = Colors.white.withValues(alpha: 0.06);
     canvas.drawCircle(Offset(size.width * 0.9, size.height * 0.1), 80, p);
-    p.color = Colors.white.withOpacity(0.04);
+    p.color = Colors.white.withValues(alpha: 0.04);
     canvas.drawCircle(Offset(size.width * 0.1, size.height * 0.9), 60, p);
   }
 
@@ -562,10 +562,10 @@ class _ArchiveTab extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          color: GuidyColors.ok.withOpacity(0.12),
+                          color: GuidyColors.ok.withValues(alpha: 0.12),
                           borderRadius: GuidyRadius.pillBorder,
                           border: Border.all(
-                              color: GuidyColors.ok.withOpacity(0.3)),
+                              color: GuidyColors.ok.withValues(alpha: 0.3)),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -668,8 +668,8 @@ class _ArchiveNoticeBanner extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    primaryC.withOpacity(0.15),
-                    accentC.withOpacity(0.10),
+                    primaryC.withValues(alpha: 0.15),
+                    accentC.withValues(alpha: 0.10),
                   ],
                 ),
                 borderRadius: GuidyRadius.mdBorder,
@@ -703,7 +703,7 @@ class _ArchiveNoticeBanner extends StatelessWidget {
             Container(
               width: 28, height: 28,
               decoration: BoxDecoration(
-                color: primaryC.withOpacity(0.08),
+                color: primaryC.withValues(alpha: 0.08),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -744,7 +744,7 @@ class _ArchiveCard extends StatelessWidget {
                   borderRadius: GuidyRadius.pillBorder,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.15),
+                      color: Colors.black.withValues(alpha: 0.15),
                       blurRadius: 6,
                       offset: const Offset(0, 2),
                     ),
