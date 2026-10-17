@@ -103,14 +103,14 @@ class GuidyText {
 // ─── 그림자 ────────────────────────────────────────────────
 class GuidyShadow {
   static List<BoxShadow> card = [
-    BoxShadow(color: const Color(0xFF0B1F2E).withValues(alpha: 0.04), offset: const Offset(0, 1), blurRadius: 2),
-    BoxShadow(color: const Color(0xFF0B1F2E).withValues(alpha: 0.06), offset: const Offset(0, 8), blurRadius: 24),
+    BoxShadow(color: const Color(0xFF0B1F2E).withOpacity(0.04), offset: const Offset(0, 1), blurRadius: 2),
+    BoxShadow(color: const Color(0xFF0B1F2E).withOpacity(0.06), offset: const Offset(0, 8), blurRadius: 24),
   ];
   static List<BoxShadow> up = [
-    BoxShadow(color: const Color(0xFF0B1F2E).withValues(alpha: 0.06), offset: const Offset(0, -4), blurRadius: 24),
+    BoxShadow(color: const Color(0xFF0B1F2E).withOpacity(0.06), offset: const Offset(0, -4), blurRadius: 24),
   ];
   static List<BoxShadow> pop = [
-    BoxShadow(color: const Color(0xFF0B1F2E).withValues(alpha: 0.18), offset: const Offset(0, 12), blurRadius: 40),
+    BoxShadow(color: const Color(0xFF0B1F2E).withOpacity(0.18), offset: const Offset(0, 12), blurRadius: 40),
   ];
 }
 
@@ -135,7 +135,7 @@ ThemeData buildLightTheme() {
       centerTitle: false,
     ),
     dividerTheme: const DividerThemeData(color: GuidyColors.line, thickness: 1),
-    cardTheme: CardThemeData(
+    cardTheme: CardTheme(
       color: GuidyColors.surface,
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -175,7 +175,7 @@ ThemeData buildDarkTheme() {
       elevation: 0,
     ),
     dividerTheme: const DividerThemeData(color: GuidyColors.darkLine, thickness: 1),
-    cardTheme: CardThemeData(
+    cardTheme: CardTheme(
       color: GuidyColors.darkSurface,
       elevation: 0,
       shape: RoundedRectangleBorder(

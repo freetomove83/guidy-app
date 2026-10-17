@@ -50,7 +50,7 @@ class ReferralScreen extends StatelessWidget {
                         gradient: LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
-                          colors: [primaryC, primaryC.withValues(alpha: 0.7)],
+                          colors: [primaryC, primaryC.withOpacity(0.7)],
                         ),
                         borderRadius: GuidyRadius.xlBorder,
                         boxShadow: GuidyShadow.pop,
@@ -64,7 +64,7 @@ class ReferralScreen extends StatelessWidget {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 8, vertical: 3),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.2),
+                                  color: Colors.white.withOpacity(0.2),
                                   borderRadius: GuidyRadius.pillBorder,
                                 ),
                                 child: const Text('친구 초대 프로그램',
@@ -92,7 +92,7 @@ class ReferralScreen extends StatelessWidget {
                               style: TextStyle(
                                 fontFamily: GuidyText.fontFamily,
                                 fontSize: 13,
-                                color: Colors.white.withValues(alpha: 0.85),
+                                color: Colors.white.withOpacity(0.85),
                                 height: 1.5,
                               )),
                           const SizedBox(height: 16),
@@ -101,7 +101,7 @@ class ReferralScreen extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 10, vertical: 6),
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.15),
+                              color: Colors.white.withOpacity(0.15),
                               borderRadius: GuidyRadius.lgBorder,
                             ),
                             child: Row(
@@ -109,14 +109,14 @@ class ReferralScreen extends StatelessWidget {
                               children: [
                                 Icon(Icons.info_outline_rounded,
                                     size: 13,
-                                    color: Colors.white.withValues(alpha: 0.8)),
+                                    color: Colors.white.withOpacity(0.8)),
                                 const SizedBox(width: 6),
                                 Text('보상 정책은 운영 상황에 따라 변경될 수 있습니다',
                                     style: TextStyle(
                                       fontFamily: GuidyText.fontFamily,
                                       fontSize: 11,
                                       color:
-                                          Colors.white.withValues(alpha: 0.8),
+                                          Colors.white.withOpacity(0.8),
                                     )),
                               ],
                             ),
@@ -185,11 +185,11 @@ class ReferralScreen extends StatelessWidget {
                                     width: 38,
                                     height: 46,
                                     decoration: BoxDecoration(
-                                      color: primaryC.withValues(alpha: 0.08),
+                                      color: primaryC.withOpacity(0.08),
                                       borderRadius: GuidyRadius.mdBorder,
                                       border: Border.all(
                                           color: primaryC
-                                              .withValues(alpha: 0.25)),
+                                              .withOpacity(0.25)),
                                     ),
                                     child: Center(
                                       child: Text(c,
@@ -281,7 +281,7 @@ class ReferralScreen extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
-                                color: primaryC.withValues(alpha: 0.1),
+                                color: primaryC.withOpacity(0.1),
                                 borderRadius: GuidyRadius.pillBorder,
                               ),
                               child: Text('복사',
@@ -302,17 +302,17 @@ class ReferralScreen extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: GuidyColors.ok.withValues(alpha: 0.06),
+                          color: GuidyColors.ok.withOpacity(0.06),
                           borderRadius: GuidyRadius.lgBorder,
                           border: Border.all(
-                              color: GuidyColors.ok.withValues(alpha: 0.3)),
+                              color: GuidyColors.ok.withOpacity(0.3)),
                         ),
                         child: Row(
                           children: [
                             Container(
                               width: 48, height: 48,
                               decoration: BoxDecoration(
-                                color: GuidyColors.ok.withValues(alpha: 0.15),
+                                color: GuidyColors.ok.withOpacity(0.15),
                                 shape: BoxShape.circle,
                               ),
                               child: const Center(
@@ -471,10 +471,10 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: highlight ? color.withValues(alpha: 0.07) : surfaceC,
+        color: highlight ? color.withOpacity(0.07) : surfaceC,
         borderRadius: GuidyRadius.lgBorder,
         border: Border.all(
-          color: highlight ? color.withValues(alpha: 0.35) : lineC,
+          color: highlight ? color.withOpacity(0.35) : lineC,
           width: highlight ? 1.5 : 1,
         ),
       ),
@@ -483,7 +483,7 @@ class _StatCard extends StatelessWidget {
           Container(
             width: 36, height: 36,
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.12),
+              color: color.withOpacity(0.12),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, size: 18, color: color),

@@ -213,8 +213,8 @@ class _SplashScreenState extends State<SplashScreen>
                       shape: BoxShape.circle,
                       gradient: RadialGradient(
                         colors: [
-                          const Color(0xFF0B3D5C).withValues(alpha: 0.6),
-                          const Color(0xFF0B3D5C).withValues(alpha: 0.0),
+                          const Color(0xFF0B3D5C).withOpacity(0.6),
+                          const Color(0xFF0B3D5C).withOpacity(0.0),
                         ],
                       ),
                     ),
@@ -283,7 +283,7 @@ class _SplashScreenState extends State<SplashScreen>
                                 fontFamily: GuidyText.fontFamily,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
-                                color: Colors.white.withValues(alpha: 0.55),
+                                color: Colors.white.withOpacity(0.55),
                                 letterSpacing: 0.5,
                               ),
                             ),
@@ -320,7 +320,7 @@ class _SplashScreenState extends State<SplashScreen>
                           fontFamily: GuidyText.fontFamily,
                           fontSize: 11,
                           fontWeight: FontWeight.w800,
-                          color: Colors.white.withValues(alpha: 0.25),
+                          color: Colors.white.withOpacity(0.25),
                           letterSpacing: 4.0,
                         ),
                       ),
@@ -373,8 +373,8 @@ class _SplashBgPainter extends CustomPainter {
     // 좌상단 액센트 글로우
     final topGlow = RadialGradient(
       colors: [
-        const Color(0xFF0B3D5C).withValues(alpha: 0.5),
-        const Color(0xFF0B3D5C).withValues(alpha: 0.0),
+        const Color(0xFF0B3D5C).withOpacity(0.5),
+        const Color(0xFF0B3D5C).withOpacity(0.0),
       ],
     );
     canvas.drawOval(
@@ -395,8 +395,8 @@ class _SplashBgPainter extends CustomPainter {
     // 우하단 테라코타 글로우
     final bottomGlow = RadialGradient(
       colors: [
-        const Color(0xFFD97757).withValues(alpha: 0.12),
-        const Color(0xFFD97757).withValues(alpha: 0.0),
+        const Color(0xFFD97757).withOpacity(0.12),
+        const Color(0xFFD97757).withOpacity(0.0),
       ],
     );
     canvas.drawOval(
@@ -433,12 +433,12 @@ class _HeadphoneIcon extends StatelessWidget {
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0B3D5C).withValues(alpha: 0.8),
+            color: const Color(0xFF0B3D5C).withOpacity(0.8),
             blurRadius: 32,
             spreadRadius: 4,
           ),
           BoxShadow(
-            color: const Color(0xFF4A8BB0).withValues(alpha: 0.3),
+            color: const Color(0xFF4A8BB0).withOpacity(0.3),
             blurRadius: 16,
             spreadRadius: 0,
           ),
@@ -492,7 +492,7 @@ class _HeadphonePainter extends CustomPainter {
     canvas.drawRRect(
       leftRect,
       Paint()
-        ..color = Colors.white.withValues(alpha: 0.9)
+        ..color = Colors.white.withOpacity(0.9)
         ..style = PaintingStyle.stroke
         ..strokeWidth = w * 0.07,
     );
@@ -511,7 +511,7 @@ class _HeadphonePainter extends CustomPainter {
     canvas.drawRRect(
       rightRect,
       Paint()
-        ..color = Colors.white.withValues(alpha: 0.9)
+        ..color = Colors.white.withOpacity(0.9)
         ..style = PaintingStyle.stroke
         ..strokeWidth = w * 0.07,
     );
@@ -611,7 +611,7 @@ class _AudioWave extends StatelessWidget {
                 colors: [
                   const Color(0xFF0B3D5C),
                   const Color(0xFF4A8BB0),
-                  const Color(0xFF7EC8E3).withValues(alpha: 0.8),
+                  const Color(0xFF7EC8E3).withOpacity(0.8),
                 ],
               ),
             ),
@@ -639,7 +639,7 @@ class _ProgressBar extends StatelessWidget {
               // 배경
               Container(
                 height: 2,
-                color: Colors.white.withValues(alpha: 0.12),
+                color: Colors.white.withOpacity(0.12),
               ),
               // 진행
               FractionallySizedBox(

@@ -76,9 +76,9 @@ class CreatorGuidesScreen extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: accentC.withValues(alpha: 0.08),
+                    color: accentC.withOpacity(0.08),
                     borderRadius: GuidyRadius.lgBorder,
-                    border: Border.all(color: accentC.withValues(alpha: 0.25)),
+                    border: Border.all(color: accentC.withOpacity(0.25)),
                   ),
                   child: Row(
                     children: [
@@ -125,7 +125,7 @@ class CreatorGuidesScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF59E0B).withValues(alpha: 0.12),
+                      color: const Color(0xFFF59E0B).withOpacity(0.12),
                       borderRadius: GuidyRadius.pillBorder,
                     ),
                     child: Row(
@@ -234,7 +234,7 @@ class _GuideCard extends StatelessWidget {
         color: surfaceC,
         borderRadius: GuidyRadius.lgBorder,
         border: Border.all(
-          color: canPlay ? lineC : lineC.withValues(alpha: 0.6),
+          color: canPlay ? lineC : lineC.withOpacity(0.6),
         ),
       ),
       child: Column(
@@ -250,7 +250,7 @@ class _GuideCard extends StatelessWidget {
                     Container(
                       width: 44, height: 44,
                       decoration: BoxDecoration(
-                        color: avatarC.withValues(alpha: canPlay ? 0.2 : 0.1),
+                        color: avatarC.withOpacity(canPlay ? 0.2 : 0.1),
                         shape: BoxShape.circle,
                       ),
                       child: Center(
@@ -261,7 +261,7 @@ class _GuideCard extends StatelessWidget {
                           style: TextStyle(
                             color: canPlay
                                 ? avatarC
-                                : avatarC.withValues(alpha: 0.5),
+                                : avatarC.withOpacity(0.5),
                             fontSize: 18, fontWeight: FontWeight.w800,
                             fontFamily: GuidyText.fontFamily,
                           ),
@@ -314,12 +314,12 @@ class _GuideCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: isFollowing
                           ? surfaceC
-                          : accentC.withValues(alpha: 0.12),
+                          : accentC.withOpacity(0.12),
                       borderRadius: GuidyRadius.pillBorder,
                       border: Border.all(
                         color: isFollowing
                             ? lineC
-                            : accentC.withValues(alpha: 0.4),
+                            : accentC.withOpacity(0.4),
                       ),
                     ),
                     child: Text(
@@ -472,10 +472,10 @@ class _BuyButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
         decoration: BoxDecoration(
-          color: const Color(0xFFF59E0B).withValues(alpha: 0.12),
+          color: const Color(0xFFF59E0B).withOpacity(0.12),
           borderRadius: GuidyRadius.pillBorder,
           border: Border.all(
-              color: const Color(0xFFF59E0B).withValues(alpha: 0.4)),
+              color: const Color(0xFFF59E0B).withOpacity(0.4)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -557,7 +557,7 @@ class _BuyButton extends StatelessWidget {
                     Container(
                       width: 36, height: 36,
                       decoration: BoxDecoration(
-                        color: avatarC.withValues(alpha: 0.2),
+                        color: avatarC.withOpacity(0.2),
                         shape: BoxShape.circle,
                       ),
                       child: Center(
@@ -626,10 +626,10 @@ class _BuyButton extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: const Color(0xFFF59E0B).withValues(alpha: 0.08),
+                color: const Color(0xFFF59E0B).withOpacity(0.08),
                 borderRadius: GuidyRadius.lgBorder,
                 border: Border.all(
-                    color: const Color(0xFFF59E0B).withValues(alpha: 0.3)),
+                    color: const Color(0xFFF59E0B).withOpacity(0.3)),
               ),
               child: Row(
                 children: [

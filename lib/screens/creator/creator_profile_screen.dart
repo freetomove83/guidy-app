@@ -103,7 +103,7 @@ class CreatorProfileScreen extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: primaryC.withValues(alpha: 0.1),
+                            color: primaryC.withOpacity(0.1),
                             borderRadius: GuidyRadius.pillBorder,
                           ),
                           child: Row(
@@ -661,7 +661,7 @@ class _ShareChannelBtn extends StatelessWidget {
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: color.withValues(alpha: 0.3),
+                  color: color.withOpacity(0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 3),
                 ),

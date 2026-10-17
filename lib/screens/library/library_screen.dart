@@ -217,7 +217,7 @@ class _ContinueTab extends StatelessWidget {
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: GuidyRadius.lgBorder,
-                        color: Colors.black.withValues(alpha: 0.3),
+                        color: Colors.black.withOpacity(0.3),
                       ),
                       child: const Center(
                         child: Icon(Icons.play_arrow_rounded, color: Colors.white, size: 24),
@@ -442,7 +442,7 @@ class _CreatorsTab extends StatelessWidget {
                   Container(
                     width: 52, height: 52,
                     decoration: BoxDecoration(
-                      color: avatarColor.withValues(alpha: 0.2),
+                      color: avatarColor.withOpacity(0.2),
                       shape: BoxShape.circle,
                     ),
                     child: Center(

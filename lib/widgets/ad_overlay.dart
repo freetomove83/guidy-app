@@ -135,7 +135,7 @@ class _SplashAdOverlayState extends State<SplashAdOverlay>
     return FadeTransition(
       opacity: _fadeIn,
       child: Material(
-        color: Colors.black.withValues(alpha: 0.92),
+        color: Colors.black.withOpacity(0.92),
         child: Stack(
           children: [
             // ── 광고 이미지/영상 영역 ────────────────────
@@ -164,7 +164,7 @@ class _SplashAdOverlayState extends State<SplashAdOverlay>
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.5),
+                            color: Colors.black.withOpacity(0.5),
                             blurRadius: 32,
                             offset: const Offset(0, 8),
                           ),
@@ -219,9 +219,9 @@ class _SplashAdOverlayState extends State<SplashAdOverlay>
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                   decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.55),
+                    color: Colors.black.withOpacity(0.55),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
+                    border: Border.all(color: Colors.white.withOpacity(0.3)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -245,7 +245,7 @@ class _SplashAdOverlayState extends State<SplashAdOverlay>
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.5),
+                  color: Colors.black.withOpacity(0.5),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: const Text('광고', style: TextStyle(color: Colors.white70, fontSize: 11)),
@@ -315,7 +315,7 @@ class _HomePopupAdState extends State<HomePopupAd>
     return FadeTransition(
       opacity: _fade,
       child: Material(
-        color: Colors.black.withValues(alpha: 0.65),
+        color: Colors.black.withOpacity(0.65),
         child: GestureDetector(
           onTap: _close,
           child: Center(
@@ -330,7 +330,7 @@ class _HomePopupAdState extends State<HomePopupAd>
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.3),
+                        color: Colors.black.withOpacity(0.3),
                         blurRadius: 40,
                         offset: const Offset(0, 10),
                       ),
@@ -509,7 +509,7 @@ class _HomeSlideUpAdState extends State<HomeSlideUpAd>
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.2),
+                    color: Colors.black.withOpacity(0.2),
                     blurRadius: 24,
                     offset: const Offset(0, -4),
                   ),
@@ -624,7 +624,7 @@ class _AdDummyContent extends StatelessWidget {
               width: 120, height: 120,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.06),
+                color: Colors.white.withOpacity(0.06),
               ),
             ),
           ),
@@ -634,7 +634,7 @@ class _AdDummyContent extends StatelessWidget {
               width: 80, height: 80,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.06),
+                color: Colors.white.withOpacity(0.06),
               ),
             ),
           ),
@@ -682,7 +682,7 @@ class _AdDummyContent extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
+                          color: Colors.white.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Text(

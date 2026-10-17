@@ -304,7 +304,7 @@ class _SwitchTile extends StatelessWidget {
         color: surfaceC,
         borderRadius: GuidyRadius.lgBorder,
         border: Border.all(
-          color: isMaster && value ? primaryC.withValues(alpha: 0.3) : lineC,
+          color: isMaster && value ? primaryC.withOpacity(0.3) : lineC,
           width: isMaster && value ? 1.5 : 1,
         ),
       ),
@@ -314,8 +314,8 @@ class _SwitchTile extends StatelessWidget {
             width: 34, height: 34,
             decoration: BoxDecoration(
               color: value
-                  ? primaryC.withValues(alpha: 0.10)
-                  : GuidyColors.mute.withValues(alpha: 0.08),
+                  ? primaryC.withOpacity(0.10)
+                  : GuidyColors.mute.withOpacity(0.08),
               borderRadius: GuidyRadius.mdBorder,
             ),
             child: Icon(icon, size: 17,
@@ -337,9 +337,8 @@ class _SwitchTile extends StatelessWidget {
           Switch(
             value: value,
             onChanged: enabled ? onChanged : null,
-            activeThumbColor: primaryC,
-            activeTrackColor: primaryC.withValues(alpha: 0.3),
-            trackOutlineColor: WidgetStatePropertyAll(lineC),
+            activeColor: primaryC,
+            activeTrackColor: primaryC.withOpacity(0.3),
           ),
         ],
       ),

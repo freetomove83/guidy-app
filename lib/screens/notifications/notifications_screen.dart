@@ -344,8 +344,8 @@ class _NotifTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final unread = !notif.isRead;
     final unreadBg = isDark
-        ? GuidyColors.darkPrimary.withValues(alpha: 0.08)
-        : GuidyColors.primarySoft.withValues(alpha: 0.45);
+        ? GuidyColors.darkPrimary.withOpacity(0.08)
+        : GuidyColors.primarySoft.withOpacity(0.45);
 
     return GestureDetector(
       onTap: onTap,
@@ -357,7 +357,7 @@ class _NotifTile extends StatelessWidget {
           borderRadius: GuidyRadius.lgBorder,
           border: Border.all(
             color: unread
-                ? GuidyColors.primary.withValues(alpha: 0.18)
+                ? GuidyColors.primary.withOpacity(0.18)
                 : lineC,
           ),
         ),
@@ -368,7 +368,7 @@ class _NotifTile extends StatelessWidget {
             Container(
               width: 40, height: 40,
               decoration: BoxDecoration(
-                color: _iconBg.withValues(alpha: 0.15),
+                color: _iconBg.withOpacity(0.15),
                 borderRadius: GuidyRadius.mdBorder,
               ),
               child: Icon(_icon, size: 20, color: _iconBg),

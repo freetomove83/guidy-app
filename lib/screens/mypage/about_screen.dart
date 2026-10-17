@@ -128,7 +128,7 @@ class AboutScreen extends StatelessWidget {
                             errorBuilder: (_, __, ___) => Container(
                               width: 64, height: 64,
                               decoration: BoxDecoration(
-                                color: primaryC.withValues(alpha: 0.12),
+                                color: primaryC.withOpacity(0.12),
                                 borderRadius: GuidyRadius.lgBorder,
                               ),
                               child: Icon(Icons.headphones_rounded,
@@ -148,7 +148,7 @@ class AboutScreen extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 16, vertical: 6),
                           decoration: BoxDecoration(
-                            color: primaryC.withValues(alpha: 0.10),
+                            color: primaryC.withOpacity(0.10),
                             borderRadius: GuidyRadius.pillBorder,
                           ),
                           child: Text('현재 버전 v$_currentVersion',
@@ -217,7 +217,7 @@ class AboutScreen extends StatelessWidget {
                         borderRadius: GuidyRadius.lgBorder,
                         border: Border.all(
                           color: isLatest
-                              ? primaryC.withValues(alpha: 0.3)
+                              ? primaryC.withOpacity(0.3)
                               : lineC,
                           width: isLatest ? 1.5 : 1,
                         ),
@@ -244,7 +244,7 @@ class AboutScreen extends StatelessWidget {
                                         horizontal: 7, vertical: 3),
                                     decoration: BoxDecoration(
                                       color: GuidyColors.ok
-                                          .withValues(alpha: 0.12),
+                                          .withOpacity(0.12),
                                       borderRadius: GuidyRadius.pillBorder,
                                     ),
                                     child: Text('최신',
@@ -319,15 +319,15 @@ class _VersionBadge extends StatelessWidget {
 
     final (bgColor, textColor) = switch (type) {
       _LabelType.launch => (
-          primaryC.withValues(alpha: 0.12),
+          primaryC.withOpacity(0.12),
           primaryC,
         ),
       _LabelType.beta => (
-          const Color(0xFFF59E0B).withValues(alpha: 0.12),
+          const Color(0xFFF59E0B).withOpacity(0.12),
           const Color(0xFFF59E0B),
         ),
       _LabelType.alpha => (
-          GuidyColors.mute.withValues(alpha: 0.12),
+          GuidyColors.mute.withOpacity(0.12),
           GuidyColors.mute,
         ),
     };

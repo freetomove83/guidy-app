@@ -88,11 +88,11 @@ class _CoverPatternPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.08)
+      ..color = Colors.white.withOpacity(0.08)
       ..style = PaintingStyle.fill;
     final r = size.width * 0.6 + (seed * 13.0 % 40);
     canvas.drawCircle(Offset(size.width * 0.7, size.height * 0.3), r, paint);
-    paint.color = Colors.white.withValues(alpha: 0.05);
+    paint.color = Colors.white.withOpacity(0.05);
     canvas.drawCircle(Offset(size.width * 0.2, size.height * 0.8), r * 0.7, paint);
   }
 
@@ -302,7 +302,7 @@ class CreatorAvatar extends StatelessWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [bgColor, bgColor.withValues(alpha: 0.7)],
+                  colors: [bgColor, bgColor.withOpacity(0.7)],
                 ),
               ),
               child: Center(
@@ -672,8 +672,8 @@ class ExhibitionCard extends StatelessWidget {
                                   begin: Alignment.topCenter,
                                   end: Alignment.bottomCenter,
                                   colors: [
-                                    Colors.black.withValues(alpha: 0.0),
-                                    Colors.black.withValues(alpha: 0.32),
+                                    Colors.black.withOpacity(0.0),
+                                    Colors.black.withOpacity(0.32),
                                   ],
                                 ),
                               ),
@@ -690,7 +690,7 @@ class ExhibitionCard extends StatelessWidget {
                                   Flexible(
                                     flex: ((1 - progressRatio!) * 1000).round().clamp(0, 999),
                                     child: Container(
-                                      color: Colors.white.withValues(alpha: 0.30),
+                                      color: Colors.white.withOpacity(0.30),
                                     ),
                                   ),
                                 ],
@@ -914,7 +914,7 @@ class SectionImageWidget extends StatelessWidget {
       child: Center(
         child: Icon(
           Icons.image_outlined,
-          color: Colors.white.withValues(alpha: 0.4),
+          color: Colors.white.withOpacity(0.4),
           size: (height != null && height! < 60) ? 18 : 28,
         ),
       ),

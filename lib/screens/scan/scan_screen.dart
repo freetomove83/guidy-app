@@ -148,7 +148,7 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
                 Text(
                   _scanned ? 'QR 코드 인식됨!' : '작품 옆 QR을 사각형 안에 담아주세요',
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.8),
+                    color: Colors.white.withOpacity(0.8),
                     fontSize: 14, fontFamily: GuidyText.fontFamily,
                   ),
                 ),
@@ -164,16 +164,16 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.1),
+                  color: Colors.white.withOpacity(0.1),
                   borderRadius: GuidyRadius.lgBorder,
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                  border: Border.all(color: Colors.white.withOpacity(0.2)),
                 ),
                 child: Row(
                   children: [
                     Container(
                       width: 36, height: 36,
                       decoration: BoxDecoration(
-                        color: GuidyColors.accent.withValues(alpha: 0.2),
+                        color: GuidyColors.accent.withOpacity(0.2),
                         borderRadius: GuidyRadius.mdBorder,
                       ),
                       child: const Icon(Icons.qr_code_rounded, color: GuidyColors.accent, size: 20),
@@ -283,7 +283,7 @@ class _ScanMaskPainter extends CustomPainter {
     final cx = size.width / 2;
     final cy = size.height / 2;
 
-    final paint = Paint()..color = Colors.black.withValues(alpha: scanned ? 0.2 : 0.6);
+    final paint = Paint()..color = Colors.black.withOpacity(scanned ? 0.2 : 0.6);
 
     final outer = Path()..addRect(Rect.fromLTWH(0, 0, size.width, size.height));
     final inner = Path()..addRRect(RRect.fromRectAndRadius(
@@ -364,7 +364,7 @@ class _BeaconToastState extends State<BeaconToast> {
                 height: 60.0 + i * 30,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: primaryC.withValues(alpha: 0.04 * (3 - i).toDouble()),
+                  color: primaryC.withOpacity(0.04 * (3 - i).toDouble()),
                 ),
               )),
               Container(

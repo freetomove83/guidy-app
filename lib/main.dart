@@ -280,7 +280,7 @@ class _MainShellState extends State<MainShell> {
             Container(
               width: 36, height: 36,
               decoration: BoxDecoration(
-                color: accentC.withValues(alpha: 0.12),
+                color: accentC.withOpacity(0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(Icons.qr_code_scanner_rounded, color: accentC, size: 20),
@@ -404,7 +404,7 @@ class _SettingsPage extends StatelessWidget {
                     Switch(
                       value: isDark,
                       onChanged: (_) => themeP.toggle(),
-                      activeThumbColor: GuidyColors.primary,
+                      activeColor: GuidyColors.primary,
                     ),
                   ],
                 ),

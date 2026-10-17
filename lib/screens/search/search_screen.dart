@@ -204,7 +204,7 @@ class _SearchScreenState extends State<SearchScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
               decoration: BoxDecoration(
-                color: accentC.withValues(alpha: 0.10),
+                color: accentC.withOpacity(0.10),
                 borderRadius: GuidyRadius.pillBorder,
               ),
               child: Text(tag, style: TextStyle(
