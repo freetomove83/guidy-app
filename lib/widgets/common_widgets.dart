@@ -479,6 +479,8 @@ class MiniPlayer extends StatelessWidget {
   final bool isPlaying;
   final VoidCallback? onTap;
   final VoidCallback? onPlayPause;
+  final VoidCallback? onSkipBackward;
+  final VoidCallback? onSkipForward;
 
   const MiniPlayer({
     super.key,
@@ -488,6 +490,8 @@ class MiniPlayer extends StatelessWidget {
     this.isPlaying = false,
     this.onTap,
     this.onPlayPause,
+    this.onSkipBackward,
+    this.onSkipForward,
   });
 
   @override
@@ -528,7 +532,10 @@ class MiniPlayer extends StatelessWidget {
             ),
             Row(
               children: [
-                const Icon(Icons.replay_10_rounded, size: 22, color: GuidyColors.sub),
+                GestureDetector(
+                  onTap: onSkipBackward,
+                  child: const Icon(Icons.replay_10_rounded, size: 22, color: GuidyColors.sub),
+                ),
                 const SizedBox(width: 4),
                 GestureDetector(
                   onTap: onPlayPause,
@@ -545,7 +552,10 @@ class MiniPlayer extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 4),
-                const Icon(Icons.forward_10_rounded, size: 22, color: GuidyColors.sub),
+                GestureDetector(
+                  onTap: onSkipForward,
+                  child: const Icon(Icons.forward_10_rounded, size: 22, color: GuidyColors.sub),
+                ),
               ],
             ),
           ],

@@ -41,8 +41,23 @@ void main() async {
     appStore.init(),   // localStorage에서 CMS 추가 항목 불러오기
     userStore.init(),  // localStorage에서 사용자 개인화 데이터 복원
   ]);
-  runApp(
-    MultiProvider(
+  runApp(GuidyRoot(appStore: appStore, userStore: userStore));
+}
+
+/// 앱 루트 — Provider 구성만 담당 (테스트에서 동일하게 재사용)
+class GuidyRoot extends StatelessWidget {
+  final AppStore appStore;
+  final UserStore userStore;
+
+  const GuidyRoot({
+    super.key,
+    required this.appStore,
+    required this.userStore,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => GuidyAudioService()),
@@ -50,8 +65,8 @@ void main() async {
         ChangeNotifierProvider.value(value: userStore),
       ],
       child: const GuidyApp(),
-    ),
-  );
+    );
+  }
 }
 
 class GuidyApp extends StatelessWidget {
@@ -176,8 +191,6 @@ class MainShell extends StatefulWidget {
 
 class _MainShellState extends State<MainShell> {
   int _navIndex = 0;
-  final bool _showMiniPlayer = true;
-  bool _isPlaying = false;
 
   final List<Widget> _pages = const [
     HomeScreen(),
@@ -189,6 +202,16 @@ class _MainShellState extends State<MainShell> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // 현재 재생 중인 작품 → 미니플레이어 표시
+    final audio = context.watch<GuidyAudioService>();
+    final store = context.watch<AppStore>();
+    final playingId = audio.currentId;
+    final nowPlaying = playingId == null ? null : store.artworkById(playingId);
+    final nowPlayingExhibition = nowPlaying == null
+        ? null
+        : store.exhibitionById(nowPlaying.exhibitionId);
+
     final surfaceC = isDark ? GuidyColors.darkSurface : GuidyColors.surface;
     final lineC = isDark ? GuidyColors.darkLine : GuidyColors.line;
     final primaryC = isDark ? GuidyColors.darkPrimary : GuidyColors.primary;
@@ -211,16 +234,23 @@ class _MainShellState extends State<MainShell> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // 미니 플레이어
-              if (_showMiniPlayer)
+              // 미니 플레이어 — GuidyAudioService 실제 재생 상태 연동
+              if (nowPlaying != null)
                 GestureDetector(
-                  onTap: () => Navigator.pushNamed(context, '/player/a1'),
+                  onTap: () => Navigator.pushNamed(
+                    context, '/player/${nowPlaying.id}'),
                   child: MiniPlayer(
-                    artworkTitle: '무제 #7',
-                    exhibitionTitle: '빛과 표면',
-                    coverSeed: 0,
-                    isPlaying: _isPlaying,
-                    onPlayPause: () => setState(() => _isPlaying = !_isPlaying),
+                    artworkTitle: nowPlaying.title,
+                    exhibitionTitle: nowPlayingExhibition?.title ?? '',
+                    coverSeed: nowPlaying.imageSeed,
+                    isPlaying: audio.isPlaying,
+                    onPlayPause: () {
+                      final url = nowPlaying.audioUrl;
+                      if (url == null) return;
+                      audio.togglePlay(url, artworkId: nowPlaying.id);
+                    },
+                    onSkipBackward: () => audio.skipBackward(10),
+                    onSkipForward: () => audio.skipForward(10),
                   ),
                 ),
               // 탭바

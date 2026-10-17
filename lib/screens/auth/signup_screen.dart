@@ -437,19 +437,20 @@ class _SignupScreenState extends State<SignupScreen> {
     }
 
     setState(() => _isLoading = true);
+    final userStore = context.read<UserStore>();
+    final messenger = ScaffoldMessenger.of(context);
     Future.delayed(const Duration(milliseconds: 1500), () async {
       if (!mounted) return;
 
       // 추천인 코드가 확인된 경우 UserStore에 저장
       if (_referralVerified && _referralController.text.isNotEmpty) {
-        final userStore = context.read<UserStore>();
         await userStore.applyReferralCode(_referralController.text.trim());
       }
 
       if (!mounted) return;
       setState(() => _isLoading = false);
       final isVerified = _referralVerified;
-      ScaffoldMessenger.of(context).showSnackBar(
+      messenger.showSnackBar(
         SnackBar(
           content: Text(isVerified
               ? '가입 완료! 추천인 코드가 적용되었습니다 🎉'

@@ -12,6 +12,9 @@ val keyProperties = Properties()
 if (keyPropertiesFile.exists()) {
     keyProperties.load(FileInputStream(keyPropertiesFile))
 }
+// key.properties(배포용 키스토어)가 없는 환경에서도 빌드가 되도록 한다
+val hasReleaseSigning = keyPropertiesFile.exists() &&
+    keyProperties.getProperty("storeFile") != null
 
 android {
     namespace = "com.guidyaudioguide.tour"
@@ -23,16 +26,14 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
-    }
-
     signingConfigs {
-        create("release") {
-            keyAlias = keyProperties["keyAlias"] as String
-            keyPassword = keyProperties["keyPassword"] as String
-            storeFile = keyProperties["storeFile"]?.let { rootProject.file(it) }
-            storePassword = keyProperties["storePassword"] as String
+        if (hasReleaseSigning) {
+            create("release") {
+                keyAlias = keyProperties["keyAlias"] as String
+                keyPassword = keyProperties["keyPassword"] as String
+                storeFile = keyProperties["storeFile"]?.let { rootProject.file(it) }
+                storePassword = keyProperties["storePassword"] as String
+            }
         }
     }
 
@@ -46,7 +47,12 @@ android {
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("release")
+            // 키스토어가 없으면 디버그 서명으로 폴백 (로컬 검증용)
+            signingConfig = if (hasReleaseSigning) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
             isMinifyEnabled = false
             isShrinkResources = false
         }
@@ -55,5 +61,11 @@ android {
 
 flutter {
     source = "../.."
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11
+    }
 }
 

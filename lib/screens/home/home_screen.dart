@@ -503,12 +503,12 @@ class _CreatorTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final creators_items = DummyData.exhibitions
+    final creatorsItems = DummyData.exhibitions
         .where((e) => e.channel == ChannelType.creator)
         .toList();
 
     return _ExhibitionListTab(
-      items: creators_items,
+      items: creatorsItems,
       emptyMessage: '크리에이터 가이드가 없습니다',
     );
   }

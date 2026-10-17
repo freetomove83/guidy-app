@@ -169,10 +169,11 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
     }
 
     setState(() => _isLoading = true);
+    final messenger = ScaffoldMessenger.of(context);
     Future.delayed(const Duration(milliseconds: 1500), () {
       if (!mounted) return;
       setState(() => _isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
+      messenger.showSnackBar(
         SnackBar(
           content: const Text('로그인 기능 연동 준비 중입니다'),
           backgroundColor: GuidyColors.primary,

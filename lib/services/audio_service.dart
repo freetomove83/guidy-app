@@ -95,11 +95,18 @@ class GuidyAudioService extends ChangeNotifier {
   /// [artworkId] : 작품 식별자 (중복 재생 방지)
   Future<void> play(String audioPath, {String? artworkId}) async {
     try {
-      // 같은 파일이 이미 재생 중이면 그냥 resume
-      if (_currentUrl == audioPath &&
-          _state == GuidyAudioState.paused) {
-        await _player.resume();
-        return;
+      // 같은 오디오가 이미 이어지고 있으면 처음부터 다시 재생하지 않는다
+      // (미니플레이어 → 플레이어 재진입 시 재생 위치 유지)
+      if (_currentUrl == audioPath && _currentAudioId == artworkId) {
+        if (_state == GuidyAudioState.playing ||
+            _state == GuidyAudioState.loading) {
+          return;
+        }
+        if (_state == GuidyAudioState.paused) {
+          await _player.resume();
+          return;
+        }
+        // completed / error / idle → 아래에서 처음부터 재생
       }
 
       _state = GuidyAudioState.loading;

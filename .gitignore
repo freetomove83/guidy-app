@@ -44,3 +44,10 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Deployment bundles
+guidy_web_deploy.zip
+*.zip
+
+# Android build reports (artifacts are redirected to the root /build)
+/android/build/
