@@ -7,25 +7,45 @@
 
 ---
 
-## 0. 현재 상태 (2026-10-18 확인)
+## 0. 현재 상태 (2026-10-18 갱신 — 서명 셋업 완료)
 
-| 항목 | 값 | 상태 |
-|---|---|---|
-| Xcode에 등록된 Apple ID | `IDE.Identifiers.Prod` 빈 배열 | **미등록** |
-| 코드 서명 인증서 | `security find-identity` → 0 valid identities | **없음** |
-| `DEVELOPMENT_TEAM` | project.pbxproj에 없음 | **미설정** |
-| `CODE_SIGN_STYLE` | `Automatic` | 양호 |
-| `CODE_SIGN_IDENTITY[sdk=iphoneos*]` | `"iPhone Developer"` (구식 표기) | 정리 권장 |
-| Bundle ID | `com.guidyaudioguide.guidyAudioGuide` | 유지 |
-| 테스트 Bundle ID | `com.guidyaudioguide.guidyAudioGuide.RunnerTests` | 유지 |
-| iOS Deployment Target | `15.0` | 양호 |
-| 연결된 실기기 | 없음 (Mac + 시뮬레이터만) | 기기 필요 |
+서명 셋업 자체는 **완료됐습니다.** 아래는 실제로 확인한 값입니다.
 
-즉 **0단계부터 시작**해야 합니다. 시뮬레이터 실행은 현재도 정상 동작합니다.
+| 항목 | 값 |
+|---|---|
+| Apple ID | 등록됨 (Xcode Settings → Accounts) |
+| 팀 | `2AB9P63KNV` — Junseok Kang (Individual, **유료**) |
+| 서명 인증서 | `Apple Development: Junseok Kang (S43TF2PC26)` |
+| `DEVELOPMENT_TEAM` | `2AB9P63KNV` — Runner + RunnerTests, 각 3개 config, **총 6곳** |
+| `CODE_SIGN_STYLE` | `Automatic` (6곳) |
+| 프로비저닝 프로파일 | `iOS Team Provisioning Profile: *`, 만료 **2027-10-18** |
+| Bundle ID | `com.guidyaudioguide.guidyAudioGuide` |
+| 테스트 Bundle ID | `com.guidyaudioguide.guidyAudioGuide.RunnerTests` |
+| iOS Deployment Target | `15.0` |
+| 서명된 실기기 빌드 | `flutter build ios` → `Runner.app` **37.2MB 성공** |
+
+프로파일 만료가 **1년 뒤**라는 점이 유료 계정의 증거입니다 (무료 Personal Team이면 7일).
+
+### 검증 명령
+
+```bash
+security find-identity -v -p codesigning                       # 1 valid identities
+codesign -dv --verbose=2 build/ios/iphoneos/Runner.app          # Authority / TeamIdentifier
+security cms -D -i build/ios/iphoneos/Runner.app/embedded.mobileprovision
+```
+
+### 남은 것: 실기기 설치
+
+실기기용 서명 빌드는 성공하지만, **실제 iPhone에 설치하려면 기기를 연결**해야 합니다 (§2 Step 4 ~ Step 7).
+
 
 ---
 
-## 1. 먼저 결정할 것: 무료 Apple ID vs 유료 개발자 프로그램
+## 1. 무료 Apple ID vs 유료 개발자 프로그램
+
+> **이 프로젝트는 이미 유료(Individual) 계정입니다** — Team `2AB9P63KNV`, 프로파일 만료 2027-10-18.
+> 따라서 푸시 알림 · Sign in with Apple · TestFlight · App Store가 모두 가능하고, 7일 만료 제약도 없습니다.
+> 아래는 배경 설명이니 건너뛰셔도 됩니다.
 
 Xcode에 Apple ID를 등록하면 두 종류의 팀이 생깁니다.
 
@@ -47,20 +67,44 @@ Xcode에 Apple ID를 등록하면 두 종류의 팀이 생깁니다.
 - 프로파일 1년, 기기 100대 (제품군별, 연 1회 리셋)
 - TestFlight, App Store, 그리고 위의 모든 capability 사용 가능
 
-### 권장
+### 이 프로젝트의 결론
 
-| 목적 | 선택 |
-|---|---|
-| 오늘 당장 내 아이폰에서 UI 확인 | **무료**로 충분 (§2 진행) |
-| 알림 / Apple 로그인 / 결제(§B-4~6) 붙이기 | **유료 필수** |
-| TestFlight로 팀/지인에게 배포 | **유료 필수** |
-
-무료로 §2를 끝내두면 유료 전환 시에도 절차는 동일하고 **Step 1~4만 그대로** 쓰면 됩니다.
-유료 결제는 급하지 않으므로, 무료로 진행하다 막히는 지점(푸시 알림 등)에서 전환하는 편이 낫습니다.
+유료 계정이므로 **무료 계정의 제약을 고민할 필요가 없습니다.** 7일 만료도, 기능 제한도, TestFlight 제한도 없습니다.
 
 ---
 
-## 2. 절차 (무료 Personal Team 기준)
+## 1-1. 반드시 먼저 확인할 것: Program License Agreement (PLA)
+
+**여기서 한 번 막혔습니다.** 팀 설정을 다 끝내고 빌드했는데도 인증서·프로파일이 발급되지 않았고,
+원인은 Xcode가 아니라 **애플 개발자 계정의 최신 약관 미동의**였습니다.
+
+증상 — `flutter build ios` 실행 시:
+
+```
+Error (Xcode): Unable to process request - PLA Update available:
+You currently don't have access to this membership resource.
+To resolve this issue, agree to the latest Program License Agreement in your developer account.
+
+Error (Xcode): No profiles for 'com.guidyaudioguide.guidyAudioGuide' were found
+```
+
+`No profiles ... were found` 만 보면 팀 설정이나 Bundle ID 문제로 오해하기 쉬운데, **PLA가 원인**입니다.
+
+**해결** — Xcode가 아니라 **웹**에서 합니다:
+
+1. https://developer.apple.com/account 접속 후 로그인
+2. 상단의 **`Review Agreement`** 배너 클릭 (또는 `Agreements` 항목)
+3. 약관 맨 아래까지 스크롤 → **체크박스** ☑ → **`Submit`**
+4. 다시 `flutter build ios`
+
+동의하면 애플 서버가 인증서와 프로파일을 자동 발급합니다. 별도로 인증서를 만들 필요가 없습니다.
+
+> `Agreements, Tax, and Banking`은 **앱 판매/세금** 관련이라 지금 필요한 것이 아닙니다.
+> 찾으시는 건 **Program License Agreement**(개발자 프로그램 약관)입니다.
+
+---
+
+## 2. 절차
 
 ### Step 1. Xcode에 Apple ID 등록
 
@@ -152,7 +196,7 @@ grep -c "DEVELOPMENT_TEAM" ios/Runner.xcodeproj/project.pbxproj   # 6 이어야 
 Team을 지정한 상태에서 빌드하면 Xcode가 자동으로 기기를 개발자 포털에 등록합니다.
 GUI로 명시적으로 하려면: **Xcode → Window → Devices and Simulators** → 기기 선택 → **Use for Development**.
 
-> 무료 계정은 기기 3대까지이며 7일 단위로 만료됩니다. 기기를 바꿔가며 테스트하면 금방 소진됩니다.
+> 이 계정은 유료이므로 **기기 100대**까지 가능합니다 (연 1회 리셋). 무료 계정의 3대 / 7일 제약은 해당 없음.
 
 ### Step 6. 빌드 & 설치
 
@@ -202,22 +246,22 @@ xcrun devicectl list devices
 
 ---
 
-## 4. 무료 계정 7일 만료 대응
+## 4. 프로파일 만료 (해당 없음)
 
-7일이 지나면 앱이 실행되지 않습니다("개발자 신뢰"가 무효화됨).
+무료 Personal Team이었다면 7일마다 프로파일이 만료되어 앱 실행이 막히고 재빌드가 필요합니다.
+
+**이 계정은 유료이므로 해당 없음** — 현재 프로파일 만료일은 **2027-10-18**(1년)입니다.
+만료가 다가오면 다음으로 확인하세요:
 
 ```bash
-cd /Users/kian/GensparkCode/guidy-app
-flutter run -d <device-id>      # 재빌드하면 프로파일이 갱신됨
+security cms -D -i build/ios/iphoneos/Runner.app/embedded.mobileprovision | plutil -extract ExpirationDate raw -
 ```
-
-매번 반복이 번거로우면 유료 전환(§5)이 답입니다.
 
 ---
 
-## 5. 유료 전환 후: TestFlight / App Store
+## 5. TestFlight / App Store
 
-무료 계정에서는 이 단계로 갈 수 없습니다.
+이미 유료 계정이므로 이 단계로 바로 갈 수 있습니다.
 
 ### 5-1. Bundle ID 등록
 
@@ -316,11 +360,11 @@ App Store Connect에서 스크린샷, 설명, 개인정보 처리방침 URL, 연
 
 | 에러 | 원인 / 해결 |
 |---|---|
+| `PLA Update available` + `No profiles for '...' were found` | **실제로 막혔던 원인.** 팀 설정이 아니라 애플 개발자 계정의 최신 약관 미동의. §1-1 참고 — 웹에서 PLA 동의 |
 | `No development certificates available to code sign app for device deployment` | Step 3의 Team 미설정. Xcode에서 Team을 고르세요 |
-| `Your development team does not support the Push Notifications capability` | 무료 Personal Team의 한계. 유료 전환하거나 해당 capability 제거 |
+| `Your development team does not support the Push Notifications capability` | 무료 Personal Team의 한계 (이 계정은 유료라 해당 없음) |
 | `The app identifier "..." cannot be registered to your development team` | Bundle ID가 이미 다른 계정에 등록됨. Bundle ID 변경 |
 | 앱 실행 시 "신뢰할 수 없는 개발자" | Step 7 (설정 → 일반 → VPN 및 기기 관리 → 개발자 신뢰) |
-| 7일 뒤 앱이 안 열림 | 무료 계정 프로파일 만료. §4 재빌드 |
 | `Failed to register bundle identifier` (테스트 타겟) | RunnerTests 타겟에도 Team을 지정했는지 확인 |
 | Xcode에 기기가 안 보임 | 케이블 재연결 / iPhone 잠금 해제 / 기기에서 "신뢰" 누르기 |
 | 개발자 모드 메뉴가 안 보임 | Xcode에 한 번 연결해야 메뉴가 생성됨 (Step 4) |
