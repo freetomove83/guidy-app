@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Navy used while the app process starts, matching the Flutter splash.
+         Keeps the transition from the system launch screen into the app
+         seamless instead of flashing white. -->
+    <color name="launch_background">#0F2038</color>
+</resources>
