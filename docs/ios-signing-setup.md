@@ -23,6 +23,7 @@
 | 테스트 Bundle ID | `com.guidyaudioguide.guidyAudioGuide.RunnerTests` |
 | iOS Deployment Target | `15.0` |
 | 서명된 실기기 빌드 | `flutter build ios` → `Runner.app` **37.2MB 성공** |
+| App Store IPA | `flutter build ipa` → `build/ios/ipa/guidy_audio_guide.ipa` **40.3MB 성공** |
 
 프로파일 만료가 **1년 뒤**라는 점이 유료 계정의 증거입니다 (무료 Personal Team이면 7일).
 
@@ -32,11 +33,40 @@
 security find-identity -v -p codesigning                       # 1 valid identities
 codesign -dv --verbose=2 build/ios/iphoneos/Runner.app          # Authority / TeamIdentifier
 security cms -D -i build/ios/iphoneos/Runner.app/embedded.mobileprovision
+
+# IPA 검증
+plutil -p build/ios/ipa/ExportOptions.plist                     # method = app-store-connect
+unzip -q build/ios/ipa/guidy_audio_guide.ipa -d /tmp/ipa && \
+  codesign -dv --verbose=2 /tmp/ipa/Payload/*.app               # Apple Distribution
 ```
+
+IPA는 `Apple Distribution: Junseok Kang (2AB9P63KNV)`로 서명되고,
+프로파일은 `iOS Team Store Provisioning Profile: com.guidyaudioguide.guidyAudioGuide`입니다.
+
+> **주의 — 배포용 인증서는 로컬에 남지 않습니다.**
+> `flutter build ipa`는 export 단계에서 **임시 키체인**에 Apple Distribution 인증서를 만들어 쓰고 버립니다.
+> 그래서 `security find-identity`에는 Development 인증서만 보입니다.
+> IPA 업로드 자체는 문제없지만, 이 상태로 IPA를 반복 생성하면 애플 포털에 배포 인증서가 계속 새로 쌓입니다
+> (계정당 활성 배포 인증서는 3개까지). 반복 빌드가 많아지면 Xcode GUI의
+> **Organizer → Distribute App**을 한 번 써서 인증서를 로그인 키체인에 정착시키는 편이 안전합니다.
+
+### 아이폰 실기기 없이 가능한 범위
+
+iOS **개발자 계정에는 아이폰이 필요 없습니다.** 시뮬레이터 실행, `flutter build ios`,
+`flutter build ipa`, TestFlight 업로드, App Store 심사 제출까지 전부 기기 없이 가능합니다.
+
+단, **QR 카메라 / BLE 비콘 / 푸시 알림**은 시뮬레이터로 검증이 불가능하므로
+그 기능을 붙이는 시점에는 실제 기기가 필요합니다. 대안:
+
+1. 주변의 아이폰 사용자에게 **TestFlight**로 초대 (내 기기 등록 불필요)
+2. **클라우드 기기팜** — BrowserStack App Live / AWS Device Farm에서 실제 아이폰 원격 조작
+3. **안드로이드 폰** — 같은 기능을 APK로 검증 가능
 
 ### 남은 것: 실기기 설치
 
 실기기용 서명 빌드는 성공하지만, **실제 iPhone에 설치하려면 기기를 연결**해야 합니다 (§2 Step 4 ~ Step 7).
+현재 이 계정에는 아이폰이 없으므로 이 단계는 보류 상태입니다.
+
 
 
 ---
