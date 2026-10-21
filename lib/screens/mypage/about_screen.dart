@@ -120,24 +120,25 @@ class AboutScreen extends StatelessWidget {
                       children: [
                         // 앱 아이콘
                         ClipRRect(
-                          borderRadius: GuidyRadius.lgBorder,
+                          borderRadius: BorderRadius.circular(56 * 0.225),
                           child: Image.asset(
                             'assets/icon/app_icon.png',
-                            width: 64, height: 64,
+                            width: 56, height: 56,
                             fit: BoxFit.cover,
                             errorBuilder: (_, __, ___) => Container(
-                              width: 64, height: 64,
+                              width: 56, height: 56,
                               decoration: BoxDecoration(
                                 color: primaryC.withValues(alpha: 0.12),
-                                borderRadius: GuidyRadius.lgBorder,
+                                borderRadius:
+                                    BorderRadius.circular(56 * 0.225),
                               ),
                               child: Icon(Icons.headphones_rounded,
-                                  size: 32, color: primaryC),
+                                  size: 28, color: primaryC),
                             ),
                           ),
                         ),
                         const SizedBox(height: 12),
-                        Text('guidy',
+                        Text('Guidy',
                             style: GuidyText.h2(textC)
                                 .copyWith(fontWeight: FontWeight.w900)),
                         const SizedBox(height: 2),

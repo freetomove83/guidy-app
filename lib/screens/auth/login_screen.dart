@@ -56,24 +56,21 @@ class LoginScreen extends StatelessWidget {
 
                     // 로고
                     Container(
-                      width: 64, height: 64,
+                      width: 88, height: 88,
                       decoration: BoxDecoration(
-                        borderRadius: GuidyRadius.lgBorder,
+                        borderRadius: BorderRadius.circular(88 * 0.225),
                         boxShadow: GuidyShadow.pop,
                       ),
-                      child: ClipRRect(
-                        borderRadius: GuidyRadius.lgBorder,
-                        child: Image.asset(
-                          'assets/icon/app_icon.png',
-                          width: 64, height: 64,
-                          fit: BoxFit.cover,
-                        ),
+                      child: Image.asset(
+                        'assets/icon/app_icon.png',
+                        width: 88, height: 88,
+                        fit: BoxFit.cover,
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
                     Text('Guidy', style: TextStyle(
                       fontFamily: GuidyText.fontFamily,
-                      fontSize: 28, fontWeight: FontWeight.w900,
+                      fontSize: 28, fontWeight: FontWeight.w800,
                       letterSpacing: -1.0, color: textC,
                     )),
                     const SizedBox(height: 6),

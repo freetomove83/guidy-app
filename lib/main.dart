@@ -457,21 +457,18 @@ class _SettingsPage extends StatelessWidget {
               child: Column(
                 children: [
                   Container(
-                    width: 48, height: 48,
+                    width: 56, height: 56,
                     decoration: BoxDecoration(
-                      borderRadius: GuidyRadius.lgBorder,
+                      borderRadius: BorderRadius.circular(56 * 0.225),
                     ),
-                    child: ClipRRect(
-                      borderRadius: GuidyRadius.lgBorder,
-                      child: Image.asset(
-                        'assets/icon/app_icon.png',
-                        width: 48, height: 48,
-                        fit: BoxFit.cover,
-                      ),
+                    child: Image.asset(
+                      'assets/icon/app_icon.png',
+                      width: 56, height: 56,
+                      fit: BoxFit.cover,
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Text('guidy', style: GuidyText.h3(textC)),
+                  Text('Guidy', style: GuidyText.h3(textC)),
                   Text('오디오 가이드 마켓플레이스', style: GuidyText.small(subC)),
                   const SizedBox(height: 4),
                   Text('v1.0.0', style: GuidyText.kicker(muteC)),

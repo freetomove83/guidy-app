@@ -235,12 +235,12 @@ class _SplashScreenState extends State<SplashScreen>
                       opacity: _iconFade,
                       child: ScaleTransition(
                         scale: _iconScale,
-                        child: _HeadphoneIcon(size: 80),
+                        child: _HeadphoneIcon(size: 120),
                       ),
                     ),
                   ),
 
-                  const SizedBox(height: 28),
+                  const SizedBox(height: 16),
 
                   // GUIDY 워드마크
                   AnimatedBuilder(
@@ -430,27 +430,25 @@ class _HeadphoneIcon extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        shape: BoxShape.circle,
+        borderRadius: BorderRadius.circular(size * 0.225),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0B3D5C).withValues(alpha: 0.8),
-            blurRadius: 32,
-            spreadRadius: 4,
+            color: Colors.black.withValues(alpha: 0.4),
+            blurRadius: 24,
+            offset: const Offset(0, 12),
           ),
           BoxShadow(
-            color: const Color(0xFF4A8BB0).withValues(alpha: 0.3),
-            blurRadius: 16,
-            spreadRadius: 0,
+            color: const Color(0xFF4A8BB0).withValues(alpha: 0.25),
+            blurRadius: 32,
+            spreadRadius: 2,
           ),
         ],
       ),
-      child: ClipOval(
-        child: Image.asset(
-          'assets/icon/app_icon.png',
-          width: size,
-          height: size,
-          fit: BoxFit.cover,
-        ),
+      child: Image.asset(
+        'assets/icon/app_icon.png',
+        width: size,
+        height: size,
+        fit: BoxFit.cover,
       ),
     );
   }

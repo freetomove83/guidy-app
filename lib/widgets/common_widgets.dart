@@ -397,18 +397,15 @@ class GuidyHeader extends StatelessWidget {
               ),
             ),
           if (showLogo) ...[
-            ClipRRect(
-              borderRadius: GuidyRadius.smBorder,
-              child: Image.asset(
-                'assets/icon/app_icon.png',
-                width: 30, height: 30, fit: BoxFit.cover,
-              ),
+            Image.asset(
+              'assets/icon/app_icon.png',
+              width: 32, height: 32, fit: BoxFit.cover,
             ),
             const SizedBox(width: 8),
             Text('Guidy', style: TextStyle(
               fontFamily: GuidyText.fontFamily,
-              fontSize: 20, fontWeight: FontWeight.w800,
-              letterSpacing: -0.6, color: textC,
+              fontSize: 18, fontWeight: FontWeight.w700,
+              letterSpacing: -0.36, color: textC,
             )),
           ],
           if (title != null && !showLogo) ...[
