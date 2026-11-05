@@ -251,7 +251,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    e.price == 0 ? '무료' : '₩${_formatPrice(e.price)}',
+                    e.price == 0 ? '무료' : '₩${formatPrice(e.price)}',
                     style: GuidyText.small(textC).copyWith(fontWeight: FontWeight.w700),
                   ),
                 ],
@@ -331,7 +331,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             Text('${e.workCount}작품 · ${e.duration}', style: GuidyText.kicker(muteC)),
                             const Spacer(),
                             Text(
-                              e.price == 0 ? '무료' : '₩${_formatPrice(e.price)}',
+                              e.price == 0 ? '무료' : '₩${formatPrice(e.price)}',
                               style: GuidyText.small(textC).copyWith(fontWeight: FontWeight.w700),
                             ),
                           ],
@@ -348,10 +348,4 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  String _formatPrice(int price) {
-    return price.toString().replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (m) => '${m[1]},',
-    );
-  }
 }

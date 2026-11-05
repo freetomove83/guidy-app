@@ -6,6 +6,7 @@
 
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../theme/app_theme.dart';
 
 // ─── 더미 광고 데이터 모델 ─────────────────────────────────
@@ -43,7 +44,7 @@ class AdDataStore {
     imageUrl: null, // Firebase Storage URL 연결 예정
     landingType: AdLandingType.internal,
     landingUrl: '/detail/expo_001',
-    endAt: DateTime(2025, 8, 31),
+    endAt: DateTime(2026, 12, 31),
     active: true,
   );
 
@@ -54,7 +55,7 @@ class AdDataStore {
     imageUrl: null,
     landingType: AdLandingType.internal,
     landingUrl: '/detail/expo_001',
-    endAt: DateTime(2025, 7, 31),
+    endAt: DateTime(2026, 12, 31),
     active: true,
   );
 
@@ -65,13 +66,30 @@ class AdDataStore {
     imageUrl: null,
     landingType: AdLandingType.internal,
     landingUrl: '/creator/creator_001',
-    endAt: DateTime(2025, 8, 15),
+    endAt: DateTime(2026, 12, 31),
     active: true,
   );
 
-  static AdData? get splashAd => _splashAd.active ? _splashAd : null;
-  static AdData? get popupAd  => _popupAd.active  ? _popupAd  : null;
-  static AdData? get slideUpAd => _slideUpAd.active ? _slideUpAd : null;
+  static AdData? _live(AdData ad) =>
+      ad.active && DateTime.now().isBefore(ad.endAt) ? ad : null;
+
+  static AdData? get splashAd  => _live(_splashAd);
+  static AdData? get popupAd   => _live(_popupAd);
+  static AdData? get slideUpAd => _live(_slideUpAd);
+
+  // '오늘 하루 보지 않기' — 숨긴 날짜(yyyy-mm-dd)를 저장
+  static const _kPopupHiddenOn = 'guidy_popup_ad_hidden_on';
+  static String _today() => DateTime.now().toIso8601String().substring(0, 10);
+
+  static Future<bool> isPopupHiddenToday() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_kPopupHiddenOn) == _today();
+  }
+
+  static Future<void> hidePopupToday() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_kPopupHiddenOn, _today());
+  }
 }
 
 // ══════════════════════════════════════════════════════════
@@ -306,6 +324,7 @@ class _HomePopupAdState extends State<HomePopupAd>
   }
 
   Future<void> _close() async {
+    if (_dontShowToday) await AdDataStore.hidePopupToday();
     await _ctrl.reverse();
     widget.onClose();
   }

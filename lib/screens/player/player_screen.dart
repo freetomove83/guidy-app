@@ -112,6 +112,8 @@ class _PlayerScreenState extends State<PlayerScreen>
     final a = _currentArtwork;
     if (a.audioUrl != null) {
       audio.play(a.audioUrl!, artworkId: a.id);
+    } else {
+      audio.stop(); // 이전 작품 오디오가 새 작품 화면 뒤에서 계속 나오지 않도록
     }
   }
 

@@ -6,6 +6,12 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../models/models.dart';
 
+/// 가격 천 단위 콤마 (₩ 기호는 호출부에서 붙임)
+String formatPrice(int price) => price.toString().replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (m) => '${m[1]},',
+    );
+
 // ─── Cover (SVG 그라디언트 플레이스홀더) ────────────────────
 class GuidyCover extends StatelessWidget {
   final int seed;
@@ -755,7 +761,7 @@ class ExhibitionCard extends StatelessWidget {
                             Text(
                               exhibition.price == 0
                                   ? '무료'
-                                  : '₩${_formatPrice(exhibition.price)}',
+                                  : '₩${formatPrice(exhibition.price)}',
                               style: GuidyText.small(
                                 exhibition.price == 0 ? GuidyColors.ok : textC,
                               ).copyWith(fontWeight: FontWeight.w700),
@@ -775,12 +781,6 @@ class ExhibitionCard extends StatelessWidget {
     );
   }
 
-  String _formatPrice(int price) {
-    return price.toString().replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (m) => '${m[1]},',
-    );
-  }
 }
 
 // ─── GuidyInputLabel ─────────────────────────────────────

@@ -26,8 +26,9 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     // 홈 진입 0.8초 후 팝업 광고 표시
-    Future.delayed(const Duration(milliseconds: 800), () {
-      if (mounted && AdDataStore.popupAd != null) {
+    Future.delayed(const Duration(milliseconds: 800), () async {
+      if (AdDataStore.popupAd == null || await AdDataStore.isPopupHiddenToday()) return;
+      if (mounted) {
         setState(() => _showPopupAd = true);
       }
     });

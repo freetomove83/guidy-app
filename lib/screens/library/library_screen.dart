@@ -343,7 +343,7 @@ class _FavoritesTab extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(e.price == 0
                         ? '무료'
-                        : '₩${_formatPrice(e.price)}',
+                        : '₩${formatPrice(e.price)}',
                         style: GuidyText.kicker(accentC)
                           .copyWith(fontWeight: FontWeight.w700)),
                     ],
@@ -365,15 +365,6 @@ class _FavoritesTab extends StatelessWidget {
     );
   }
 
-  String _formatPrice(int price) {
-    final s = price.toString();
-    final buf = StringBuffer();
-    for (int i = 0; i < s.length; i++) {
-      if (i > 0 && (s.length - i) % 3 == 0) buf.write(',');
-      buf.write(s[i]);
-    }
-    return buf.toString();
-  }
 }
 
 // ─── 크리에이터 탭 ───────────────────────────────────────

@@ -60,7 +60,8 @@ class GuidyRoot extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
-        ChangeNotifierProvider(create: (_) => GuidyAudioService()),
+        // 싱글톤이므로 Provider가 dispose하지 않도록 .value 사용
+        ChangeNotifierProvider.value(value: GuidyAudioService()),
         ChangeNotifierProvider.value(value: appStore),
         ChangeNotifierProvider.value(value: userStore),
       ],
@@ -194,7 +195,7 @@ class _MainShellState extends State<MainShell> {
 
   final List<Widget> _pages = const [
     HomeScreen(),
-    ScanScreen(),
+    SizedBox.shrink(), // 스캔 탭은 /scan 라우트로 push (상주 화면 불필요)
     LibraryScreen(),
     _SettingsPage(),
   ];
@@ -446,7 +447,7 @@ class _SettingsPage extends StatelessWidget {
               Navigator.pushNamed(context, '/help');
             }),
             const SizedBox(height: 8),
-            _settingItem(Icons.info_outline_rounded, 'Guidy 소개', '버전 1.0.0', context, surfaceC, lineC, textC, subC, () {
+            _settingItem(Icons.info_outline_rounded, 'Guidy 소개', '버전 ${AboutScreen.currentVersion}', context, surfaceC, lineC, textC, subC, () {
               Navigator.pushNamed(context, '/about');
             }),
 
@@ -471,7 +472,7 @@ class _SettingsPage extends StatelessWidget {
                   Text('Guidy', style: GuidyText.h3(textC)),
                   Text('오디오 가이드 마켓플레이스', style: GuidyText.small(subC)),
                   const SizedBox(height: 4),
-                  Text('v1.0.0', style: GuidyText.kicker(muteC)),
+                  Text('v${AboutScreen.currentVersion}', style: GuidyText.kicker(muteC)),
                 ],
               ),
             ),

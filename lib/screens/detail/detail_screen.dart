@@ -9,6 +9,7 @@ import '../../models/models.dart';
 import '../../models/app_store.dart';
 import '../../models/user_store.dart';
 import '../../widgets/common_widgets.dart';
+import '../../widgets/exhibition_actions.dart';
 
 class DetailScreen extends StatefulWidget {
   final String exhibitionId;
@@ -26,7 +27,6 @@ class _DetailScreenState extends State<DetailScreen> {
     if (exhibition == null) {
       return const NotFoundScreen(message: '전시를 찾을 수 없습니다');
     }
-    final artworks   = store.artworksFor(widget.exhibitionId);
     final sections   = store.sectionsFor(widget.exhibitionId);
     final guides     = store.creatorGuidesFor(widget.exhibitionId);
 
@@ -248,7 +248,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                   children: [
                                     _metaItem(Icons.timer_outlined, '소요 시간', exhibition.duration, textC, muteC),
                                     _metaItem(Icons.attach_money_rounded, '이용료',
-                                      exhibition.price == 0 ? '무료' : '₩${_formatPrice(exhibition.price)}',
+                                      exhibition.price == 0 ? '무료' : '₩${formatPrice(exhibition.price)}',
                                       textC, muteC),
                                   ],
                                 ),
@@ -372,15 +372,15 @@ class _DetailScreenState extends State<DetailScreen> {
                         PillButton(
                           label: '미리듣기',
                           size: 'md',
-                          onPressed: () => _openPlayer(artworks),
+                          onPressed: () => openExhibitionPlayer(context, exhibition),
                         ),
                         const SizedBox(width: 10),
                       ],
                       Expanded(
                         child: GestureDetector(
                           onTap: () => canPlay
-                              ? _openPlayer(artworks)
-                              : _confirmPurchase(exhibition),
+                              ? openExhibitionPlayer(context, exhibition)
+                              : confirmPurchase(context, exhibition),
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 200),
                             padding: const EdgeInsets.symmetric(vertical: 14),
@@ -409,7 +409,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                       ? '지금 바로 듣기'
                                       : (exhibition.price == 0
                                           ? '무료로 감상하기'
-                                          : '₩${_formatPrice(exhibition.price)} 구매'),
+                                          : '₩${formatPrice(exhibition.price)} 구매'),
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 15,
@@ -434,76 +434,6 @@ class _DetailScreenState extends State<DetailScreen> {
     );
   }
 
-  void _openPlayer(List<Artwork> artworks) {
-    if (artworks.isEmpty) {
-      // 다른 전시의 오디오로 대체 재생하지 않는다
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('이 전시의 오디오 가이드가 준비 중입니다')),
-      );
-      return;
-    }
-    Navigator.pushNamed(context, '/player/${artworks.first.id}');
-  }
-
-  // shortcut: 결제 연동 전이라 확인 후 바로 구매 기록만 추가, PG 연동 시 교체
-  Future<void> _confirmPurchase(Exhibition exhibition) async {
-    final isDark   = Theme.of(context).brightness == Brightness.dark;
-    final surfaceC = isDark ? GuidyColors.darkSurface : GuidyColors.surface;
-    final textC    = isDark ? GuidyColors.darkText    : GuidyColors.ink;
-    final subC     = isDark ? GuidyColors.darkSub     : GuidyColors.sub;
-    final muteC    = isDark ? GuidyColors.darkMute    : GuidyColors.mute;
-
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: surfaceC,
-        title: Text('구매 확인', style: GuidyText.h3(textC)),
-        content: Text(
-          '「${exhibition.title}」 오디오 가이드를\n₩${_formatPrice(exhibition.price)}에 구매하시겠습니까?',
-          style: GuidyText.body(subC)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text('취소', style: GuidyText.body(muteC)),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: Text('구매하기',
-              style: GuidyText.body(GuidyColors.primary).copyWith(fontWeight: FontWeight.w700)),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true || !mounted) return;
-
-    await context.read<UserStore>().addPurchase(Purchase(
-      id: 'p_${DateTime.now().millisecondsSinceEpoch}',
-      exhibitionId: exhibition.id,
-      exhibitionTitle: exhibition.title,
-      venueName: exhibition.venue,
-      coverSeed: exhibition.coverSeed,
-      pricePaid: exhibition.price,
-      purchasedAt: DateTime.now(),
-      status: PurchaseStatus.unused,
-    ));
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('「${exhibition.title}」 구매가 완료되었습니다'),
-        backgroundColor: GuidyColors.ok,
-      ),
-    );
-  }
-
-  String _formatPrice(int price) {
-    final s = price.toString();
-    final result = StringBuffer();
-    for (int i = 0; i < s.length; i++) {
-      if (i > 0 && (s.length - i) % 3 == 0) result.write(',');
-      result.write(s[i]);
-    }
-    return result.toString();
-  }
 
   // ─── 공유 바텀시트 ────────────────────────────────────
   void _showShareSheet(

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../../models/models.dart';
 import '../../widgets/common_widgets.dart';
+import '../../widgets/exhibition_actions.dart';
 
 class FollowingScreen extends StatelessWidget {
   const FollowingScreen({super.key});
@@ -231,7 +232,7 @@ class _FeedCardState extends State<_FeedCard> {
                         primary: true,
                         size: 'sm',
                         icon: Icons.play_arrow_rounded,
-                        onPressed: () => Navigator.pushNamed(context, '/player/a1'),
+                        onPressed: () => openExhibitionPlayer(context, item.exhibition!),
                       ),
                     ),
                   ],

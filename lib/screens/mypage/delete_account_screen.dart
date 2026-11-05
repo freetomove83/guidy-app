@@ -30,10 +30,10 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
 
   Future<void> _deleteAccount() async {
     setState(() => _loading = true);
-    await Future.delayed(const Duration(milliseconds: 1000));
+    // 실제 환경에서는 Firebase Auth 계정 삭제 + Firestore 데이터 삭제도 필요
+    await context.read<UserStore>().clearAll();
     if (!mounted) return;
     setState(() => _loading = false);
-    // 실제 환경에서는 Firebase Auth 계정 삭제 + Firestore 데이터 삭제
     Navigator.pushNamedAndRemoveUntil(context, '/login', (_) => false);
   }
 

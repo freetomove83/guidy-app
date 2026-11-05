@@ -7,7 +7,8 @@ import '../../theme/app_theme.dart';
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
 
-  static const _currentVersion = '1.0.0';
+  // pubspec.yaml version과 함께 올릴 것 (main.dart 설정 탭도 이 값을 사용)
+  static const currentVersion = '1.0.0';
 
   // 버전 히스토리 (최신순)
   static const _history = [
@@ -152,7 +153,7 @@ class AboutScreen extends StatelessWidget {
                             color: primaryC.withValues(alpha: 0.10),
                             borderRadius: GuidyRadius.pillBorder,
                           ),
-                          child: Text('현재 버전 v$_currentVersion',
+                          child: Text('현재 버전 v$currentVersion',
                               style: GuidyText.small(primaryC)
                                   .copyWith(fontWeight: FontWeight.w700)),
                         ),

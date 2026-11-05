@@ -48,7 +48,7 @@ class UserStore extends ChangeNotifier {
   final Set<String> _favorites  = {};
   final Set<String> _likes      = {};
   final Set<String> _following  = {};
-  final List<Purchase> _purchases = List.from(DummyData.purchases);
+  final List<Purchase> _purchases = [];
 
   // ── Getters ─────────────────────────────────────────
   String get userName  => _userName;
@@ -111,7 +111,13 @@ class UserStore extends ChangeNotifier {
       if (purchasesRaw != null) {
         final List<dynamic> list = jsonDecode(purchasesRaw);
         _purchases.clear();
-        _purchases.addAll(list.map((e) => _purchaseFromJson(e as Map<String, dynamic>)));
+        for (final e in list) {
+          try {
+            _purchases.add(_purchaseFromJson(e as Map<String, dynamic>));
+          } catch (err) {
+            debugPrint('[UserStore] 손상된 구매 데이터 건너뜀: $err');
+          }
+        }
       }
 
       // 크리에이터 신청 상태 복원
@@ -134,7 +140,10 @@ class UserStore extends ChangeNotifier {
       }
 
       notifyListeners();
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[UserStore] 저장 데이터 복원 실패: $e');
+      notifyListeners();
+    }
   }
 
   /// 6자리 대문자 랜덤 추천 코드 생성
@@ -185,6 +194,31 @@ class UserStore extends ChangeNotifier {
     await prefs.remove(_kCreatorStatus);
     await prefs.remove(_kCreatorAppliedAt);
     await prefs.remove(_kCreatorApprovedAt);
+  }
+
+  // ── 로그아웃·탈퇴: 기기에 남은 사용자 데이터 삭제 ─────
+  Future<void> clearAll() async {
+    _userName = 'Guidy 사용자';
+    _userEmail = '';
+    _creatorStatus = CreatorApplyStatus.none;
+    _creatorAppliedAt = null;
+    _creatorApprovedAt = null;
+    _referredByCode = '';
+    _referralCount = 0;
+    _freeTickets = 0;
+    _favorites.clear();
+    _likes.clear();
+    _following.clear();
+    _purchases.clear();
+    _myReferralCode = _generateCode('');
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    for (final k in [_kFavorites, _kLikes, _kFollowing, _kPurchases, _kUserName,
+        _kUserEmail, _kCreatorStatus, _kCreatorAppliedAt, _kCreatorApprovedAt,
+        _kReferredByCode, _kReferralCount, _kFreeTickets]) {
+      await prefs.remove(k);
+    }
+    await prefs.setString(_kMyReferralCode, _myReferralCode);
   }
 
   // ── 개인 정보 업데이트 ───────────────────────────────

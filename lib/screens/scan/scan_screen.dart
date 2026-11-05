@@ -34,8 +34,11 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
 
   void _simulateScan() {
     setState(() => _scanned = true);
-    Future.delayed(const Duration(seconds: 1), () {
-      if (mounted) Navigator.pushNamed(context, '/detail/e1');
+    // shortcut: 카메라 연동 전 시뮬레이션(e1 고정), QR 패키지 도입 시 인식 결과로 교체
+    Future.delayed(const Duration(seconds: 1), () async {
+      if (!mounted) return;
+      await Navigator.pushNamed(context, '/detail/e1');
+      if (mounted) setState(() => _scanned = false); // 돌아오면 다시 스캔 가능
     });
   }
 

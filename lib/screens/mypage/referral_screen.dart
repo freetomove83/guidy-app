@@ -1,6 +1,7 @@
 // lib/screens/mypage/referral_screen.dart
 // 친구 초대 & 추천인 코드 화면
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -392,9 +393,9 @@ class ReferralScreen extends StatelessWidget {
                       lineC: lineC,
                     ),
 
-                    // 테스트용 보상 추가 버튼 (개발 확인용)
-                    const SizedBox(height: 24),
-                    GestureDetector(
+                    // 테스트용 보상 추가 버튼 (디버그 빌드에서만)
+                    if (kDebugMode) const SizedBox(height: 24),
+                    if (kDebugMode) GestureDetector(
                       onTap: () async {
                         await userStore.debugAddReward();
                         if (context.mounted) {

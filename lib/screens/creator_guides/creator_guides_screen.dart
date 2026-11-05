@@ -455,15 +455,6 @@ class _BuyButton extends StatelessWidget {
     required this.textC,
   });
 
-  String _fmtPrice(int p) {
-    final s = p.toString();
-    final buf = StringBuffer();
-    for (int i = 0; i < s.length; i++) {
-      if (i > 0 && (s.length - i) % 3 == 0) buf.write(',');
-      buf.write(s[i]);
-    }
-    return buf.toString();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -483,7 +474,7 @@ class _BuyButton extends StatelessWidget {
             const Icon(Icons.lock_rounded,
                 size: 14, color: Color(0xFFF59E0B)),
             const SizedBox(width: 5),
-            Text('₩${_fmtPrice(guide.price)}',
+            Text('₩${formatPrice(guide.price)}',
               style: GuidyText.small(const Color(0xFFF59E0B))
                   .copyWith(fontWeight: FontWeight.w800)),
           ],
@@ -648,7 +639,7 @@ class _BuyButton extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Text('₩${_fmtPrice(guide.price)}',
+                  Text('₩${formatPrice(guide.price)}',
                     style: const TextStyle(
                       color: Color(0xFFF59E0B),
                       fontSize: 20, fontWeight: FontWeight.w900,
@@ -697,7 +688,7 @@ class _BuyButton extends StatelessWidget {
                     ),
                     child: Center(
                       child: Text(
-                        '₩${_fmtPrice(guide.price)} 구매하기',
+                        '₩${formatPrice(guide.price)} 구매하기',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 15, fontWeight: FontWeight.w800,

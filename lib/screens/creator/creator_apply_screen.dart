@@ -1,6 +1,7 @@
 // lib/screens/creator/creator_apply_screen.dart
 // 크리에이터 신청 / 진행 상황 화면
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:provider/provider.dart';
@@ -665,7 +666,7 @@ class _PendingView extends StatelessWidget {
                     const SizedBox(height: 20),
 
                     // 개발 테스트용: 승인 시뮬레이션 버튼
-                    GestureDetector(
+                    if (kDebugMode) GestureDetector(
                       onTap: () => context.read<UserStore>().approveCreator(),
                       child: Container(
                         width: double.infinity,
@@ -843,7 +844,7 @@ class _ApprovedView extends StatelessWidget {
                     const SizedBox(height: 12),
 
                     // 신청 초기화 (개발용)
-                    GestureDetector(
+                    if (kDebugMode) GestureDetector(
                       onTap: () => context.read<UserStore>().resetCreatorStatus(),
                       child: Container(
                         width: double.infinity,

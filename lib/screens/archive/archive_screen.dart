@@ -2,9 +2,13 @@
 // 아카이브 화면
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../theme/app_theme.dart';
 import '../../models/models.dart';
+import '../../models/app_store.dart';
+import '../../models/user_store.dart';
 import '../../widgets/common_widgets.dart';
+import '../../widgets/exhibition_actions.dart';
 
 class ArchiveScreen extends StatelessWidget {
   final String exhibitionId;
@@ -12,10 +16,11 @@ class ArchiveScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final exhibition = DummyData.exhibitions.firstWhere(
-      (e) => e.id == exhibitionId && e.channel == ChannelType.archive,
-      orElse: () => DummyData.exhibitions.firstWhere((e) => e.channel == ChannelType.archive),
-    );
+    final exhibition = context.read<AppStore>().exhibitionById(exhibitionId);
+    if (exhibition == null) {
+      return const NotFoundScreen(message: '전시를 찾을 수 없습니다');
+    }
+    final canPlay = context.watch<UserStore>().canAccess(exhibition);
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgC = isDark ? GuidyColors.darkBg : GuidyColors.bg;
@@ -135,7 +140,9 @@ class ArchiveScreen extends StatelessWidget {
                             children: [
                               Expanded(
                                 child: GestureDetector(
-                                  onTap: () => Navigator.pushNamed(context, '/player/a1'),
+                                  onTap: () => canPlay
+                                      ? openExhibitionPlayer(context, exhibition)
+                                      : confirmPurchase(context, exhibition),
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(vertical: 14),
                                     decoration: BoxDecoration(
@@ -149,7 +156,8 @@ class ArchiveScreen extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(width: 10),
-                              PillButton(label: '미리듣기', size: 'lg'),
+                              PillButton(label: '미리듣기', size: 'lg',
+                                onPressed: () => openExhibitionPlayer(context, exhibition)),
                             ],
                           ),
                           const SizedBox(height: 20),
@@ -262,7 +270,9 @@ class ArchiveScreen extends StatelessWidget {
                 boxShadow: GuidyShadow.up,
               ),
               child: GestureDetector(
-                onTap: () {},
+                onTap: () => canPlay
+                    ? openExhibitionPlayer(context, exhibition)
+                    : confirmPurchase(context, exhibition),
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   decoration: BoxDecoration(
@@ -274,7 +284,7 @@ class ArchiveScreen extends StatelessWidget {
                     children: [
                       Icon(Icons.shopping_bag_outlined, color: bgC, size: 18),
                       const SizedBox(width: 8),
-                      Text('₩${exhibition.price} · 구매하고 감상하기',
+                      Text(canPlay ? '지금 바로 감상하기' : '₩${formatPrice(exhibition.price)} · 구매하고 감상하기',
                         style: TextStyle(color: bgC, fontSize: 15, fontWeight: FontWeight.w800,
                           fontFamily: GuidyText.fontFamily)),
                     ],

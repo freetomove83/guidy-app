@@ -355,6 +355,7 @@ class _ProfileTabState extends State<_ProfileTab> {
                 ),
                 TextButton(
                   onPressed: () {
+                    context.read<UserStore>().clearAll();
                     Navigator.pop(context);
                     Navigator.pushNamedAndRemoveUntil(context, '/login', (_) => false);
                   },
@@ -408,14 +409,7 @@ class _ProfileTabState extends State<_ProfileTab> {
           Row(
             children: [
               Text(label, style: GuidyText.kicker(muteC)),
-              if (!enabled && trailingHint != null) ...
-                [const SizedBox(width: 6),
-                Expanded(
-                  child: Text(trailingHint,
-                    style: GuidyText.kicker(muteC.withValues(alpha: 0.7)),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                )],
+              const Spacer(),
               if (!enabled && label == '이메일')
                 Padding(
                   padding: const EdgeInsets.only(left: 4),
@@ -440,7 +434,10 @@ class _ProfileTabState extends State<_ProfileTab> {
             style: GuidyText.body(
               enabled ? textC : muteC,
             ).copyWith(fontWeight: FontWeight.w500),
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
+              // 값이 비었을 때 안내 문구를 입력칸에 표시 (라벨 줄에선 잘림)
+              hintText: trailingHint,
+              hintStyle: GuidyText.small(muteC.withValues(alpha: 0.7)),
               border: InputBorder.none,
               isDense: true,
               contentPadding: EdgeInsets.zero,
@@ -657,7 +654,7 @@ class _PurchaseCard extends StatelessWidget {
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          Text(_formatPrice(purchase.pricePaid),
+                          Text('₩${formatPrice(purchase.pricePaid)}',
                             style: GuidyText.small(textC).copyWith(fontWeight: FontWeight.w700)),
                           const SizedBox(width: 8),
                           Text(_formatDate(purchase.purchasedAt),
@@ -770,15 +767,6 @@ class _PurchaseCard extends StatelessWidget {
     }
   }
 
-  String _formatPrice(int price) {
-    final s = price.toString();
-    final buf = StringBuffer();
-    for (int i = 0; i < s.length; i++) {
-      if (i > 0 && (s.length - i) % 3 == 0) buf.write(',');
-      buf.write(s[i]);
-    }
-    return '₩${buf.toString()}';
-  }
 
   String _formatDate(DateTime dt) =>
       '${dt.year}.${dt.month.toString().padLeft(2,'0')}.${dt.day.toString().padLeft(2,'0')}';

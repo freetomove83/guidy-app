@@ -28,8 +28,13 @@ class AppStore extends ChangeNotifier {
         final List<dynamic> list = jsonDecode(rawArtworks);
         final existingIds = _artworks.map((a) => a.id).toSet();
         for (final item in list) {
-          final j = item as Map<String, dynamic>;
-          final artwork = _artworkFromJson(j);
+          final Artwork artwork;
+          try {
+            artwork = _artworkFromJson(item as Map<String, dynamic>);
+          } catch (e) {
+            debugPrint('[AppStore] 손상된 작품 데이터 건너뜀: $e');
+            continue;
+          }
           if (!existingIds.contains(artwork.id)) {
             _artworks.add(artwork);
             existingIds.add(artwork.id);
@@ -47,7 +52,8 @@ class AppStore extends ChangeNotifier {
         final cmsData = list.map((e) => e as Map<String, dynamic>).toList();
 
         for (final j in cmsData) {
-          final sectionId   = j['id'] as String;
+          final sectionId = j['id'];
+          if (sectionId is! String) continue; // 손상된 섹션 데이터 건너뜀
           final imageBase64 = j['imageBase64'] as String?;
           final idx = _sections.indexWhere((s) => s.id == sectionId);
 
@@ -87,8 +93,8 @@ class AppStore extends ChangeNotifier {
         final Map<String, dynamic> map = jsonDecode(rawActivities);
         map.forEach((creatorId, activitiesJson) {
           final idx = _creators.indexWhere((c) => c.id == creatorId);
-          if (idx >= 0) {
-            final activities = (activitiesJson as List<dynamic>)
+          if (idx >= 0 && activitiesJson is List) {
+            final activities = activitiesJson
                 .map((e) => CreatorActivity.fromJson(e as Map<String, dynamic>))
                 .toList();
             _creators[idx] = _creators[idx].copyWith(activities: activities);
@@ -97,7 +103,11 @@ class AppStore extends ChangeNotifier {
       }
 
       notifyListeners();
-    } catch (_) {}
+    } catch (e) {
+      // 일부만 복원돼도 앱은 계속 동작. 원인 추적용 로그만 남김
+      debugPrint('[AppStore] 저장 데이터 복원 실패: $e');
+      notifyListeners();
+    }
   }
 
   // ── Getters ────────────────────────────────────────────
