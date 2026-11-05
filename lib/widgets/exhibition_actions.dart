@@ -24,24 +24,20 @@ void openExhibitionPlayer(BuildContext context, Exhibition exhibition) {
 
 // shortcut: 결제 연동 전이라 확인 후 바로 구매 기록만 추가, PG 연동 시 교체
 Future<void> confirmPurchase(BuildContext context, Exhibition exhibition) async {
-  final isDark   = Theme.of(context).brightness == Brightness.dark;
-  final surfaceC = isDark ? GuidyColors.darkSurface : GuidyColors.surface;
-  final textC    = isDark ? GuidyColors.darkText    : GuidyColors.ink;
-  final subC     = isDark ? GuidyColors.darkSub     : GuidyColors.sub;
-  final muteC    = isDark ? GuidyColors.darkMute    : GuidyColors.mute;
+  final pal = GuidyPalette.of(context);
 
   final confirmed = await showDialog<bool>(
     context: context,
     builder: (ctx) => AlertDialog(
-      backgroundColor: surfaceC,
-      title: Text('구매 확인', style: GuidyText.h3(textC)),
+      backgroundColor: pal.surface,
+      title: Text('구매 확인', style: GuidyText.h3(pal.text)),
       content: Text(
         '「${exhibition.title}」 오디오 가이드를\n₩${formatPrice(exhibition.price)}에 구매하시겠습니까?',
-        style: GuidyText.body(subC)),
+        style: GuidyText.body(pal.sub)),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(ctx, false),
-          child: Text('취소', style: GuidyText.body(muteC)),
+          child: Text('취소', style: GuidyText.body(pal.mute)),
         ),
         TextButton(
           onPressed: () => Navigator.pop(ctx, true),

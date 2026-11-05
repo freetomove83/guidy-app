@@ -65,17 +65,10 @@ class AboutScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark   = Theme.of(context).brightness == Brightness.dark;
-    final bgC      = isDark ? GuidyColors.darkBg      : GuidyColors.bg;
-    final textC    = isDark ? GuidyColors.darkText     : GuidyColors.ink;
-    final subC     = isDark ? GuidyColors.darkSub      : GuidyColors.sub;
-    final muteC    = isDark ? GuidyColors.darkMute     : GuidyColors.mute;
-    final surfaceC = isDark ? GuidyColors.darkSurface  : GuidyColors.surface;
-    final lineC    = isDark ? GuidyColors.darkLine     : GuidyColors.line;
-    final primaryC = isDark ? GuidyColors.darkPrimary  : GuidyColors.primary;
+    final pal = GuidyPalette.of(context);
 
     return Scaffold(
-      backgroundColor: bgC,
+      backgroundColor: pal.bg,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -90,16 +83,16 @@ class AboutScreen extends StatelessWidget {
                     child: Container(
                       width: 36, height: 36,
                       decoration: BoxDecoration(
-                        color: surfaceC,
+                        color: pal.surface,
                         borderRadius: GuidyRadius.mdBorder,
-                        border: Border.all(color: lineC),
+                        border: Border.all(color: pal.line),
                       ),
                       child: Icon(Icons.arrow_back_ios_new_rounded,
-                          size: 16, color: textC),
+                          size: 16, color: pal.text),
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Text('Guidy 소개', style: GuidyText.h3(textC)),
+                  Text('Guidy 소개', style: GuidyText.h3(pal.text)),
                 ],
               ),
             ),
@@ -113,9 +106,9 @@ class AboutScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: surfaceC,
+                      color: pal.surface,
                       borderRadius: GuidyRadius.lgBorder,
-                      border: Border.all(color: lineC),
+                      border: Border.all(color: pal.line),
                     ),
                     child: Column(
                       children: [
@@ -129,32 +122,32 @@ class AboutScreen extends StatelessWidget {
                             errorBuilder: (_, __, ___) => Container(
                               width: 56, height: 56,
                               decoration: BoxDecoration(
-                                color: primaryC.withValues(alpha: 0.12),
+                                color: pal.primary.withValues(alpha: 0.12),
                                 borderRadius:
                                     BorderRadius.circular(56 * 0.225),
                               ),
                               child: Icon(Icons.headphones_rounded,
-                                  size: 28, color: primaryC),
+                                  size: 28, color: pal.primary),
                             ),
                           ),
                         ),
                         const SizedBox(height: 12),
                         Text('Guidy',
-                            style: GuidyText.h2(textC)
+                            style: GuidyText.h2(pal.text)
                                 .copyWith(fontWeight: FontWeight.w900)),
                         const SizedBox(height: 2),
                         Text('오디오 가이드 마켓플레이스',
-                            style: GuidyText.small(subC)),
+                            style: GuidyText.small(pal.sub)),
                         const SizedBox(height: 12),
                         Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 16, vertical: 6),
                           decoration: BoxDecoration(
-                            color: primaryC.withValues(alpha: 0.10),
+                            color: pal.primary.withValues(alpha: 0.10),
                             borderRadius: GuidyRadius.pillBorder,
                           ),
                           child: Text('현재 버전 v$currentVersion',
-                              style: GuidyText.small(primaryC)
+                              style: GuidyText.small(pal.primary)
                                   .copyWith(fontWeight: FontWeight.w700)),
                         ),
                       ],
@@ -166,19 +159,19 @@ class AboutScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: surfaceC,
+                      color: pal.surface,
                       borderRadius: GuidyRadius.lgBorder,
-                      border: Border.all(color: lineC),
+                      border: Border.all(color: pal.line),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(children: [
                           Icon(Icons.auto_stories_rounded,
-                              size: 16, color: primaryC),
+                              size: 16, color: pal.primary),
                           const SizedBox(width: 6),
                           Text('서비스 소개',
-                              style: GuidyText.body(textC)
+                              style: GuidyText.body(pal.text)
                                   .copyWith(fontWeight: FontWeight.w700)),
                         ]),
                         const SizedBox(height: 10),
@@ -187,7 +180,7 @@ class AboutScreen extends StatelessWidget {
                           '오디오 가이드를 큐레이션하고 판매하는 플랫폼입니다.\n\n'
                           '전문 큐레이터부터 예술을 사랑하는 누구나 '
                           '크리에이터로 활동하며 오디오 가이드를 만들고 수익을 얻을 수 있습니다.',
-                          style: GuidyText.body(subC).copyWith(height: 1.6),
+                          style: GuidyText.body(pal.sub).copyWith(height: 1.6),
                         ),
                       ],
                     ),
@@ -198,10 +191,10 @@ class AboutScreen extends StatelessWidget {
                   Row(
                     children: [
                       Icon(Icons.history_rounded,
-                          size: 18, color: primaryC),
+                          size: 18, color: pal.primary),
                       const SizedBox(width: 6),
                       Text('업데이트 히스토리',
-                          style: GuidyText.h3(textC)),
+                          style: GuidyText.h3(pal.text)),
                     ],
                   ),
                   const SizedBox(height: 12),
@@ -215,12 +208,12 @@ class AboutScreen extends StatelessWidget {
                     return Container(
                       margin: const EdgeInsets.only(bottom: 12),
                       decoration: BoxDecoration(
-                        color: surfaceC,
+                        color: pal.surface,
                         borderRadius: GuidyRadius.lgBorder,
                         border: Border.all(
                           color: isLatest
-                              ? primaryC.withValues(alpha: 0.3)
-                              : lineC,
+                              ? pal.primary.withValues(alpha: 0.3)
+                              : pal.line,
                           width: isLatest ? 1.5 : 1,
                         ),
                       ),
@@ -233,7 +226,7 @@ class AboutScreen extends StatelessWidget {
                             child: Row(
                               children: [
                                 Text('v${ver.version}',
-                                    style: GuidyText.h3(textC)
+                                    style: GuidyText.h3(pal.text)
                                         .copyWith(fontWeight: FontWeight.w800)),
                                 const SizedBox(width: 8),
                                 _VersionBadge(
@@ -257,11 +250,11 @@ class AboutScreen extends StatelessWidget {
                                 ],
                                 const Spacer(),
                                 Text(ver.date,
-                                    style: GuidyText.small(muteC)),
+                                    style: GuidyText.small(pal.mute)),
                               ],
                             ),
                           ),
-                          Divider(color: lineC, height: 1),
+                          Divider(color: pal.line, height: 1),
                           // 업데이트 항목
                           Padding(
                             padding:
@@ -279,14 +272,14 @@ class AboutScreen extends StatelessWidget {
                                           top: 7, right: 8),
                                       decoration: BoxDecoration(
                                         color: isLatest
-                                            ? primaryC
-                                            : muteC,
+                                            ? pal.primary
+                                            : pal.mute,
                                         shape: BoxShape.circle,
                                       ),
                                     ),
                                     Expanded(
                                       child: Text(u,
-                                          style: GuidyText.body(subC)),
+                                          style: GuidyText.body(pal.sub)),
                                     ),
                                   ],
                                 ),
@@ -316,13 +309,12 @@ class _VersionBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final primaryC = isDark ? GuidyColors.darkPrimary : GuidyColors.primary;
+    final pal = GuidyPalette.of(context);
 
     final (bgColor, textColor) = switch (type) {
       _LabelType.launch => (
-          primaryC.withValues(alpha: 0.12),
-          primaryC,
+          pal.primary.withValues(alpha: 0.12),
+          pal.primary,
         ),
       _LabelType.beta => (
           const Color(0xFFF59E0B).withValues(alpha: 0.12),

@@ -65,18 +65,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark   = Theme.of(context).brightness == Brightness.dark;
-    final bgC      = isDark ? GuidyColors.darkBg      : GuidyColors.bg;
-    final textC    = isDark ? GuidyColors.darkText     : GuidyColors.ink;
-    final subC     = isDark ? GuidyColors.darkSub      : GuidyColors.sub;
-    final muteC    = isDark ? GuidyColors.darkMute     : GuidyColors.mute;
-    final surfaceC = isDark ? GuidyColors.darkSurface  : GuidyColors.surface;
-    final lineC    = isDark ? GuidyColors.darkLine     : GuidyColors.line;
-    final primaryC = isDark ? GuidyColors.darkPrimary  : GuidyColors.primary;
-    final accentC  = isDark ? GuidyColors.darkAccent   : GuidyColors.accent;
+    final pal = GuidyPalette.of(context);
 
     return Scaffold(
-      backgroundColor: bgC,
+      backgroundColor: pal.bg,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -91,15 +83,15 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     child: Container(
                       width: 36, height: 36,
                       decoration: BoxDecoration(
-                        color: surfaceC,
+                        color: pal.surface,
                         borderRadius: GuidyRadius.mdBorder,
-                        border: Border.all(color: lineC),
+                        border: Border.all(color: pal.line),
                       ),
-                      child: Icon(Icons.arrow_back_ios_new_rounded, size: 16, color: textC),
+                      child: Icon(Icons.arrow_back_ios_new_rounded, size: 16, color: pal.text),
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Text('비밀번호 변경', style: GuidyText.h3(textC)),
+                  Text('비밀번호 변경', style: GuidyText.h3(pal.text)),
                 ],
               ),
             ),
@@ -125,12 +117,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Icon(Icons.security_rounded,
-                                size: 16, color: primaryC),
+                                size: 16, color: pal.primary),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 '비밀번호는 8자 이상, 영문·숫자·특수문자를 조합하면 더욱 안전합니다.',
-                                style: GuidyText.small(subC),
+                                style: GuidyText.small(pal.sub),
                               ),
                             ),
                           ],
@@ -139,7 +131,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       const SizedBox(height: 24),
 
                       // 현재 비밀번호
-                      Text('현재 비밀번호', style: GuidyText.body(textC)
+                      Text('현재 비밀번호', style: GuidyText.body(pal.text)
                           .copyWith(fontWeight: FontWeight.w700)),
                       const SizedBox(height: 8),
                       _PwField(
@@ -147,11 +139,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         hint: '현재 비밀번호를 입력하세요',
                         show: _showCurrent,
                         onToggle: () => setState(() => _showCurrent = !_showCurrent),
-                        surfaceC: surfaceC,
-                        lineC: lineC,
-                        textC: textC,
-                        muteC: muteC,
-                        primaryC: primaryC,
+                        surfaceC: pal.surface,
+                        lineC: pal.line,
+                        textC: pal.text,
+                        muteC: pal.mute,
+                        primaryC: pal.primary,
                         validator: (v) {
                           if (v == null || v.isEmpty) return '현재 비밀번호를 입력해주세요';
                           return null;
@@ -160,7 +152,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       const SizedBox(height: 20),
 
                       // 새 비밀번호
-                      Text('새 비밀번호', style: GuidyText.body(textC)
+                      Text('새 비밀번호', style: GuidyText.body(pal.text)
                           .copyWith(fontWeight: FontWeight.w700)),
                       const SizedBox(height: 8),
                       _PwField(
@@ -168,11 +160,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         hint: '새 비밀번호를 입력하세요 (8자 이상)',
                         show: _showNew,
                         onToggle: () => setState(() => _showNew = !_showNew),
-                        surfaceC: surfaceC,
-                        lineC: lineC,
-                        textC: textC,
-                        muteC: muteC,
-                        primaryC: primaryC,
+                        surfaceC: pal.surface,
+                        lineC: pal.line,
+                        textC: pal.text,
+                        muteC: pal.mute,
+                        primaryC: pal.primary,
                         onChanged: (_) => setState(() {}),
                         validator: (v) {
                           if (v == null || v.isEmpty) return '새 비밀번호를 입력해주세요';
@@ -189,7 +181,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       const SizedBox(height: 20),
 
                       // 새 비밀번호 확인
-                      Text('비밀번호 확인', style: GuidyText.body(textC)
+                      Text('비밀번호 확인', style: GuidyText.body(pal.text)
                           .copyWith(fontWeight: FontWeight.w700)),
                       const SizedBox(height: 8),
                       _PwField(
@@ -197,11 +189,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         hint: '새 비밀번호를 다시 입력하세요',
                         show: _showConfirm,
                         onToggle: () => setState(() => _showConfirm = !_showConfirm),
-                        surfaceC: surfaceC,
-                        lineC: lineC,
-                        textC: textC,
-                        muteC: muteC,
-                        primaryC: primaryC,
+                        surfaceC: pal.surface,
+                        lineC: pal.line,
+                        textC: pal.text,
+                        muteC: pal.mute,
+                        primaryC: pal.primary,
                         validator: (v) {
                           if (v == null || v.isEmpty) return '비밀번호 확인을 입력해주세요';
                           if (v != _newCtrl.text) return '새 비밀번호와 일치하지 않습니다';
@@ -218,7 +210,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                           child: Container(
                             height: 50,
                             decoration: BoxDecoration(
-                              color: accentC,
+                              color: pal.accent,
                               borderRadius: GuidyRadius.lgBorder,
                             ),
                             child: Center(
@@ -256,8 +248,7 @@ class _StrengthBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final lineC  = isDark ? GuidyColors.darkLine : GuidyColors.line;
+    final pal = GuidyPalette.of(context);
 
     final (label, color, filled) = switch (strength) {
       _PwStrength.none   => ('', Colors.transparent, 0),
@@ -276,7 +267,7 @@ class _StrengthBar extends StatelessWidget {
               height: 4,
               margin: EdgeInsets.only(right: i < 3 ? 4 : 0),
               decoration: BoxDecoration(
-                color: i < filled ? color : lineC,
+                color: i < filled ? color : pal.line,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),

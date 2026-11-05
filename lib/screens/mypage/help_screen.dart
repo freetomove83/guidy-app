@@ -17,16 +17,10 @@ class _HelpScreenState extends State<HelpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark   = Theme.of(context).brightness == Brightness.dark;
-    final bgC      = isDark ? GuidyColors.darkBg      : GuidyColors.bg;
-    final textC    = isDark ? GuidyColors.darkText     : GuidyColors.ink;
-    final muteC    = isDark ? GuidyColors.darkMute     : GuidyColors.mute;
-    final surfaceC = isDark ? GuidyColors.darkSurface  : GuidyColors.surface;
-    final lineC    = isDark ? GuidyColors.darkLine     : GuidyColors.line;
-    final primaryC = isDark ? GuidyColors.darkPrimary  : GuidyColors.primary;
+    final pal = GuidyPalette.of(context);
 
     return Scaffold(
-      backgroundColor: bgC,
+      backgroundColor: pal.bg,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -41,16 +35,16 @@ class _HelpScreenState extends State<HelpScreen> {
                     child: Container(
                       width: 36, height: 36,
                       decoration: BoxDecoration(
-                        color: surfaceC,
+                        color: pal.surface,
                         borderRadius: GuidyRadius.mdBorder,
-                        border: Border.all(color: lineC),
+                        border: Border.all(color: pal.line),
                       ),
                       child: Icon(Icons.arrow_back_ios_new_rounded,
-                          size: 16, color: textC),
+                          size: 16, color: pal.text),
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Text('도움말', style: GuidyText.h3(textC)),
+                  Text('도움말', style: GuidyText.h3(pal.text)),
                 ],
               ),
             ),
@@ -59,7 +53,7 @@ class _HelpScreenState extends State<HelpScreen> {
             // 탭 바
             Container(
               decoration: BoxDecoration(
-                border: Border(bottom: BorderSide(color: lineC)),
+                border: Border(bottom: BorderSide(color: pal.line)),
               ),
               child: Row(
                 children: List.generate(_tabs.length, (i) {
@@ -72,7 +66,7 @@ class _HelpScreenState extends State<HelpScreen> {
                       decoration: BoxDecoration(
                         border: Border(
                           bottom: BorderSide(
-                            color: isA ? primaryC : Colors.transparent,
+                            color: isA ? pal.primary : Colors.transparent,
                             width: 2.5,
                           ),
                         ),
@@ -84,7 +78,7 @@ class _HelpScreenState extends State<HelpScreen> {
                             fontWeight: isA
                                 ? FontWeight.w800
                                 : FontWeight.w500,
-                            color: isA ? textC : muteC,
+                            color: isA ? pal.text : pal.mute,
                           )),
                     ),
                   );
@@ -153,12 +147,7 @@ class _HowToUseTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark   = Theme.of(context).brightness == Brightness.dark;
-    final textC    = isDark ? GuidyColors.darkText     : GuidyColors.ink;
-    final subC     = isDark ? GuidyColors.darkSub      : GuidyColors.sub;
-    final surfaceC = isDark ? GuidyColors.darkSurface  : GuidyColors.surface;
-    final lineC    = isDark ? GuidyColors.darkLine     : GuidyColors.line;
-    final primaryC = isDark ? GuidyColors.darkPrimary  : GuidyColors.primary;
+    final pal = GuidyPalette.of(context);
 
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
@@ -169,9 +158,9 @@ class _HowToUseTab extends StatelessWidget {
           margin: const EdgeInsets.only(bottom: 12),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: surfaceC,
+            color: pal.surface,
             borderRadius: GuidyRadius.lgBorder,
-            border: Border.all(color: lineC),
+            border: Border.all(color: pal.line),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -179,20 +168,20 @@ class _HowToUseTab extends StatelessWidget {
               Container(
                 width: 40, height: 40,
                 decoration: BoxDecoration(
-                  color: primaryC.withValues(alpha: 0.10),
+                  color: pal.primary.withValues(alpha: 0.10),
                   borderRadius: GuidyRadius.mdBorder,
                 ),
                 child: Stack(
                   children: [
                     Center(
-                      child: Icon(s.icon, size: 18, color: primaryC),
+                      child: Icon(s.icon, size: 18, color: pal.primary),
                     ),
                     Positioned(
                       right: 4, bottom: 4,
                       child: Container(
                         width: 14, height: 14,
                         decoration: BoxDecoration(
-                          color: primaryC,
+                          color: pal.primary,
                           shape: BoxShape.circle,
                         ),
                         child: Center(
@@ -214,10 +203,10 @@ class _HowToUseTab extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(s.title,
-                        style: GuidyText.body(textC)
+                        style: GuidyText.body(pal.text)
                             .copyWith(fontWeight: FontWeight.w700)),
                     const SizedBox(height: 4),
-                    Text(s.desc, style: GuidyText.small(subC)),
+                    Text(s.desc, style: GuidyText.small(pal.sub)),
                   ],
                 ),
               ),
@@ -286,13 +275,7 @@ class _FaqTabState extends State<_FaqTab> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark   = Theme.of(context).brightness == Brightness.dark;
-    final textC    = isDark ? GuidyColors.darkText     : GuidyColors.ink;
-    final subC     = isDark ? GuidyColors.darkSub      : GuidyColors.sub;
-    final muteC    = isDark ? GuidyColors.darkMute     : GuidyColors.mute;
-    final surfaceC = isDark ? GuidyColors.darkSurface  : GuidyColors.surface;
-    final lineC    = isDark ? GuidyColors.darkLine     : GuidyColors.line;
-    final primaryC = isDark ? GuidyColors.darkPrimary  : GuidyColors.primary;
+    final pal = GuidyPalette.of(context);
 
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
@@ -307,10 +290,10 @@ class _FaqTabState extends State<_FaqTab> {
             duration: const Duration(milliseconds: 200),
             margin: const EdgeInsets.only(bottom: 8),
             decoration: BoxDecoration(
-              color: surfaceC,
+              color: pal.surface,
               borderRadius: GuidyRadius.lgBorder,
               border: Border.all(
-                color: isOpen ? primaryC.withValues(alpha: 0.4) : lineC,
+                color: isOpen ? pal.primary.withValues(alpha: 0.4) : pal.line,
                 width: isOpen ? 1.5 : 1,
               ),
             ),
@@ -328,8 +311,8 @@ class _FaqTabState extends State<_FaqTab> {
                         margin: const EdgeInsets.only(top: 1),
                         decoration: BoxDecoration(
                           color: isOpen
-                              ? primaryC
-                              : primaryC.withValues(alpha: 0.10),
+                              ? pal.primary
+                              : pal.primary.withValues(alpha: 0.10),
                           shape: BoxShape.circle,
                         ),
                         child: Center(
@@ -337,14 +320,14 @@ class _FaqTabState extends State<_FaqTab> {
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w800,
-                                color: isOpen ? Colors.white : primaryC,
+                                color: isOpen ? Colors.white : pal.primary,
                               )),
                         ),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(faq.q,
-                            style: GuidyText.body(textC).copyWith(
+                            style: GuidyText.body(pal.text).copyWith(
                               fontWeight: isOpen
                                   ? FontWeight.w700
                                   : FontWeight.w500,
@@ -355,7 +338,7 @@ class _FaqTabState extends State<_FaqTab> {
                         turns: isOpen ? 0.5 : 0,
                         duration: const Duration(milliseconds: 200),
                         child: Icon(Icons.keyboard_arrow_down_rounded,
-                            size: 18, color: muteC),
+                            size: 18, color: pal.mute),
                       ),
                     ],
                   ),
@@ -386,7 +369,7 @@ class _FaqTabState extends State<_FaqTab> {
                         ),
                         Expanded(
                           child: Text(faq.a,
-                              style: GuidyText.body(subC)
+                              style: GuidyText.body(pal.sub)
                                   .copyWith(height: 1.6)),
                         ),
                       ],

@@ -28,16 +28,10 @@ class SectionDetailScreen extends StatelessWidget {
         .toList();
 
     final isDark   = Theme.of(context).brightness == Brightness.dark;
-    final bgC      = isDark ? GuidyColors.darkBg     : GuidyColors.bg;
-    final textC    = isDark ? GuidyColors.darkText    : GuidyColors.ink;
-    final subC     = isDark ? GuidyColors.darkSub     : GuidyColors.sub;
-    final lineC    = isDark ? GuidyColors.darkLine    : GuidyColors.line;
-    final surfaceC = isDark ? GuidyColors.darkSurface : GuidyColors.surface;
-    final muteC    = isDark ? GuidyColors.darkMute    : GuidyColors.mute;
-    final accentC  = isDark ? GuidyColors.darkAccent  : GuidyColors.accent;
+    final pal = GuidyPalette.of(context);
 
     return Scaffold(
-      backgroundColor: bgC,
+      backgroundColor: pal.bg,
       body: Stack(
         children: [
           CustomScrollView(
@@ -65,7 +59,7 @@ class SectionDetailScreen extends StatelessWidget {
                             end: Alignment.bottomCenter,
                             colors: [
                               Colors.transparent,
-                              bgC.withValues(alpha: 0.9),
+                              pal.bg.withValues(alpha: 0.9),
                             ],
                             stops: const [0.4, 1.0],
                           ),
@@ -124,23 +118,23 @@ class SectionDetailScreen extends StatelessWidget {
                       if (exhibition != null) ...[
                         Row(
                           children: [
-                            Icon(Icons.museum_outlined, size: 13, color: muteC),
+                            Icon(Icons.museum_outlined, size: 13, color: pal.mute),
                             const SizedBox(width: 4),
                             Text(exhibition.title,
-                              style: GuidyText.kicker(muteC)),
+                              style: GuidyText.kicker(pal.mute)),
                           ],
                         ),
                         const SizedBox(height: 6),
                       ],
 
                       // 섹션 제목
-                      Text(section.title, style: GuidyText.h1(textC)),
+                      Text(section.title, style: GuidyText.h1(pal.text)),
                       const SizedBox(height: 12),
 
                       // 섹션 설명
                       if (section.description.isNotEmpty) ...[
                         Text(section.description,
-                          style: GuidyText.body(subC)),
+                          style: GuidyText.body(pal.sub)),
                         const SizedBox(height: 20),
                       ],
 
@@ -148,19 +142,19 @@ class SectionDetailScreen extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         decoration: BoxDecoration(
-                          color: surfaceC,
+                          color: pal.surface,
                           borderRadius: GuidyRadius.lgBorder,
-                          border: Border.all(color: lineC),
+                          border: Border.all(color: pal.line),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             _statItem(Icons.image_outlined,
-                              '${artworks.length}', '작품', textC, muteC),
-                            Container(width: 1, height: 30, color: lineC),
+                              '${artworks.length}', '작품', pal.text, pal.mute),
+                            Container(width: 1, height: 30, color: pal.line),
                             _statItem(Icons.headphones_outlined,
                               '${(artworks.fold(0, (sum, a) => sum + a.durationSec) ~/ 60)}분',
-                              '총 재생', textC, muteC),
+                              '총 재생', pal.text, pal.mute),
                           ],
                         ),
                       ),
@@ -169,33 +163,33 @@ class SectionDetailScreen extends StatelessWidget {
                       // 작품 목록
                       if (artworks.isNotEmpty) ...[
                         Text('이 섹션의 작품',
-                          style: GuidyText.h3(textC)),
+                          style: GuidyText.h3(pal.text)),
                         const SizedBox(height: 12),
                         ...artworks.asMap().entries.map((entry) =>
                           _ArtworkItem(
                             artwork: entry.value,
                             index: entry.key + 1,
                             isDark: isDark,
-                            textC: textC, subC: subC,
-                            lineC: lineC, surfaceC: surfaceC,
-                            muteC: muteC, accentC: accentC,
+                            textC: pal.text, subC: pal.sub,
+                            lineC: pal.line, surfaceC: pal.surface,
+                            muteC: pal.mute, accentC: pal.accent,
                           ),
                         ),
                       ] else ...[
                         Container(
                           padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
-                            color: surfaceC,
+                            color: pal.surface,
                             borderRadius: GuidyRadius.lgBorder,
-                            border: Border.all(color: lineC),
+                            border: Border.all(color: pal.line),
                           ),
                           child: Center(
                             child: Column(
                               children: [
-                                Icon(Icons.collections_outlined, size: 36, color: muteC),
+                                Icon(Icons.collections_outlined, size: 36, color: pal.mute),
                                 const SizedBox(height: 8),
                                 Text('이 섹션의 작품이 준비 중입니다',
-                                  style: GuidyText.body(muteC)),
+                                  style: GuidyText.body(pal.mute)),
                               ],
                             ),
                           ),
@@ -217,8 +211,8 @@ class SectionDetailScreen extends StatelessWidget {
                 padding: EdgeInsets.fromLTRB(
                   20, 16, 20, MediaQuery.of(context).padding.bottom + 16),
                 decoration: BoxDecoration(
-                  color: bgC,
-                  border: Border(top: BorderSide(color: lineC)),
+                  color: pal.bg,
+                  border: Border(top: BorderSide(color: pal.line)),
                   boxShadow: GuidyShadow.up,
                 ),
                 child: PillButton(

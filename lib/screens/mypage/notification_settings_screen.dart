@@ -53,16 +53,10 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
 
   @override
   Widget build(BuildContext context) {
-    final isDark   = Theme.of(context).brightness == Brightness.dark;
-    final bgC      = isDark ? GuidyColors.darkBg      : GuidyColors.bg;
-    final textC    = isDark ? GuidyColors.darkText     : GuidyColors.ink;
-    final subC     = isDark ? GuidyColors.darkSub      : GuidyColors.sub;
-    final surfaceC = isDark ? GuidyColors.darkSurface  : GuidyColors.surface;
-    final lineC    = isDark ? GuidyColors.darkLine     : GuidyColors.line;
-    final primaryC = isDark ? GuidyColors.darkPrimary  : GuidyColors.primary;
+    final pal = GuidyPalette.of(context);
 
     return Scaffold(
-      backgroundColor: bgC,
+      backgroundColor: pal.bg,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -77,15 +71,15 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                     child: Container(
                       width: 36, height: 36,
                       decoration: BoxDecoration(
-                        color: surfaceC,
+                        color: pal.surface,
                         borderRadius: GuidyRadius.mdBorder,
-                        border: Border.all(color: lineC),
+                        border: Border.all(color: pal.line),
                       ),
-                      child: Icon(Icons.arrow_back_ios_new_rounded, size: 16, color: textC),
+                      child: Icon(Icons.arrow_back_ios_new_rounded, size: 16, color: pal.text),
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Text('알림 설정', style: GuidyText.h3(textC)),
+                  Text('알림 설정', style: GuidyText.h3(pal.text)),
                 ],
               ),
             ),
@@ -97,18 +91,18 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                 padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
                 children: [
                   // 전체 푸시 알림 마스터 스위치
-                  _SectionHeader('푸시 알림', textC),
+                  _SectionHeader('푸시 알림', pal.text),
                   const SizedBox(height: 8),
                   _SwitchTile(
                     icon: Icons.notifications_rounded,
                     title: '푸시 알림 전체',
                     subtitle: '모든 푸시 알림을 켜거나 끕니다',
                     value: _pushAll,
-                    primaryC: primaryC,
-                    surfaceC: surfaceC,
-                    lineC: lineC,
-                    textC: textC,
-                    subC: subC,
+                    primaryC: pal.primary,
+                    surfaceC: pal.surface,
+                    lineC: pal.line,
+                    textC: pal.text,
+                    subC: pal.sub,
                     isMaster: true,
                     onChanged: (v) {
                       setState(() {
@@ -139,11 +133,11 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                           title: '구매 / 결제 알림',
                           subtitle: '구매 완료, 환불 처리 알림',
                           value: _pushPurchase,
-                          primaryC: primaryC,
-                          surfaceC: surfaceC,
-                          lineC: lineC,
-                          textC: textC,
-                          subC: subC,
+                          primaryC: pal.primary,
+                          surfaceC: pal.surface,
+                          lineC: pal.line,
+                          textC: pal.text,
+                          subC: pal.sub,
                           enabled: _pushAll,
                           onChanged: (v) {
                             setState(() => _pushPurchase = v);
@@ -156,11 +150,11 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                           title: '새 가이드 알림',
                           subtitle: '즐겨찾기한 전시의 새 오디오 가이드 등록',
                           value: _pushNewGuide,
-                          primaryC: primaryC,
-                          surfaceC: surfaceC,
-                          lineC: lineC,
-                          textC: textC,
-                          subC: subC,
+                          primaryC: pal.primary,
+                          surfaceC: pal.surface,
+                          lineC: pal.line,
+                          textC: pal.text,
+                          subC: pal.sub,
                           enabled: _pushAll,
                           onChanged: (v) {
                             setState(() => _pushNewGuide = v);
@@ -173,11 +167,11 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                           title: '크리에이터 활동 알림',
                           subtitle: '팔로우한 크리에이터의 새 콘텐츠',
                           value: _pushCreator,
-                          primaryC: primaryC,
-                          surfaceC: surfaceC,
-                          lineC: lineC,
-                          textC: textC,
-                          subC: subC,
+                          primaryC: pal.primary,
+                          surfaceC: pal.surface,
+                          lineC: pal.line,
+                          textC: pal.text,
+                          subC: pal.sub,
                           enabled: _pushAll,
                           onChanged: (v) {
                             setState(() => _pushCreator = v);
@@ -190,11 +184,11 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                           title: '프로모션 · 이벤트 알림',
                           subtitle: '할인, 기획전, 이벤트 정보',
                           value: _pushPromotion,
-                          primaryC: primaryC,
-                          surfaceC: surfaceC,
-                          lineC: lineC,
-                          textC: textC,
-                          subC: subC,
+                          primaryC: pal.primary,
+                          surfaceC: pal.surface,
+                          lineC: pal.line,
+                          textC: pal.text,
+                          subC: pal.sub,
                           enabled: _pushAll,
                           onChanged: (v) {
                             setState(() => _pushPromotion = v);
@@ -208,18 +202,18 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                   const SizedBox(height: 24),
 
                   // 이메일 알림
-                  _SectionHeader('이메일 알림', textC),
+                  _SectionHeader('이메일 알림', pal.text),
                   const SizedBox(height: 8),
                   _SwitchTile(
                     icon: Icons.mail_outline_rounded,
                     title: '마케팅 이메일 수신',
                     subtitle: '뉴스레터, 프로모션, 신규 서비스 안내',
                     value: _emailMarketing,
-                    primaryC: primaryC,
-                    surfaceC: surfaceC,
-                    lineC: lineC,
-                    textC: textC,
-                    subC: subC,
+                    primaryC: pal.primary,
+                    surfaceC: pal.surface,
+                    lineC: pal.line,
+                    textC: pal.text,
+                    subC: pal.sub,
                     onChanged: (v) {
                       setState(() => _emailMarketing = v);
                       _save(_kEmailMarketing, v);
@@ -239,12 +233,12 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Icon(Icons.info_outline_rounded,
-                            size: 15, color: primaryC),
+                            size: 15, color: pal.primary),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             '구매 및 결제 관련 알림은 푸시 알림을 끄더라도 이메일로 발송됩니다.',
-                            style: GuidyText.small(subC),
+                            style: GuidyText.small(pal.sub),
                           ),
                         ),
                       ],

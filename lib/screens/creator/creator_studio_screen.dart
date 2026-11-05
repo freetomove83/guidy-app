@@ -33,16 +33,10 @@ class _CreatorDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgC = isDark ? GuidyColors.darkBg : GuidyColors.bg;
-    final textC = isDark ? GuidyColors.darkText : GuidyColors.ink;
-    final subC = isDark ? GuidyColors.darkSub : GuidyColors.sub;
-    final muteC = isDark ? GuidyColors.darkMute : GuidyColors.mute;
-    final surfaceC = isDark ? GuidyColors.darkSurface : GuidyColors.surface;
-    final lineC = isDark ? GuidyColors.darkLine : GuidyColors.line;
-    final accentC = isDark ? GuidyColors.darkAccent : GuidyColors.accent;
+    final pal = GuidyPalette.of(context);
 
     return Scaffold(
-      backgroundColor: bgC,
+      backgroundColor: pal.bg,
       body: SafeArea(
         bottom: false,
         child: ListView(
@@ -59,16 +53,16 @@ class _CreatorDashboard extends StatelessWidget {
                       color: isDark ? GuidyColors.darkCreator.withValues(alpha: 0.2) : GuidyColors.creatorSoft,
                       borderRadius: GuidyRadius.pillBorder,
                     ),
-                    child: Text('크리에이터 스튜디오', style: GuidyText.kicker(isDark ? GuidyColors.darkCreator : GuidyColors.creator)),
+                    child: Text('크리에이터 스튜디오', style: GuidyText.kicker(pal.creator)),
                   ),
                   const Spacer(),
-                  Icon(Icons.notifications_outlined, color: textC, size: 22),
+                  Icon(Icons.notifications_outlined, color: pal.text, size: 22),
                 ],
               ),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
-              child: Text(DummyData.creators.first.name, style: GuidyText.h2(textC)),
+              child: Text(DummyData.creators.first.name, style: GuidyText.h2(pal.text)),
             ),
 
             // 이달 예상 수익 카드
@@ -114,7 +108,7 @@ class _CreatorDashboard extends StatelessWidget {
                     SizedBox(
                       height: 40,
                       child: CustomPaint(
-                        painter: _MiniChartPainter(color: accentC),
+                        painter: _MiniChartPainter(color: pal.accent),
                         size: const Size(double.infinity, 40),
                       ),
                     ),
@@ -132,11 +126,11 @@ class _CreatorDashboard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
                 children: [
-                  _kpiCard('청취', '8,420', Icons.headphones_outlined, accentC, surfaceC, lineC, textC, subC),
+                  _kpiCard('청취', '8,420', Icons.headphones_outlined, pal.accent, pal.surface, pal.line, pal.text, pal.sub),
                   const SizedBox(width: 10),
-                  _kpiCard('판매', '142건', Icons.shopping_bag_outlined, isDark ? GuidyColors.darkPrimary : GuidyColors.primary, surfaceC, lineC, textC, subC),
+                  _kpiCard('판매', '142건', Icons.shopping_bag_outlined, pal.primary, pal.surface, pal.line, pal.text, pal.sub),
                   const SizedBox(width: 10),
-                  _kpiCard('팔로워', '12.4k', Icons.people_outline_rounded, GuidyColors.ok, surfaceC, lineC, textC, subC),
+                  _kpiCard('팔로워', '12.4k', Icons.people_outline_rounded, GuidyColors.ok, pal.surface, pal.line, pal.text, pal.sub),
                 ],
               ),
             ),
@@ -149,15 +143,15 @@ class _CreatorDashboard extends StatelessWidget {
             ...DummyData.exhibitions.take(3).toList().asMap().entries.map((e) {
               final ex = e.value;
               final statusLabels = ['공개', '심사중', '초안'];
-              final statusColors = [GuidyColors.ok, GuidyColors.warn, muteC];
+              final statusColors = [GuidyColors.ok, GuidyColors.warn, pal.mute];
               final idx = e.key % 3;
               return Container(
                 margin: const EdgeInsets.fromLTRB(20, 0, 20, 8),
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: surfaceC,
+                  color: pal.surface,
                   borderRadius: GuidyRadius.lgBorder,
-                  border: Border.all(color: lineC),
+                  border: Border.all(color: pal.line),
                 ),
                 child: Row(
                   children: [
@@ -181,16 +175,16 @@ class _CreatorDashboard extends StatelessWidget {
                             ],
                           ),
                           const SizedBox(height: 2),
-                          Text(ex.title, style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w700),
+                          Text(ex.title, style: GuidyText.body(pal.text).copyWith(fontWeight: FontWeight.w700),
                             maxLines: 1, overflow: TextOverflow.ellipsis),
                           Text('청취 ${e.key * 324 + 89}회 · 수익 ₩${(e.key + 1) * 34200}',
-                            style: GuidyText.small(subC)),
+                            style: GuidyText.small(pal.sub)),
                         ],
                       ),
                     ),
                     GestureDetector(
                       onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const GuideEditScreen())),
-                      child: Icon(Icons.edit_outlined, color: muteC, size: 18),
+                      child: Icon(Icons.edit_outlined, color: pal.mute, size: 18),
                     ),
                   ],
                 ),
@@ -201,8 +195,8 @@ class _CreatorDashboard extends StatelessWidget {
 
             // ── 프로필 활동 관리 ───────────────────────────
             _ActivityManagementSection(
-              bgC: bgC, textC: textC, subC: subC,
-              muteC: muteC, surfaceC: surfaceC, lineC: lineC,
+              bgC: pal.bg, textC: pal.text, subC: pal.sub,
+              muteC: pal.mute, surfaceC: pal.surface, lineC: pal.line,
             ),
 
             const SizedBox(height: 20),
@@ -213,31 +207,31 @@ class _CreatorDashboard extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: isDark ? GuidyColors.darkBgAlt : GuidyColors.bgAlt,
+                  color: pal.bgAlt,
                   borderRadius: GuidyRadius.lgBorder,
-                  border: Border.all(color: lineC),
+                  border: Border.all(color: pal.line),
                 ),
                 child: Row(
                   children: [
                     Container(
                       width: 40, height: 40,
                       decoration: BoxDecoration(
-                        color: accentC.withValues(alpha: 0.15),
+                        color: pal.accent.withValues(alpha: 0.15),
                         borderRadius: GuidyRadius.lgBorder,
                       ),
-                      child: Icon(Icons.account_balance_wallet_outlined, color: accentC, size: 20),
+                      child: Icon(Icons.account_balance_wallet_outlined, color: pal.accent, size: 20),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('수수료 20% · 80% 정산', style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w700)),
-                          Text('매월 15일 자동 정산', style: GuidyText.small(subC)),
+                          Text('수수료 20% · 80% 정산', style: GuidyText.body(pal.text).copyWith(fontWeight: FontWeight.w700)),
+                          Text('매월 15일 자동 정산', style: GuidyText.small(pal.sub)),
                         ],
                       ),
                     ),
-                    Icon(Icons.arrow_forward_ios_rounded, size: 12, color: muteC),
+                    Icon(Icons.arrow_forward_ios_rounded, size: 12, color: pal.mute),
                   ],
                 ),
               ),
@@ -286,18 +280,10 @@ class _GuideEditScreenState extends State<GuideEditScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgC = isDark ? GuidyColors.darkBg : GuidyColors.bg;
-    final textC = isDark ? GuidyColors.darkText : GuidyColors.ink;
-    final subC = isDark ? GuidyColors.darkSub : GuidyColors.sub;
-    final muteC = isDark ? GuidyColors.darkMute : GuidyColors.mute;
-    final surfaceC = isDark ? GuidyColors.darkSurface : GuidyColors.surface;
-    final lineC = isDark ? GuidyColors.darkLine : GuidyColors.line;
-    final primaryC = isDark ? GuidyColors.darkPrimary : GuidyColors.primary;
-    final accentC = isDark ? GuidyColors.darkAccent : GuidyColors.accent;
+    final pal = GuidyPalette.of(context);
 
     return Scaffold(
-      backgroundColor: bgC,
+      backgroundColor: pal.bg,
       body: SafeArea(
         child: Column(
           children: [
@@ -308,10 +294,10 @@ class _GuideEditScreenState extends State<GuideEditScreen> {
                 children: [
                   GestureDetector(
                     onTap: () => Navigator.pop(context),
-                    child: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: textC),
+                    child: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: pal.text),
                   ),
                   const Spacer(),
-                  Text('자동저장됨', style: GuidyText.small(muteC)),
+                  Text('자동저장됨', style: GuidyText.small(pal.mute)),
                   const SizedBox(width: 12),
                   PillButton(label: '미리보기', size: 'sm'),
                   const SizedBox(width: 8),
@@ -340,12 +326,12 @@ class _GuideEditScreenState extends State<GuideEditScreen> {
                                 Container(
                                   height: 3,
                                   decoration: BoxDecoration(
-                                    color: isDone || isActive ? primaryC : lineC,
+                                    color: isDone || isActive ? pal.primary : pal.line,
                                     borderRadius: GuidyRadius.pillBorder,
                                   ),
                                 ),
                                 const SizedBox(height: 4),
-                                Text(_steps[i], style: GuidyText.kicker(isActive ? primaryC : muteC)),
+                                Text(_steps[i], style: GuidyText.kicker(isActive ? pal.primary : pal.mute)),
                               ],
                             ),
                           ),
@@ -365,9 +351,9 @@ class _GuideEditScreenState extends State<GuideEditScreen> {
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 children: [
-                  Text('오디오 녹음', style: GuidyText.h3(textC)),
+                  Text('오디오 녹음', style: GuidyText.h3(pal.text)),
                   const SizedBox(height: 4),
-                  Text('각 작품의 오디오 해설을 녹음하거나 AI TTS로 생성하세요', style: GuidyText.body(subC)),
+                  Text('각 작품의 오디오 해설을 녹음하거나 AI TTS로 생성하세요', style: GuidyText.body(pal.sub)),
                   const SizedBox(height: 16),
 
                   // 작품별 오디오 상태
@@ -376,14 +362,14 @@ class _GuideEditScreenState extends State<GuideEditScreen> {
                     final a = entry.value;
                     final statuses = ['완료', '녹음 중', '없음'];
                     final st = statuses[idx % 3];
-                    final stColor = st == '완료' ? GuidyColors.ok : st == '녹음 중' ? GuidyColors.danger : muteC;
+                    final stColor = st == '완료' ? GuidyColors.ok : st == '녹음 중' ? GuidyColors.danger : pal.mute;
                     return Container(
                       margin: const EdgeInsets.only(bottom: 8),
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: st == '없음' ? GuidyColors.warn.withValues(alpha: 0.08) : surfaceC,
+                        color: st == '없음' ? GuidyColors.warn.withValues(alpha: 0.08) : pal.surface,
                         borderRadius: GuidyRadius.lgBorder,
-                        border: Border.all(color: st == '없음' ? GuidyColors.warn.withValues(alpha: 0.3) : lineC),
+                        border: Border.all(color: st == '없음' ? GuidyColors.warn.withValues(alpha: 0.3) : pal.line),
                       ),
                       child: Row(
                         children: [
@@ -393,7 +379,7 @@ class _GuideEditScreenState extends State<GuideEditScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(a.title, style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w700)),
+                                Text(a.title, style: GuidyText.body(pal.text).copyWith(fontWeight: FontWeight.w700)),
                                 Row(children: [
                                   Container(
                                     width: 6, height: 6,
@@ -421,14 +407,14 @@ class _GuideEditScreenState extends State<GuideEditScreen> {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
-                                color: surfaceC,
+                                color: pal.surface,
                                 borderRadius: GuidyRadius.pillBorder,
-                                border: Border.all(color: lineC),
+                                border: Border.all(color: pal.line),
                               ),
                               child: Row(mainAxisSize: MainAxisSize.min, children: [
-                                Icon(Icons.add, color: muteC, size: 12),
+                                Icon(Icons.add, color: pal.mute, size: 12),
                                 const SizedBox(width: 2),
-                                Text('녹음', style: GuidyText.kicker(muteC)),
+                                Text('녹음', style: GuidyText.kicker(pal.mute)),
                               ]),
                             ),
                         ],
@@ -443,21 +429,21 @@ class _GuideEditScreenState extends State<GuideEditScreen> {
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [primaryC.withValues(alpha: 0.1), accentC.withValues(alpha: 0.1)],
+                        colors: [pal.primary.withValues(alpha: 0.1), pal.accent.withValues(alpha: 0.1)],
                       ),
                       borderRadius: GuidyRadius.lgBorder,
-                      border: Border.all(color: primaryC.withValues(alpha: 0.3)),
+                      border: Border.all(color: pal.primary.withValues(alpha: 0.3)),
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.auto_awesome_rounded, color: primaryC, size: 20),
+                        Icon(Icons.auto_awesome_rounded, color: pal.primary, size: 20),
                         const SizedBox(width: 10),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('AI TTS로 자동 생성', style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w800)),
-                              Text('스크립트만 있으면 자연스러운 낭독을 생성합니다', style: GuidyText.small(subC)),
+                              Text('AI TTS로 자동 생성', style: GuidyText.body(pal.text).copyWith(fontWeight: FontWeight.w800)),
+                              Text('스크립트만 있으면 자연스러운 낭독을 생성합니다', style: GuidyText.small(pal.sub)),
                             ],
                           ),
                         ),
@@ -473,8 +459,8 @@ class _GuideEditScreenState extends State<GuideEditScreen> {
             Container(
               padding: EdgeInsets.fromLTRB(20, 12, 20, MediaQuery.of(context).padding.bottom + 12),
               decoration: BoxDecoration(
-                color: bgC,
-                border: Border(top: BorderSide(color: lineC)),
+                color: pal.bg,
+                border: Border(top: BorderSide(color: pal.line)),
               ),
               child: Row(
                 children: [
@@ -486,13 +472,13 @@ class _GuideEditScreenState extends State<GuideEditScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         decoration: BoxDecoration(
-                          color: textC,
+                          color: pal.text,
                           borderRadius: GuidyRadius.pillBorder,
                         ),
                         child: Text(
                           _step < 3 ? '다음 단계 →' : '출시하기',
                           textAlign: TextAlign.center,
-                          style: TextStyle(color: bgC, fontSize: 15, fontWeight: FontWeight.w800,
+                          style: TextStyle(color: pal.bg, fontSize: 15, fontWeight: FontWeight.w800,
                             fontFamily: GuidyText.fontFamily),
                         ),
                       ),
@@ -515,24 +501,17 @@ class _CreatorOnboardingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgC = isDark ? GuidyColors.darkBg : GuidyColors.bg;
-    final textC = isDark ? GuidyColors.darkText : GuidyColors.ink;
-    final subC = isDark ? GuidyColors.darkSub : GuidyColors.sub;
-    final muteC = isDark ? GuidyColors.darkMute : GuidyColors.mute;
-    final surfaceC = isDark ? GuidyColors.darkSurface : GuidyColors.surface;
-    final lineC = isDark ? GuidyColors.darkLine : GuidyColors.line;
-    final accentC = isDark ? GuidyColors.darkAccent : GuidyColors.accent;
+    final pal = GuidyPalette.of(context);
 
     return Scaffold(
-      backgroundColor: bgC,
+      backgroundColor: pal.bg,
       appBar: AppBar(
-        backgroundColor: bgC,
+        backgroundColor: pal.bg,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: textC),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: pal.text),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text('크리에이터 신청 · 진행 상황', style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w700)),
+        title: Text('크리에이터 신청 · 진행 상황', style: GuidyText.body(pal.text).copyWith(fontWeight: FontWeight.w700)),
         elevation: 0,
       ),
       body: ListView(
@@ -542,7 +521,7 @@ class _CreatorOnboardingScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: accentC,
+              color: pal.accent,
               borderRadius: GuidyRadius.xlBorder,
             ),
             child: Stack(
@@ -589,9 +568,9 @@ class _CreatorOnboardingScreen extends StatelessWidget {
           const SizedBox(height: 24),
 
           // 심사 타임라인
-          Text('심사 진행 상황', style: GuidyText.h3(textC)),
+          Text('심사 진행 상황', style: GuidyText.h3(pal.text)),
           const SizedBox(height: 12),
-          ..._timelineItems(textC, subC, muteC, surfaceC, lineC, accentC, isDark ? GuidyColors.darkPrimary : GuidyColors.primary),
+          ..._timelineItems(pal.text, pal.sub, pal.mute, pal.surface, pal.line, pal.accent, pal.primary),
 
           const SizedBox(height: 24),
 
@@ -599,18 +578,18 @@ class _CreatorOnboardingScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: surfaceC,
+              color: pal.surface,
               borderRadius: GuidyRadius.lgBorder,
-              border: Border.all(color: lineC),
+              border: Border.all(color: pal.line),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('제출한 정보', style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w800)),
+                Text('제출한 정보', style: GuidyText.body(pal.text).copyWith(fontWeight: FontWeight.w800)),
                 const SizedBox(height: 12),
-                _infoRow('활동명', '김도슨트', textC, subC),
-                _infoRow('전문 분야', '미술사, 현대미술', textC, subC),
-                _infoRow('포트폴리오', 'portfolio.com/kim', textC, subC),
+                _infoRow('활동명', '김도슨트', pal.text, pal.sub),
+                _infoRow('전문 분야', '미술사, 현대미술', pal.text, pal.sub),
+                _infoRow('포트폴리오', 'portfolio.com/kim', pal.text, pal.sub),
               ],
             ),
           ),
@@ -621,19 +600,19 @@ class _CreatorOnboardingScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: isDark ? GuidyColors.darkBgAlt : GuidyColors.bgAlt,
+              color: pal.bgAlt,
               borderRadius: GuidyRadius.lgBorder,
             ),
             child: Row(
               children: [
-                Icon(Icons.mail_outline_rounded, color: muteC, size: 18),
+                Icon(Icons.mail_outline_rounded, color: pal.mute, size: 18),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('문의사항이 있으신가요?', style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w700)),
-                      Text('creator@guidy.app', style: GuidyText.small(subC)),
+                      Text('문의사항이 있으신가요?', style: GuidyText.body(pal.text).copyWith(fontWeight: FontWeight.w700)),
+                      Text('creator@guidy.app', style: GuidyText.small(pal.sub)),
                     ],
                   ),
                 ),
@@ -810,8 +789,7 @@ class _ActivityManagementSection extends StatelessWidget {
     if (creator == null) return const SizedBox.shrink();
 
     final activities = creator.activities;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final primaryC = isDark ? GuidyColors.darkPrimary : GuidyColors.primary;
+    final pal = GuidyPalette.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -827,15 +805,15 @@ class _ActivityManagementSection extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
-                    color: primaryC.withValues(alpha: 0.1),
+                    color: pal.primary.withValues(alpha: 0.1),
                     borderRadius: GuidyRadius.pillBorder,
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.add_rounded, color: primaryC, size: 14),
+                      Icon(Icons.add_rounded, color: pal.primary, size: 14),
                       const SizedBox(width: 4),
-                      Text('추가', style: GuidyText.kicker(primaryC)
+                      Text('추가', style: GuidyText.kicker(pal.primary)
                           .copyWith(fontWeight: FontWeight.w700)),
                     ],
                   ),
@@ -1027,17 +1005,11 @@ class _ActivityDialogState extends State<_ActivityDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark   = Theme.of(context).brightness == Brightness.dark;
-    final surfaceC = isDark ? GuidyColors.darkSurface : GuidyColors.surface;
-    final textC    = isDark ? GuidyColors.darkText     : GuidyColors.ink;
-    final subC     = isDark ? GuidyColors.darkSub      : GuidyColors.sub;
-    final lineC    = isDark ? GuidyColors.darkLine     : GuidyColors.line;
-    final primaryC = isDark ? GuidyColors.darkPrimary  : GuidyColors.primary;
-    final bgC      = isDark ? GuidyColors.darkBg       : GuidyColors.bg;
+    final pal = GuidyPalette.of(context);
     final isEdit   = widget.existing != null;
 
     return Dialog(
-      backgroundColor: surfaceC,
+      backgroundColor: pal.surface,
       shape: RoundedRectangleBorder(borderRadius: GuidyRadius.xlBorder),
       child: Container(
         width: 400,
@@ -1049,7 +1021,7 @@ class _ActivityDialogState extends State<_ActivityDialog> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(isEdit ? '활동 수정' : '활동 추가', style: GuidyText.h3(textC)),
+                Text(isEdit ? '활동 수정' : '활동 추가', style: GuidyText.h3(pal.text)),
                 GestureDetector(
                   onTap: () => Navigator.pop(context),
                   child: const Icon(Icons.close_rounded, color: GuidyColors.mute, size: 20),
@@ -1058,7 +1030,7 @@ class _ActivityDialogState extends State<_ActivityDialog> {
             ),
             const SizedBox(height: 20),
 
-            Text('종류', style: GuidyText.small(subC)),
+            Text('종류', style: GuidyText.small(pal.sub)),
             const SizedBox(height: 8),
             Wrap(
               spacing: 6, runSpacing: 6,
@@ -1075,15 +1047,15 @@ class _ActivityDialogState extends State<_ActivityDialog> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color: selected ? primaryC.withValues(alpha: 0.12) : bgC,
+                      color: selected ? pal.primary.withValues(alpha: 0.12) : pal.bg,
                       borderRadius: GuidyRadius.pillBorder,
                       border: Border.all(
-                        color: selected ? primaryC : lineC,
+                        color: selected ? pal.primary : pal.line,
                         width: selected ? 1.5 : 1,
                       ),
                     ),
                     child: Text(_typeLabels[t] ?? '',
-                      style: GuidyText.kicker(selected ? primaryC : subC)
+                      style: GuidyText.kicker(selected ? pal.primary : pal.sub)
                           .copyWith(fontWeight: FontWeight.w600)),
                   ),
                 );
@@ -1091,19 +1063,19 @@ class _ActivityDialogState extends State<_ActivityDialog> {
             ),
             const SizedBox(height: 16),
 
-            Text('표시 이름 *', style: GuidyText.small(subC)),
+            Text('표시 이름 *', style: GuidyText.small(pal.sub)),
             const SizedBox(height: 6),
-            _field(_labelCtrl, '예: YouTube', bgC, lineC, textC, subC),
+            _field(_labelCtrl, '예: YouTube', pal.bg, pal.line, pal.text, pal.sub),
             const SizedBox(height: 12),
 
-            Text('부제 (구독자 수, 방문 수 등)', style: GuidyText.small(subC)),
+            Text('부제 (구독자 수, 방문 수 등)', style: GuidyText.small(pal.sub)),
             const SizedBox(height: 6),
-            _field(_detailCtrl, '예: 구독자 3.7만명', bgC, lineC, textC, subC),
+            _field(_detailCtrl, '예: 구독자 3.7만명', pal.bg, pal.line, pal.text, pal.sub),
             const SizedBox(height: 12),
 
-            Text('링크 URL (선택)', style: GuidyText.small(subC)),
+            Text('링크 URL (선택)', style: GuidyText.small(pal.sub)),
             const SizedBox(height: 6),
-            _field(_urlCtrl, 'https://...', bgC, lineC, textC, subC),
+            _field(_urlCtrl, 'https://...', pal.bg, pal.line, pal.text, pal.sub),
             const SizedBox(height: 24),
 
             Row(
@@ -1114,11 +1086,11 @@ class _ActivityDialogState extends State<_ActivityDialog> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     decoration: BoxDecoration(
-                      color: surfaceC,
+                      color: pal.surface,
                       borderRadius: GuidyRadius.mdBorder,
-                      border: Border.all(color: lineC),
+                      border: Border.all(color: pal.line),
                     ),
-                    child: Text('취소', style: GuidyText.small(textC)
+                    child: Text('취소', style: GuidyText.small(pal.text)
                         .copyWith(fontWeight: FontWeight.w600)),
                   ),
                 ),
@@ -1128,7 +1100,7 @@ class _ActivityDialogState extends State<_ActivityDialog> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     decoration: BoxDecoration(
-                      color: primaryC,
+                      color: pal.primary,
                       borderRadius: GuidyRadius.mdBorder,
                     ),
                     child: Text(isEdit ? '저장' : '추가',

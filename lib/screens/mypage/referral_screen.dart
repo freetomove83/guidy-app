@@ -15,20 +15,13 @@ class ReferralScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userStore = context.watch<UserStore>();
-    final isDark    = Theme.of(context).brightness == Brightness.dark;
-    final bgC       = isDark ? GuidyColors.darkBg      : GuidyColors.bg;
-    final textC     = isDark ? GuidyColors.darkText     : GuidyColors.ink;
-    final subC      = isDark ? GuidyColors.darkSub      : GuidyColors.sub;
-    final muteC     = isDark ? GuidyColors.darkMute     : GuidyColors.mute;
-    final surfaceC  = isDark ? GuidyColors.darkSurface  : GuidyColors.surface;
-    final lineC     = isDark ? GuidyColors.darkLine     : GuidyColors.line;
-    final primaryC  = isDark ? GuidyColors.darkPrimary  : GuidyColors.primary;
+    final pal = GuidyPalette.of(context);
 
     final myCode     = userStore.myReferralCode;
     final inviteLink = 'https://guidy.co.kr/join?ref=$myCode';
 
     return Scaffold(
-      backgroundColor: bgC,
+      backgroundColor: pal.bg,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -51,7 +44,7 @@ class ReferralScreen extends StatelessWidget {
                         gradient: LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
-                          colors: [primaryC, primaryC.withValues(alpha: 0.7)],
+                          colors: [pal.primary, pal.primary.withValues(alpha: 0.7)],
                         ),
                         borderRadius: GuidyRadius.xlBorder,
                         boxShadow: GuidyShadow.pop,
@@ -129,7 +122,7 @@ class ReferralScreen extends StatelessWidget {
                     const SizedBox(height: 24),
 
                     // ─── 내 초대 현황 ─────────────────────
-                    Text('내 초대 현황', style: GuidyText.h3(textC)),
+                    Text('내 초대 현황', style: GuidyText.h3(pal.text)),
                     const SizedBox(height: 12),
                     Row(
                       children: [
@@ -138,11 +131,11 @@ class ReferralScreen extends StatelessWidget {
                             icon: Icons.people_rounded,
                             label: '초대한 친구',
                             value: '${userStore.referralCount}명',
-                            color: primaryC,
-                            surfaceC: surfaceC,
-                            lineC: lineC,
-                            textC: textC,
-                            subC: subC,
+                            color: pal.primary,
+                            surfaceC: pal.surface,
+                            lineC: pal.line,
+                            textC: pal.text,
+                            subC: pal.sub,
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -152,10 +145,10 @@ class ReferralScreen extends StatelessWidget {
                             label: '보유 이용권',
                             value: '${userStore.freeTickets}장',
                             color: GuidyColors.ok,
-                            surfaceC: surfaceC,
-                            lineC: lineC,
-                            textC: textC,
-                            subC: subC,
+                            surfaceC: pal.surface,
+                            lineC: pal.line,
+                            textC: pal.text,
+                            subC: pal.sub,
                             highlight: userStore.freeTickets > 0,
                           ),
                         ),
@@ -165,14 +158,14 @@ class ReferralScreen extends StatelessWidget {
                     const SizedBox(height: 24),
 
                     // ─── 내 초대 코드 ─────────────────────
-                    Text('내 초대 코드', style: GuidyText.h3(textC)),
+                    Text('내 초대 코드', style: GuidyText.h3(pal.text)),
                     const SizedBox(height: 12),
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: surfaceC,
+                        color: pal.surface,
                         borderRadius: GuidyRadius.lgBorder,
-                        border: Border.all(color: lineC),
+                        border: Border.all(color: pal.line),
                       ),
                       child: Column(
                         children: [
@@ -186,10 +179,10 @@ class ReferralScreen extends StatelessWidget {
                                     width: 38,
                                     height: 46,
                                     decoration: BoxDecoration(
-                                      color: primaryC.withValues(alpha: 0.08),
+                                      color: pal.primary.withValues(alpha: 0.08),
                                       borderRadius: GuidyRadius.mdBorder,
                                       border: Border.all(
-                                          color: primaryC
+                                          color: pal.primary
                                               .withValues(alpha: 0.25)),
                                     ),
                                     child: Center(
@@ -198,7 +191,7 @@ class ReferralScreen extends StatelessWidget {
                                             fontFamily: GuidyText.fontFamily,
                                             fontSize: 20,
                                             fontWeight: FontWeight.w900,
-                                            color: primaryC,
+                                            color: pal.primary,
                                             letterSpacing: 0,
                                           )),
                                     ),
@@ -217,10 +210,10 @@ class ReferralScreen extends StatelessWidget {
                                         ClipboardData(text: myCode));
                                     _showSnack(context, '초대 코드가 복사되었습니다');
                                   },
-                                  primaryC: primaryC,
-                                  surfaceC: surfaceC,
-                                  lineC: lineC,
-                                  textC: subC,
+                                  primaryC: pal.primary,
+                                  surfaceC: pal.surface,
+                                  lineC: pal.line,
+                                  textC: pal.sub,
                                 ),
                               ),
                               const SizedBox(width: 10),
@@ -234,10 +227,10 @@ class ReferralScreen extends StatelessWidget {
                                     _showSnack(context,
                                         '초대 링크가 복사되었습니다. 친구에게 전달해보세요 🎉');
                                   },
-                                  primaryC: primaryC,
-                                  surfaceC: surfaceC,
-                                  lineC: lineC,
-                                  textC: subC,
+                                  primaryC: pal.primary,
+                                  surfaceC: pal.surface,
+                                  lineC: pal.line,
+                                  textC: pal.sub,
                                   filled: true,
                                 ),
                               ),
@@ -259,21 +252,19 @@ class ReferralScreen extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 14, vertical: 12),
                         decoration: BoxDecoration(
-                          color: isDark
-                              ? GuidyColors.darkBgAlt
-                              : GuidyColors.bgAlt,
+                          color: pal.bgAlt,
                           borderRadius: GuidyRadius.lgBorder,
-                          border: Border.all(color: lineC),
+                          border: Border.all(color: pal.line),
                         ),
                         child: Row(
                           children: [
                             Icon(Icons.link_rounded,
-                                size: 16, color: muteC),
+                                size: 16, color: pal.mute),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 inviteLink,
-                                style: GuidyText.small(subC),
+                                style: GuidyText.small(pal.sub),
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
@@ -282,11 +273,11 @@ class ReferralScreen extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
-                                color: primaryC.withValues(alpha: 0.1),
+                                color: pal.primary.withValues(alpha: 0.1),
                                 borderRadius: GuidyRadius.pillBorder,
                               ),
                               child: Text('복사',
-                                  style: GuidyText.kicker(primaryC)
+                                  style: GuidyText.kicker(pal.primary)
                                       .copyWith(fontWeight: FontWeight.w700)),
                             ),
                           ],
@@ -298,7 +289,7 @@ class ReferralScreen extends StatelessWidget {
 
                     // ─── 무료 이용권 섹션 ─────────────────
                     if (userStore.freeTickets > 0) ...[
-                      Text('무료 이용권', style: GuidyText.h3(textC)),
+                      Text('무료 이용권', style: GuidyText.h3(pal.text)),
                       const SizedBox(height: 12),
                       Container(
                         padding: const EdgeInsets.all(16),
@@ -328,13 +319,13 @@ class ReferralScreen extends StatelessWidget {
                                 children: [
                                   Text(
                                     '무료 이용권 ${userStore.freeTickets}장 보유 중',
-                                    style: GuidyText.body(textC).copyWith(
+                                    style: GuidyText.body(pal.text).copyWith(
                                         fontWeight: FontWeight.w700),
                                   ),
                                   const SizedBox(height: 3),
                                   Text(
                                     '전시 상세 화면에서 유료 오디오 가이드를\n결제 없이 이용할 수 있습니다',
-                                    style: GuidyText.small(subC)
+                                    style: GuidyText.small(pal.sub)
                                         .copyWith(height: 1.5),
                                   ),
                                 ],
@@ -347,39 +338,39 @@ class ReferralScreen extends StatelessWidget {
                     ],
 
                     // ─── 이용 안내 ────────────────────────
-                    Text('이용 안내', style: GuidyText.h3(textC)),
+                    Text('이용 안내', style: GuidyText.h3(pal.text)),
                     const SizedBox(height: 12),
                     _GuideStep(
                       step: '1',
                       title: '초대 코드 또는 링크 공유',
                       desc: '내 초대 코드나 링크를 친구에게 전달하세요',
-                      primaryC: primaryC,
-                      textC: textC,
-                      subC: subC,
-                      surfaceC: surfaceC,
-                      lineC: lineC,
+                      primaryC: pal.primary,
+                      textC: pal.text,
+                      subC: pal.sub,
+                      surfaceC: pal.surface,
+                      lineC: pal.line,
                     ),
                     const SizedBox(height: 8),
                     _GuideStep(
                       step: '2',
                       title: '친구가 코드 입력 후 가입',
                       desc: '친구가 회원가입 시 내 코드를 입력하면 연결됩니다',
-                      primaryC: primaryC,
-                      textC: textC,
-                      subC: subC,
-                      surfaceC: surfaceC,
-                      lineC: lineC,
+                      primaryC: pal.primary,
+                      textC: pal.text,
+                      subC: pal.sub,
+                      surfaceC: pal.surface,
+                      lineC: pal.line,
                     ),
                     const SizedBox(height: 8),
                     _GuideStep(
                       step: '3',
                       title: '무료 이용권 자동 지급',
                       desc: '가입 완료 후 내 계정에 무료 이용권 1장이 자동으로 지급됩니다',
-                      primaryC: primaryC,
-                      textC: textC,
-                      subC: subC,
-                      surfaceC: surfaceC,
-                      lineC: lineC,
+                      primaryC: pal.primary,
+                      textC: pal.text,
+                      subC: pal.sub,
+                      surfaceC: pal.surface,
+                      lineC: pal.line,
                     ),
                     const SizedBox(height: 8),
                     _GuideStep(
@@ -387,10 +378,10 @@ class ReferralScreen extends StatelessWidget {
                       title: '무료 이용권으로 감상',
                       desc: '유료 오디오 가이드를 이용권 사용으로 무료 감상',
                       primaryC: GuidyColors.ok,
-                      textC: textC,
-                      subC: subC,
-                      surfaceC: surfaceC,
-                      lineC: lineC,
+                      textC: pal.text,
+                      subC: pal.sub,
+                      surfaceC: pal.surface,
+                      lineC: pal.line,
                     ),
 
                     // 테스트용 보상 추가 버튼 (디버그 빌드에서만)
@@ -406,20 +397,20 @@ class ReferralScreen extends StatelessWidget {
                         width: double.infinity,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         decoration: BoxDecoration(
-                          color: surfaceC,
+                          color: pal.surface,
                           borderRadius: GuidyRadius.lgBorder,
                           border: Border.all(
-                              color: lineC,
+                              color: pal.line,
                               style: BorderStyle.solid),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(Icons.science_outlined,
-                                size: 14, color: muteC),
+                                size: 14, color: pal.mute),
                             const SizedBox(width: 6),
                             Text('테스트: 초대 보상 받기 (개발 확인용)',
-                                style: GuidyText.small(muteC)),
+                                style: GuidyText.small(pal.mute)),
                           ],
                         ),
                       ),

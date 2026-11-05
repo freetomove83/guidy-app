@@ -55,17 +55,10 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgC = isDark ? GuidyColors.darkBg : GuidyColors.bg;
-    final textC = isDark ? GuidyColors.darkText : GuidyColors.ink;
-    final subC = isDark ? GuidyColors.darkSub : GuidyColors.sub;
-    final muteC = isDark ? GuidyColors.darkMute : GuidyColors.mute;
-    final surfaceC = isDark ? GuidyColors.darkSurface : GuidyColors.surface;
-    final lineC = isDark ? GuidyColors.darkLine : GuidyColors.line;
-    final primaryC = isDark ? GuidyColors.darkPrimary : GuidyColors.primary;
+    final pal = GuidyPalette.of(context);
 
     return Scaffold(
-      backgroundColor: bgC,
+      backgroundColor: pal.bg,
       body: SafeArea(
         child: Column(
           children: [
@@ -80,14 +73,14 @@ class _SignupScreenState extends State<SignupScreen> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: isDark ? GuidyColors.darkBgAlt : GuidyColors.bgAlt,
+                        color: pal.bgAlt,
                         borderRadius: GuidyRadius.lgBorder,
-                        border: Border.all(color: lineC),
+                        border: Border.all(color: pal.line),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('소셜 계정으로 가입', style: GuidyText.small(textC).copyWith(fontWeight: FontWeight.w700)),
+                          Text('소셜 계정으로 가입', style: GuidyText.small(pal.text).copyWith(fontWeight: FontWeight.w700)),
                           const SizedBox(height: 12),
                           Row(
                             children: [
@@ -130,68 +123,68 @@ class _SignupScreenState extends State<SignupScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 20),
                       child: Row(
                         children: [
-                          Expanded(child: Divider(color: lineC)),
+                          Expanded(child: Divider(color: pal.line)),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 14),
-                            child: Text('이메일로 가입', style: GuidyText.small(muteC)),
+                            child: Text('이메일로 가입', style: GuidyText.small(pal.mute)),
                           ),
-                          Expanded(child: Divider(color: lineC)),
+                          Expanded(child: Divider(color: pal.line)),
                         ],
                       ),
                     ),
 
                     // 이름
-                    GuidyInputLabel(label: '이름', textC: textC),
+                    GuidyInputLabel(label: '이름', textC: pal.text),
                     const SizedBox(height: 6),
                     GuidyInputField(
                       controller: _nameController,
                       hint: '이름을 입력해주세요',
-                      surfaceC: surfaceC, lineC: lineC, textC: textC, subC: subC,
+                      surfaceC: pal.surface, lineC: pal.line, textC: pal.text, subC: pal.sub,
                     ),
                     const SizedBox(height: 14),
 
                     // 이메일
-                    GuidyInputLabel(label: '이메일', textC: textC),
+                    GuidyInputLabel(label: '이메일', textC: pal.text),
                     const SizedBox(height: 6),
                     GuidyInputField(
                       controller: _emailController,
                       hint: 'example@email.com',
                       keyboardType: TextInputType.emailAddress,
-                      surfaceC: surfaceC, lineC: lineC, textC: textC, subC: subC,
+                      surfaceC: pal.surface, lineC: pal.line, textC: pal.text, subC: pal.sub,
                     ),
                     const SizedBox(height: 14),
 
                     // 비밀번호
-                    GuidyInputLabel(label: '비밀번호', textC: textC),
+                    GuidyInputLabel(label: '비밀번호', textC: pal.text),
                     const SizedBox(height: 6),
                     GuidyInputField(
                       controller: _passwordController,
                       hint: '8자 이상 영문, 숫자 포함',
                       obscureText: _obscurePassword,
-                      surfaceC: surfaceC, lineC: lineC, textC: textC, subC: subC,
+                      surfaceC: pal.surface, lineC: pal.line, textC: pal.text, subC: pal.sub,
                       suffix: GestureDetector(
                         onTap: () => setState(() => _obscurePassword = !_obscurePassword),
                         child: Icon(
                           _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                          size: 20, color: muteC,
+                          size: 20, color: pal.mute,
                         ),
                       ),
                     ),
                     const SizedBox(height: 14),
 
                     // 비밀번호 확인
-                    GuidyInputLabel(label: '비밀번호 확인', textC: textC),
+                    GuidyInputLabel(label: '비밀번호 확인', textC: pal.text),
                     const SizedBox(height: 6),
                     GuidyInputField(
                       controller: _confirmController,
                       hint: '비밀번호를 다시 입력해주세요',
                       obscureText: _obscureConfirm,
-                      surfaceC: surfaceC, lineC: lineC, textC: textC, subC: subC,
+                      surfaceC: pal.surface, lineC: pal.line, textC: pal.text, subC: pal.sub,
                       suffix: GestureDetector(
                         onTap: () => setState(() => _obscureConfirm = !_obscureConfirm),
                         child: Icon(
                           _obscureConfirm ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                          size: 20, color: muteC,
+                          size: 20, color: pal.mute,
                         ),
                       ),
                     ),
@@ -200,9 +193,9 @@ class _SignupScreenState extends State<SignupScreen> {
                     // ─── 추천인 코드 (선택) ───────────────────
                     Row(
                       children: [
-                        GuidyInputLabel(label: '추천인 코드', textC: textC),
+                        GuidyInputLabel(label: '추천인 코드', textC: pal.text),
                         const SizedBox(width: 6),
-                        Text('(선택)', style: GuidyText.small(muteC)),
+                        Text('(선택)', style: GuidyText.small(pal.mute)),
                       ],
                     ),
                     const SizedBox(height: 6),
@@ -218,14 +211,14 @@ class _SignupScreenState extends State<SignupScreen> {
                                 hint: '초대 코드 6자리 입력 (예: GUIDY1)',
                                 surfaceC: _referralVerified
                                     ? GuidyColors.ok.withValues(alpha: 0.08)
-                                    : surfaceC,
+                                    : pal.surface,
                                 lineC: _referralVerified
                                     ? GuidyColors.ok
                                     : (_referralError != null
                                         ? Colors.red.shade300
-                                        : lineC),
-                                textC: textC,
-                                subC: subC,
+                                        : pal.line),
+                                textC: pal.text,
+                                subC: pal.sub,
                                 suffix: _referralVerified
                                     ? const Icon(
                                         Icons.check_circle_rounded,
@@ -278,7 +271,7 @@ class _SignupScreenState extends State<SignupScreen> {
                             decoration: BoxDecoration(
                               color: _referralVerified
                                   ? GuidyColors.ok.withValues(alpha: 0.15)
-                                  : primaryC,
+                                  : pal.primary,
                               borderRadius: GuidyRadius.lgBorder,
                             ),
                             child: Center(
@@ -305,10 +298,10 @@ class _SignupScreenState extends State<SignupScreen> {
                         child: Row(
                           children: [
                             Icon(Icons.card_giftcard_rounded,
-                                size: 13, color: muteC),
+                                size: 13, color: pal.mute),
                             const SizedBox(width: 5),
                             Text('친구의 초대 코드를 입력하면 가입 혜택이 제공됩니다',
-                                style: GuidyText.kicker(muteC)),
+                                style: GuidyText.kicker(pal.mute)),
                           ],
                         ),
                       ),
@@ -318,16 +311,16 @@ class _SignupScreenState extends State<SignupScreen> {
                       value: _agreeTerms,
                       label: '[필수] 이용약관 및 개인정보처리방침 동의',
                       onChanged: (v) => setState(() => _agreeTerms = v ?? false),
-                      textC: textC, primaryC: primaryC, lineC: lineC,
+                      textC: pal.text, primaryC: pal.primary, lineC: pal.line,
                       showArrow: true,
-                      onArrowTap: () => _showTermsDialog(context, bgC, textC, subC, primaryC),
+                      onArrowTap: () => _showTermsDialog(context, pal.bg, pal.text, pal.sub, pal.primary),
                     ),
                     const SizedBox(height: 8),
                     _CheckItem(
                       value: _agreeMarketing,
                       label: '[선택] 마케팅 정보 수신 동의',
                       onChanged: (v) => setState(() => _agreeMarketing = v ?? false),
-                      textC: subC, primaryC: primaryC, lineC: lineC,
+                      textC: pal.sub, primaryC: pal.primary, lineC: pal.line,
                     ),
 
                     const SizedBox(height: 28),
@@ -339,7 +332,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         width: double.infinity,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         decoration: BoxDecoration(
-                          color: _agreeTerms ? primaryC : (isDark ? GuidyColors.darkLine : GuidyColors.line),
+                          color: _agreeTerms ? pal.primary : (pal.line),
                           borderRadius: GuidyRadius.lgBorder,
                           boxShadow: _agreeTerms ? GuidyShadow.pop : null,
                         ),
@@ -359,10 +352,10 @@ class _SignupScreenState extends State<SignupScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text('이미 계정이 있으신가요? ', style: GuidyText.small(subC)),
+                          Text('이미 계정이 있으신가요? ', style: GuidyText.small(pal.sub)),
                           GestureDetector(
                             onTap: () => Navigator.pop(context),
-                            child: Text('로그인', style: GuidyText.small(primaryC).copyWith(fontWeight: FontWeight.w800)),
+                            child: Text('로그인', style: GuidyText.small(pal.primary).copyWith(fontWeight: FontWeight.w800)),
                           ),
                         ],
                       ),

@@ -39,16 +39,10 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark   = Theme.of(context).brightness == Brightness.dark;
-    final bgC      = isDark ? GuidyColors.darkBg      : GuidyColors.bg;
-    final textC    = isDark ? GuidyColors.darkText     : GuidyColors.ink;
-    final subC     = isDark ? GuidyColors.darkSub      : GuidyColors.sub;
-    final muteC    = isDark ? GuidyColors.darkMute     : GuidyColors.mute;
-    final surfaceC = isDark ? GuidyColors.darkSurface  : GuidyColors.surface;
-    final lineC    = isDark ? GuidyColors.darkLine     : GuidyColors.line;
+    final pal = GuidyPalette.of(context);
 
     return Scaffold(
-      backgroundColor: bgC,
+      backgroundColor: pal.bg,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -69,15 +63,15 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                     child: Container(
                       width: 36, height: 36,
                       decoration: BoxDecoration(
-                        color: surfaceC,
+                        color: pal.surface,
                         borderRadius: GuidyRadius.mdBorder,
-                        border: Border.all(color: lineC),
+                        border: Border.all(color: pal.line),
                       ),
-                      child: Icon(Icons.arrow_back_ios_new_rounded, size: 16, color: textC),
+                      child: Icon(Icons.arrow_back_ios_new_rounded, size: 16, color: pal.text),
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Text('회원 탈퇴', style: GuidyText.h3(textC)),
+                  Text('회원 탈퇴', style: GuidyText.h3(pal.text)),
                 ],
               ),
             ),
@@ -86,8 +80,8 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
             // ─── 내용 ─────────────────────────────────
             Expanded(
               child: _step == 0
-                  ? _buildStep0(context, textC, subC, muteC, surfaceC, lineC)
-                  : _buildStep1(context, textC, subC, muteC, surfaceC, lineC),
+                  ? _buildStep0(context, pal.text, pal.sub, pal.mute, pal.surface, pal.line)
+                  : _buildStep1(context, pal.text, pal.sub, pal.mute, pal.surface, pal.line),
             ),
           ],
         ),
@@ -242,8 +236,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
 
   Widget _buildStep1(BuildContext ctx, Color textC, Color subC,
       Color muteC, Color surfaceC, Color lineC) {
-    final isDark   = Theme.of(ctx).brightness == Brightness.dark;
-    final primaryC = isDark ? GuidyColors.darkPrimary : GuidyColors.primary;
+    final pal = GuidyPalette.of(ctx);
     final inputOk  = _confirmCtrl.text == _confirmText;
 
     return SingleChildScrollView(
@@ -293,7 +286,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
               focusedBorder: OutlineInputBorder(
                 borderRadius: GuidyRadius.lgBorder,
                 borderSide: BorderSide(
-                  color: inputOk ? GuidyColors.ok : primaryC,
+                  color: inputOk ? GuidyColors.ok : pal.primary,
                   width: 1.5,
                 ),
               ),

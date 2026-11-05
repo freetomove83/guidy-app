@@ -29,12 +29,10 @@ class _LibraryScreenState extends State<LibraryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgC    = isDark ? GuidyColors.darkBg   : GuidyColors.bg;
-    final lineC  = isDark ? GuidyColors.darkLine  : GuidyColors.line;
+    final pal = GuidyPalette.of(context);
 
     return Scaffold(
-      backgroundColor: bgC,
+      backgroundColor: pal.bg,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -43,7 +41,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
             // 탭
             Container(
               decoration: BoxDecoration(
-                border: Border(bottom: BorderSide(color: lineC)),
+                border: Border(bottom: BorderSide(color: pal.line)),
               ),
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
@@ -51,9 +49,6 @@ class _LibraryScreenState extends State<LibraryScreen> {
                 child: Row(
                   children: List.generate(_tabs.length, (i) {
                     final isA    = i == _tabIndex;
-                    final textC  = isDark ? GuidyColors.darkText  : GuidyColors.ink;
-                    final muteC  = isDark ? GuidyColors.darkMute  : GuidyColors.mute;
-                    final primaryC = isDark ? GuidyColors.darkPrimary : GuidyColors.primary;
                     return GestureDetector(
                       onTap: () => setState(() => _tabIndex = i),
                       child: Container(
@@ -61,14 +56,14 @@ class _LibraryScreenState extends State<LibraryScreen> {
                         margin: const EdgeInsets.only(right: 20),
                         decoration: BoxDecoration(
                           border: Border(bottom: BorderSide(
-                            color: isA ? primaryC : Colors.transparent,
+                            color: isA ? pal.primary : Colors.transparent,
                             width: 2.5,
                           )),
                         ),
                         child: Text(_tabs[i], style: TextStyle(
                           fontFamily: GuidyText.fontFamily, fontSize: 14,
                           fontWeight: isA ? FontWeight.w800 : FontWeight.w500,
-                          color: isA ? textC : muteC,
+                          color: isA ? pal.text : pal.mute,
                         )),
                       ),
                     );
@@ -100,12 +95,7 @@ class _CollectionTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark   = Theme.of(context).brightness == Brightness.dark;
-    final textC    = isDark ? GuidyColors.darkText    : GuidyColors.ink;
-    final subC     = isDark ? GuidyColors.darkSub     : GuidyColors.sub;
-    final muteC    = isDark ? GuidyColors.darkMute    : GuidyColors.mute;
-    final lineC    = isDark ? GuidyColors.darkLine    : GuidyColors.line;
-    final surfaceC = isDark ? GuidyColors.darkSurface : GuidyColors.surface;
+    final pal = GuidyPalette.of(context);
     final store    = context.read<AppStore>();
     final exhibitions = store.exhibitions;
 
@@ -146,9 +136,9 @@ class _CollectionTab extends StatelessWidget {
               margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: surfaceC,
+                color: pal.surface,
                 borderRadius: GuidyRadius.lgBorder,
-                border: Border.all(color: lineC),
+                border: Border.all(color: pal.line),
               ),
               child: GestureDetector(
                 onTap: () => Navigator.pushNamed(context, '/archive/${e.id}'),
@@ -164,13 +154,13 @@ class _CollectionTab extends StatelessWidget {
                           const ChannelBadge(type: ChannelType.archive),
                           const SizedBox(height: 4),
                           Text(e.title,
-                            style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w700),
+                            style: GuidyText.body(pal.text).copyWith(fontWeight: FontWeight.w700),
                             maxLines: 1, overflow: TextOverflow.ellipsis),
-                          Text(e.venue, style: GuidyText.small(subC)),
+                          Text(e.venue, style: GuidyText.small(pal.sub)),
                         ],
                       ),
                     ),
-                    Icon(Icons.chevron_right_rounded, color: muteC, size: 18),
+                    Icon(Icons.chevron_right_rounded, color: pal.mute, size: 18),
                   ],
                 ),
               ),
@@ -186,13 +176,7 @@ class _ContinueTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark   = Theme.of(context).brightness == Brightness.dark;
-    final textC    = isDark ? GuidyColors.darkText    : GuidyColors.ink;
-    final subC     = isDark ? GuidyColors.darkSub     : GuidyColors.sub;
-    final muteC    = isDark ? GuidyColors.darkMute    : GuidyColors.mute;
-    final lineC    = isDark ? GuidyColors.darkLine    : GuidyColors.line;
-    final surfaceC = isDark ? GuidyColors.darkSurface : GuidyColors.surface;
-    final accentC  = isDark ? GuidyColors.darkAccent  : GuidyColors.accent;
+    final pal = GuidyPalette.of(context);
     final artworks = context.read<AppStore>().artworks;
 
     return ListView(
@@ -201,9 +185,9 @@ class _ContinueTab extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: surfaceC,
+          color: pal.surface,
           borderRadius: GuidyRadius.lgBorder,
-          border: Border.all(color: lineC),
+          border: Border.all(color: pal.line),
         ),
         child: GestureDetector(
           onTap: () => Navigator.pushNamed(context, '/player/${a.id}'),
@@ -232,21 +216,21 @@ class _ContinueTab extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(a.title,
-                      style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w700)),
-                    Text(a.artist, style: GuidyText.small(subC)),
+                      style: GuidyText.body(pal.text).copyWith(fontWeight: FontWeight.w700)),
+                    Text(a.artist, style: GuidyText.small(pal.sub)),
                     const SizedBox(height: 6),
                     ClipRRect(
                       borderRadius: GuidyRadius.pillBorder,
                       child: LinearProgressIndicator(
                         value: 0.4,
-                        backgroundColor: lineC,
-                        valueColor: AlwaysStoppedAnimation<Color>(accentC),
+                        backgroundColor: pal.line,
+                        valueColor: AlwaysStoppedAnimation<Color>(pal.accent),
                         minHeight: 3,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text('1:12 / ${a.durationSec ~/ 60}:${(a.durationSec % 60).toString().padLeft(2, '0')}',
-                      style: GuidyText.kicker(muteC)),
+                      style: GuidyText.kicker(pal.mute)),
                   ],
                 ),
               ),
@@ -267,25 +251,19 @@ class _FavoritesTab extends StatelessWidget {
     final userStore  = context.watch<UserStore>();
     final store      = context.read<AppStore>();
     final favorites  = userStore.favorites;
-    final isDark     = Theme.of(context).brightness == Brightness.dark;
-    final textC      = isDark ? GuidyColors.darkText     : GuidyColors.ink;
-    final subC       = isDark ? GuidyColors.darkSub      : GuidyColors.sub;
-    final muteC      = isDark ? GuidyColors.darkMute     : GuidyColors.mute;
-    final lineC      = isDark ? GuidyColors.darkLine     : GuidyColors.line;
-    final surfaceC   = isDark ? GuidyColors.darkSurface  : GuidyColors.surface;
-    final accentC    = isDark ? GuidyColors.darkAccent   : GuidyColors.accent;
+    final pal = GuidyPalette.of(context);
 
     if (favorites.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.bookmark_outlined, size: 64, color: muteC),
+            Icon(Icons.bookmark_outlined, size: 64, color: pal.mute),
             const SizedBox(height: 12),
-            Text('즐겨찾기한 가이드가 없습니다', style: GuidyText.body(muteC)),
+            Text('즐겨찾기한 가이드가 없습니다', style: GuidyText.body(pal.mute)),
             const SizedBox(height: 8),
             Text('전시 상세에서 북마크 버튼을 눌러 저장하세요',
-              style: GuidyText.small(muteC)),
+              style: GuidyText.small(pal.mute)),
             const SizedBox(height: 16),
             PillButton(
               label: '가이드 탐색하기',
@@ -306,14 +284,14 @@ class _FavoritesTab extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
       children: [
         Text('즐겨찾기한 전시 ${favExhibitions.length}개',
-          style: GuidyText.small(muteC)),
+          style: GuidyText.small(pal.mute)),
         const SizedBox(height: 12),
         ...favExhibitions.map((e) => Container(
           margin: const EdgeInsets.only(bottom: 10),
           decoration: BoxDecoration(
-            color: surfaceC,
+            color: pal.surface,
             borderRadius: GuidyRadius.lgBorder,
-            border: Border.all(color: lineC),
+            border: Border.all(color: pal.line),
           ),
           child: GestureDetector(
             onTap: () => Navigator.pushNamed(context, '/detail/${e.id}'),
@@ -337,14 +315,14 @@ class _FavoritesTab extends StatelessWidget {
                       ChannelBadge(type: e.channel),
                       const SizedBox(height: 4),
                       Text(e.title,
-                        style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w700),
+                        style: GuidyText.body(pal.text).copyWith(fontWeight: FontWeight.w700),
                         maxLines: 1, overflow: TextOverflow.ellipsis),
-                      Text(e.venue, style: GuidyText.small(subC)),
+                      Text(e.venue, style: GuidyText.small(pal.sub)),
                       const SizedBox(height: 4),
                       Text(e.price == 0
                         ? '무료'
                         : '₩${formatPrice(e.price)}',
-                        style: GuidyText.kicker(accentC)
+                        style: GuidyText.kicker(pal.accent)
                           .copyWith(fontWeight: FontWeight.w700)),
                     ],
                   ),
@@ -354,7 +332,7 @@ class _FavoritesTab extends StatelessWidget {
                   onTap: () => context.read<UserStore>().toggleFavorite(e.id),
                   child: Padding(
                     padding: const EdgeInsets.all(14),
-                    child: Icon(Icons.bookmark_rounded, color: accentC, size: 20),
+                    child: Icon(Icons.bookmark_rounded, color: pal.accent, size: 20),
                   ),
                 ),
               ],
@@ -375,24 +353,19 @@ class _CreatorsTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final userStore  = context.watch<UserStore>();
     final following  = userStore.following;
-    final isDark     = Theme.of(context).brightness == Brightness.dark;
-    final textC      = isDark ? GuidyColors.darkText     : GuidyColors.ink;
-    final subC       = isDark ? GuidyColors.darkSub      : GuidyColors.sub;
-    final muteC      = isDark ? GuidyColors.darkMute     : GuidyColors.mute;
-    final lineC      = isDark ? GuidyColors.darkLine     : GuidyColors.line;
-    final surfaceC   = isDark ? GuidyColors.darkSurface  : GuidyColors.surface;
+    final pal = GuidyPalette.of(context);
 
     if (following.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.people_outline_rounded, size: 64, color: muteC),
+            Icon(Icons.people_outline_rounded, size: 64, color: pal.mute),
             const SizedBox(height: 12),
-            Text('팔로우한 크리에이터가 없습니다', style: GuidyText.body(muteC)),
+            Text('팔로우한 크리에이터가 없습니다', style: GuidyText.body(pal.mute)),
             const SizedBox(height: 8),
             Text('크리에이터 가이드에서 팔로우를 눌러보세요',
-              style: GuidyText.small(muteC)),
+              style: GuidyText.small(pal.mute)),
           ],
         ),
       );
@@ -407,7 +380,7 @@ class _CreatorsTab extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
       children: [
         Text('팔로우 중인 크리에이터 ${followedCreators.length}명',
-          style: GuidyText.small(muteC)),
+          style: GuidyText.small(pal.mute)),
         const SizedBox(height: 12),
         ...followedCreators.map((creator) {
           Color avatarColor;
@@ -422,9 +395,9 @@ class _CreatorsTab extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 10),
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: surfaceC,
+              color: pal.surface,
               borderRadius: GuidyRadius.lgBorder,
-              border: Border.all(color: lineC),
+              border: Border.all(color: pal.line),
             ),
             child: GestureDetector(
               onTap: () => Navigator.pushNamed(context, '/creator/${creator.id}'),
@@ -455,7 +428,7 @@ class _CreatorsTab extends StatelessWidget {
                         Row(
                           children: [
                             Text(creator.name,
-                              style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w700)),
+                              style: GuidyText.body(pal.text).copyWith(fontWeight: FontWeight.w700)),
                             if (creator.isVerified) ...[
                               const SizedBox(width: 4),
                               const Icon(Icons.verified_rounded,
@@ -463,15 +436,15 @@ class _CreatorsTab extends StatelessWidget {
                             ],
                           ],
                         ),
-                        Text(creator.title, style: GuidyText.small(subC)),
+                        Text(creator.title, style: GuidyText.small(pal.sub)),
                         const SizedBox(height: 4),
                         Row(
                           children: [
                             _stat(Icons.people_outline_rounded,
-                              _formatCount(creator.followerCount), muteC),
+                              _formatCount(creator.followerCount), pal.mute),
                             const SizedBox(width: 10),
                             _stat(Icons.headphones_outlined,
-                              '${creator.guideCount}개 가이드', muteC),
+                              '${creator.guideCount}개 가이드', pal.mute),
                           ],
                         ),
                       ],
@@ -483,12 +456,12 @@ class _CreatorsTab extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                       decoration: BoxDecoration(
-                        color: surfaceC,
+                        color: pal.surface,
                         borderRadius: GuidyRadius.pillBorder,
-                        border: Border.all(color: lineC),
+                        border: Border.all(color: pal.line),
                       ),
                       child: Text('팔로잉',
-                        style: GuidyText.kicker(muteC).copyWith(fontWeight: FontWeight.w700)),
+                        style: GuidyText.kicker(pal.mute).copyWith(fontWeight: FontWeight.w700)),
                     ),
                   ),
                 ],

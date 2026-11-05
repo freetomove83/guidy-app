@@ -59,11 +59,7 @@ class _StepIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark   = Theme.of(context).brightness == Brightness.dark;
-    final lineC    = isDark ? GuidyColors.darkLine    : GuidyColors.line;
-    final muteC    = isDark ? GuidyColors.darkMute    : GuidyColors.mute;
-    final textC    = isDark ? GuidyColors.darkText    : GuidyColors.ink;
-    final primaryC = isDark ? GuidyColors.darkPrimary : GuidyColors.primary;
+    final pal = GuidyPalette.of(context);
 
     return Row(
       children: List.generate(_steps.length * 2 - 1, (i) {
@@ -73,7 +69,7 @@ class _StepIndicator extends StatelessWidget {
           return Expanded(
             child: Container(
               height: 2,
-              color: filled ? primaryC : lineC,
+              color: filled ? pal.primary : pal.line,
             ),
           );
         }
@@ -88,9 +84,9 @@ class _StepIndicator extends StatelessWidget {
               width: 28, height: 28,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: isDone || isCurrent ? primaryC : Colors.transparent,
+                color: isDone || isCurrent ? pal.primary : Colors.transparent,
                 border: Border.all(
-                  color: isDone || isCurrent ? primaryC : lineC,
+                  color: isDone || isCurrent ? pal.primary : pal.line,
                   width: 1.5,
                 ),
               ),
@@ -102,7 +98,7 @@ class _StepIndicator extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
-                          color: isCurrent ? Colors.white : muteC,
+                          color: isCurrent ? Colors.white : pal.mute,
                         )),
               ),
             ),
@@ -112,7 +108,7 @@ class _StepIndicator extends StatelessWidget {
                   fontSize: 10,
                   fontFamily: GuidyText.fontFamily,
                   fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w400,
-                  color: isCurrent || isDone ? textC : muteC,
+                  color: isCurrent || isDone ? pal.text : pal.mute,
                 )),
           ],
         );
@@ -166,18 +162,10 @@ class _ApplyFormViewState extends State<_ApplyFormView> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark   = Theme.of(context).brightness == Brightness.dark;
-    final bgC      = isDark ? GuidyColors.darkBg      : GuidyColors.bg;
-    final textC    = isDark ? GuidyColors.darkText     : GuidyColors.ink;
-    final subC     = isDark ? GuidyColors.darkSub      : GuidyColors.sub;
-    final muteC    = isDark ? GuidyColors.darkMute     : GuidyColors.mute;
-    final surfaceC = isDark ? GuidyColors.darkSurface  : GuidyColors.surface;
-    final lineC    = isDark ? GuidyColors.darkLine     : GuidyColors.line;
-    final primaryC = isDark ? GuidyColors.darkPrimary  : GuidyColors.primary;
-    final accentC  = isDark ? GuidyColors.darkAccent   : GuidyColors.accent;
+    final pal = GuidyPalette.of(context);
 
     return Scaffold(
-      backgroundColor: bgC,
+      backgroundColor: pal.bg,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -192,16 +180,16 @@ class _ApplyFormViewState extends State<_ApplyFormView> {
                     child: Container(
                       width: 36, height: 36,
                       decoration: BoxDecoration(
-                        color: surfaceC,
+                        color: pal.surface,
                         borderRadius: GuidyRadius.mdBorder,
-                        border: Border.all(color: lineC),
+                        border: Border.all(color: pal.line),
                       ),
                       child: Icon(Icons.arrow_back_ios_new_rounded,
-                          size: 16, color: textC),
+                          size: 16, color: pal.text),
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Text('크리에이터 신청', style: GuidyText.h3(textC)),
+                  Text('크리에이터 신청', style: GuidyText.h3(pal.text)),
                 ],
               ),
             ),
@@ -230,20 +218,20 @@ class _ApplyFormViewState extends State<_ApplyFormView> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(Icons.mic_rounded, color: primaryC, size: 18),
+                          Icon(Icons.mic_rounded, color: pal.primary, size: 18),
                           const SizedBox(width: 10),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text('크리에이터가 되어 수익을 창출하세요',
-                                    style: GuidyText.body(primaryC)
+                                    style: GuidyText.body(pal.primary)
                                         .copyWith(fontWeight: FontWeight.w700)),
                                 const SizedBox(height: 4),
                                 Text(
                                     '오디오 가이드를 제작하고 전시 큐레이터로 활동하며\n'
                                     '판매 수익의 70%를 받으세요.',
-                                    style: GuidyText.small(subC)),
+                                    style: GuidyText.small(pal.sub)),
                               ],
                             ),
                           ),
@@ -253,19 +241,19 @@ class _ApplyFormViewState extends State<_ApplyFormView> {
                     const SizedBox(height: 24),
 
                     // 이름
-                    _fieldLabel('활동 이름 *', textC),
+                    _fieldLabel('활동 이름 *', pal.text),
                     const SizedBox(height: 6),
                     _inputField(
                       controller: _nameCtrl,
                       hint: '크리에이터 이름 또는 채널명',
-                      surfaceC: surfaceC, lineC: lineC,
-                      textC: textC, muteC: muteC, primaryC: primaryC,
+                      surfaceC: pal.surface, lineC: pal.line,
+                      textC: pal.text, muteC: pal.mute, primaryC: pal.primary,
                       onChanged: (_) => setState(() {}),
                     ),
                     const SizedBox(height: 16),
 
                     // 전문 분야
-                    _fieldLabel('전문 분야 *', textC),
+                    _fieldLabel('전문 분야 *', pal.text),
                     const SizedBox(height: 6),
                     Wrap(
                       spacing: 8, runSpacing: 8,
@@ -278,16 +266,16 @@ class _ApplyFormViewState extends State<_ApplyFormView> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 7),
                             decoration: BoxDecoration(
-                              color: selected ? primaryC : surfaceC,
+                              color: selected ? pal.primary : pal.surface,
                               borderRadius: GuidyRadius.pillBorder,
                               border: Border.all(
-                                color: selected ? primaryC : lineC,
+                                color: selected ? pal.primary : pal.line,
                                 width: selected ? 1.5 : 1,
                               ),
                             ),
                             child: Text(f,
                                 style: GuidyText.small(
-                                    selected ? Colors.white : subC)
+                                    selected ? Colors.white : pal.sub)
                                     .copyWith(fontWeight: FontWeight.w600)),
                           ),
                         );
@@ -296,13 +284,13 @@ class _ApplyFormViewState extends State<_ApplyFormView> {
                     const SizedBox(height: 16),
 
                     // 자기소개
-                    _fieldLabel('자기 소개 *', textC),
+                    _fieldLabel('자기 소개 *', pal.text),
                     const SizedBox(height: 6),
                     Container(
                       decoration: BoxDecoration(
-                        color: surfaceC,
+                        color: pal.surface,
                         borderRadius: GuidyRadius.lgBorder,
-                        border: Border.all(color: lineC),
+                        border: Border.all(color: pal.line),
                       ),
                       child: TextField(
                         controller: _introCtrl,
@@ -310,27 +298,27 @@ class _ApplyFormViewState extends State<_ApplyFormView> {
                         maxLines: 6,
                         maxLength: 300,
                         onChanged: (_) => setState(() {}),
-                        style: GuidyText.body(textC)
+                        style: GuidyText.body(pal.text)
                             .copyWith(fontWeight: FontWeight.w500),
                         decoration: InputDecoration(
                           hintText: '예술·문화에 대한 열정과 경험을 소개해주세요. (최대 300자)',
-                          hintStyle: GuidyText.body(muteC),
+                          hintStyle: GuidyText.body(pal.mute),
                           border: InputBorder.none,
                           contentPadding: const EdgeInsets.all(14),
-                          counterStyle: GuidyText.kicker(muteC),
+                          counterStyle: GuidyText.kicker(pal.mute),
                         ),
                       ),
                     ),
                     const SizedBox(height: 16),
 
                     // 포트폴리오/SNS 링크 (선택)
-                    _fieldLabel('포트폴리오 / SNS 링크 (선택)', textC),
+                    _fieldLabel('포트폴리오 / SNS 링크 (선택)', pal.text),
                     const SizedBox(height: 6),
                     _inputField(
                       controller: _linkCtrl,
                       hint: 'https://instagram.com/yourname',
-                      surfaceC: surfaceC, lineC: lineC,
-                      textC: textC, muteC: muteC, primaryC: primaryC,
+                      surfaceC: pal.surface, lineC: pal.line,
+                      textC: pal.text, muteC: pal.mute, primaryC: pal.primary,
                       keyboardType: TextInputType.url,
                     ),
                     const SizedBox(height: 24),
@@ -347,10 +335,10 @@ class _ApplyFormViewState extends State<_ApplyFormView> {
                             width: 20, height: 20,
                             margin: const EdgeInsets.only(top: 2),
                             decoration: BoxDecoration(
-                              color: _agreed ? primaryC : Colors.transparent,
+                              color: _agreed ? pal.primary : Colors.transparent,
                               borderRadius: BorderRadius.circular(5),
                               border: Border.all(
-                                color: _agreed ? primaryC : lineC,
+                                color: _agreed ? pal.primary : pal.line,
                                 width: 1.5,
                               ),
                             ),
@@ -365,16 +353,16 @@ class _ApplyFormViewState extends State<_ApplyFormView> {
                         Expanded(
                           child: RichText(
                             text: TextSpan(
-                              style: GuidyText.body(subC)
+                              style: GuidyText.body(pal.sub)
                                   .copyWith(fontWeight: FontWeight.w500),
                               children: [
                                 const TextSpan(text: '크리에이터 운영 정책 및 '),
                                 TextSpan(
                                   text: '수익·정산 약관',
-                                  style: GuidyText.body(primaryC).copyWith(
+                                  style: GuidyText.body(pal.primary).copyWith(
                                     fontWeight: FontWeight.w700,
                                     decoration: TextDecoration.underline,
-                                    decorationColor: primaryC,
+                                    decorationColor: pal.primary,
                                   ),
                                   recognizer: TapGestureRecognizer()
                                     ..onTap = () => _showTermsModal(
@@ -389,10 +377,10 @@ class _ApplyFormViewState extends State<_ApplyFormView> {
                                 const TextSpan(text: ' 및 '),
                                 TextSpan(
                                   text: '이용약관',
-                                  style: GuidyText.body(primaryC).copyWith(
+                                  style: GuidyText.body(pal.primary).copyWith(
                                     fontWeight: FontWeight.w700,
                                     decoration: TextDecoration.underline,
-                                    decorationColor: primaryC,
+                                    decorationColor: pal.primary,
                                   ),
                                   recognizer: TapGestureRecognizer()
                                     ..onTap = () => _showTermsModal(
@@ -422,7 +410,7 @@ class _ApplyFormViewState extends State<_ApplyFormView> {
                           duration: const Duration(milliseconds: 150),
                           height: 50,
                           decoration: BoxDecoration(
-                            color: _canSubmit ? accentC : lineC,
+                            color: _canSubmit ? pal.accent : pal.line,
                             borderRadius: GuidyRadius.lgBorder,
                           ),
                           child: Center(
@@ -434,7 +422,7 @@ class _ApplyFormViewState extends State<_ApplyFormView> {
                                   )
                                 : Text('신청서 제출',
                                     style: GuidyText.body(
-                                      _canSubmit ? Colors.white : muteC,
+                                      _canSubmit ? Colors.white : pal.mute,
                                     ).copyWith(fontWeight: FontWeight.w700)),
                           ),
                         ),
@@ -499,14 +487,7 @@ class _PendingView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark   = Theme.of(context).brightness == Brightness.dark;
-    final bgC      = isDark ? GuidyColors.darkBg      : GuidyColors.bg;
-    final textC    = isDark ? GuidyColors.darkText     : GuidyColors.ink;
-    final subC     = isDark ? GuidyColors.darkSub      : GuidyColors.sub;
-    final muteC    = isDark ? GuidyColors.darkMute     : GuidyColors.mute;
-    final surfaceC = isDark ? GuidyColors.darkSurface  : GuidyColors.surface;
-    final lineC    = isDark ? GuidyColors.darkLine     : GuidyColors.line;
-    final primaryC = isDark ? GuidyColors.darkPrimary  : GuidyColors.primary;
+    final pal = GuidyPalette.of(context);
 
     final userStore   = context.watch<UserStore>();
     final appliedAt   = userStore.creatorAppliedAt;
@@ -516,7 +497,7 @@ class _PendingView extends StatelessWidget {
         : '신청 접수됨';
 
     return Scaffold(
-      backgroundColor: bgC,
+      backgroundColor: pal.bg,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -530,16 +511,16 @@ class _PendingView extends StatelessWidget {
                     child: Container(
                       width: 36, height: 36,
                       decoration: BoxDecoration(
-                        color: surfaceC,
+                        color: pal.surface,
                         borderRadius: GuidyRadius.mdBorder,
-                        border: Border.all(color: lineC),
+                        border: Border.all(color: pal.line),
                       ),
                       child: Icon(Icons.arrow_back_ios_new_rounded,
-                          size: 16, color: textC),
+                          size: 16, color: pal.text),
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Text('크리에이터 신청', style: GuidyText.h3(textC)),
+                  Text('크리에이터 신청', style: GuidyText.h3(pal.text)),
                 ],
               ),
             ),
@@ -556,15 +537,15 @@ class _PendingView extends StatelessWidget {
                 child: Column(
                   children: [
                     // 상태 아이콘
-                    _PulsingIcon(primaryC: primaryC),
+                    _PulsingIcon(primaryC: pal.primary),
                     const SizedBox(height: 20),
 
                     Text('신청서가 접수되었습니다',
-                        style: GuidyText.h2(textC)
+                        style: GuidyText.h2(pal.text)
                             .copyWith(fontWeight: FontWeight.w800)),
                     const SizedBox(height: 8),
                     Text('팀이 신청서를 검토 중입니다.\n영업일 기준 3~5일 내에 결과를 알려드립니다.',
-                        style: GuidyText.body(subC),
+                        style: GuidyText.body(pal.sub),
                         textAlign: TextAlign.center),
                     const SizedBox(height: 28),
 
@@ -573,14 +554,14 @@ class _PendingView extends StatelessWidget {
                       width: double.infinity,
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: surfaceC,
+                        color: pal.surface,
                         borderRadius: GuidyRadius.lgBorder,
-                        border: Border.all(color: lineC),
+                        border: Border.all(color: pal.line),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('진행 상황', style: GuidyText.body(textC)
+                          Text('진행 상황', style: GuidyText.body(pal.text)
                               .copyWith(fontWeight: FontWeight.w700)),
                           const SizedBox(height: 16),
                           _timelineItem(
@@ -589,31 +570,31 @@ class _PendingView extends StatelessWidget {
                             title: '신청서 제출 완료',
                             desc: appliedText,
                             isDone: true,
-                            lineC: lineC,
-                            textC: textC,
-                            muteC: muteC,
+                            lineC: pal.line,
+                            textC: pal.text,
+                            muteC: pal.mute,
                           ),
                           _timelineItem(
                             icon: Icons.manage_search_rounded,
-                            color: primaryC,
+                            color: pal.primary,
                             title: '서류 검토 중',
                             desc: '신청서 내용을 확인하고 있습니다',
                             isDone: false,
                             isActive: true,
-                            lineC: lineC,
-                            textC: textC,
-                            muteC: muteC,
+                            lineC: pal.line,
+                            textC: pal.text,
+                            muteC: pal.mute,
                           ),
                           _timelineItem(
                             icon: Icons.verified_rounded,
-                            color: muteC,
+                            color: pal.mute,
                             title: '승인 완료',
                             desc: '크리에이터 활동 시작',
                             isDone: false,
                             isLast: true,
-                            lineC: lineC,
-                            textC: textC,
-                            muteC: muteC,
+                            lineC: pal.line,
+                            textC: pal.text,
+                            muteC: pal.mute,
                           ),
                         ],
                       ),
@@ -633,10 +614,10 @@ class _PendingView extends StatelessWidget {
                         children: [
                           Row(children: [
                             Icon(Icons.info_outline_rounded,
-                                size: 14, color: primaryC),
+                                size: 14, color: pal.primary),
                             const SizedBox(width: 6),
                             Text('검토 안내',
-                                style: GuidyText.small(primaryC)
+                                style: GuidyText.small(pal.primary)
                                     .copyWith(fontWeight: FontWeight.w700)),
                           ]),
                           const SizedBox(height: 8),
@@ -653,10 +634,10 @@ class _PendingView extends StatelessWidget {
                                   width: 3, height: 3,
                                   margin: const EdgeInsets.only(top: 7, right: 7),
                                   decoration: BoxDecoration(
-                                    color: subC, shape: BoxShape.circle),
+                                    color: pal.sub, shape: BoxShape.circle),
                                 ),
                                 Expanded(child: Text(t,
-                                    style: GuidyText.small(subC))),
+                                    style: GuidyText.small(pal.sub))),
                               ],
                             ),
                           )),
@@ -672,13 +653,13 @@ class _PendingView extends StatelessWidget {
                         width: double.infinity,
                         height: 44,
                         decoration: BoxDecoration(
-                          color: surfaceC,
+                          color: pal.surface,
                           borderRadius: GuidyRadius.lgBorder,
-                          border: Border.all(color: lineC),
+                          border: Border.all(color: pal.line),
                         ),
                         child: Center(
                           child: Text('[개발용] 승인 시뮬레이션',
-                              style: GuidyText.small(muteC)
+                              style: GuidyText.small(pal.mute)
                                   .copyWith(fontWeight: FontWeight.w600)),
                         ),
                       ),
@@ -700,15 +681,7 @@ class _ApprovedView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark   = Theme.of(context).brightness == Brightness.dark;
-    final bgC      = isDark ? GuidyColors.darkBg      : GuidyColors.bg;
-    final textC    = isDark ? GuidyColors.darkText     : GuidyColors.ink;
-    final subC     = isDark ? GuidyColors.darkSub      : GuidyColors.sub;
-    final muteC    = isDark ? GuidyColors.darkMute     : GuidyColors.mute;
-    final surfaceC = isDark ? GuidyColors.darkSurface  : GuidyColors.surface;
-    final lineC    = isDark ? GuidyColors.darkLine     : GuidyColors.line;
-    final primaryC = isDark ? GuidyColors.darkPrimary  : GuidyColors.primary;
-    final accentC  = isDark ? GuidyColors.darkAccent   : GuidyColors.accent;
+    final pal = GuidyPalette.of(context);
 
     final userStore   = context.watch<UserStore>();
     final approvedAt  = userStore.creatorApprovedAt;
@@ -718,7 +691,7 @@ class _ApprovedView extends StatelessWidget {
         : '승인됨';
 
     return Scaffold(
-      backgroundColor: bgC,
+      backgroundColor: pal.bg,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -732,16 +705,16 @@ class _ApprovedView extends StatelessWidget {
                     child: Container(
                       width: 36, height: 36,
                       decoration: BoxDecoration(
-                        color: surfaceC,
+                        color: pal.surface,
                         borderRadius: GuidyRadius.mdBorder,
-                        border: Border.all(color: lineC),
+                        border: Border.all(color: pal.line),
                       ),
                       child: Icon(Icons.arrow_back_ios_new_rounded,
-                          size: 16, color: textC),
+                          size: 16, color: pal.text),
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Text('크리에이터 신청', style: GuidyText.h3(textC)),
+                  Text('크리에이터 신청', style: GuidyText.h3(pal.text)),
                 ],
               ),
             ),
@@ -770,12 +743,12 @@ class _ApprovedView extends StatelessWidget {
                     const SizedBox(height: 20),
 
                     Text('크리에이터 승인이 완료되었습니다!',
-                        style: GuidyText.h2(textC)
+                        style: GuidyText.h2(pal.text)
                             .copyWith(fontWeight: FontWeight.w800),
                         textAlign: TextAlign.center),
                     const SizedBox(height: 8),
                     Text('이제 오디오 가이드를 제작하고\n수익을 창출할 수 있습니다.',
-                        style: GuidyText.body(subC),
+                        style: GuidyText.body(pal.sub),
                         textAlign: TextAlign.center),
                     const SizedBox(height: 28),
 
@@ -801,13 +774,13 @@ class _ApprovedView extends StatelessWidget {
                           ]),
                           const SizedBox(height: 12),
                           _benefitRow(Icons.mic_rounded,
-                              '오디오 가이드 제작 · 업로드', primaryC, subC),
+                              '오디오 가이드 제작 · 업로드', pal.primary, pal.sub),
                           _benefitRow(Icons.attach_money_rounded,
-                              '판매 수익의 70% 정산', primaryC, subC),
+                              '판매 수익의 70% 정산', pal.primary, pal.sub),
                           _benefitRow(Icons.people_rounded,
-                              '팔로워와 소통하는 크리에이터 채널', primaryC, subC),
+                              '팔로워와 소통하는 크리에이터 채널', pal.primary, pal.sub),
                           _benefitRow(Icons.analytics_rounded,
-                              '실시간 재생 · 수익 통계 대시보드', primaryC, subC),
+                              '실시간 재생 · 수익 통계 대시보드', pal.primary, pal.sub),
                         ],
                       ),
                     ),
@@ -823,7 +796,7 @@ class _ApprovedView extends StatelessWidget {
                         width: double.infinity,
                         height: 50,
                         decoration: BoxDecoration(
-                          color: accentC,
+                          color: pal.accent,
                           borderRadius: GuidyRadius.lgBorder,
                         ),
                         child: Center(
@@ -850,13 +823,13 @@ class _ApprovedView extends StatelessWidget {
                         width: double.infinity,
                         height: 44,
                         decoration: BoxDecoration(
-                          color: surfaceC,
+                          color: pal.surface,
                           borderRadius: GuidyRadius.lgBorder,
-                          border: Border.all(color: lineC),
+                          border: Border.all(color: pal.line),
                         ),
                         child: Center(
                           child: Text('[개발용] 상태 초기화',
-                              style: GuidyText.small(muteC)
+                              style: GuidyText.small(pal.mute)
                                   .copyWith(fontWeight: FontWeight.w600)),
                         ),
                       ),
@@ -1034,18 +1007,13 @@ class _TermsModalState extends State<_TermsModal> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark    = Theme.of(context).brightness == Brightness.dark;
-    final bgC       = isDark ? GuidyColors.darkSurface : GuidyColors.surface;
-    final textC     = isDark ? GuidyColors.darkText    : GuidyColors.ink;
-    final subC      = isDark ? GuidyColors.darkSub     : GuidyColors.sub;
-    final lineC     = isDark ? GuidyColors.darkLine    : GuidyColors.line;
-    final primaryC  = isDark ? GuidyColors.darkPrimary : GuidyColors.primary;
+    final pal = GuidyPalette.of(context);
     final h         = MediaQuery.of(context).size.height;
 
     return Container(
       height: h * 0.85,
       decoration: BoxDecoration(
-        color: bgC,
+        color: pal.surface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(
@@ -1055,7 +1023,7 @@ class _TermsModalState extends State<_TermsModal> {
             margin: const EdgeInsets.only(top: 10),
             width: 40, height: 4,
             decoration: BoxDecoration(
-              color: lineC,
+              color: pal.line,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -1064,14 +1032,14 @@ class _TermsModalState extends State<_TermsModal> {
             padding: const EdgeInsets.fromLTRB(20, 14, 16, 0),
             child: Row(
               children: [
-                Icon(Icons.gavel_rounded, color: primaryC, size: 18),
+                Icon(Icons.gavel_rounded, color: pal.primary, size: 18),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(widget.title,
-                      style: GuidyText.h3(textC)),
+                      style: GuidyText.h3(pal.text)),
                 ),
                 IconButton(
-                  icon: Icon(Icons.close_rounded, color: subC, size: 20),
+                  icon: Icon(Icons.close_rounded, color: pal.sub, size: 20),
                   onPressed: () => Navigator.pop(context),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(
@@ -1081,18 +1049,18 @@ class _TermsModalState extends State<_TermsModal> {
               ],
             ),
           ),
-          Divider(color: lineC, height: 1),
+          Divider(color: pal.line, height: 1),
           // 내용
           Expanded(
             child: _loading
                 ? Center(
                     child: CircularProgressIndicator(
-                        color: primaryC, strokeWidth: 2))
+                        color: pal.primary, strokeWidth: 2))
                 : SingleChildScrollView(
                     padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
                     child: Text(
                       _content ?? '',
-                      style: GuidyText.body(subC).copyWith(
+                      style: GuidyText.body(pal.sub).copyWith(
                         height: 1.8,
                         fontSize: 13,
                       ),
@@ -1111,7 +1079,7 @@ class _TermsModalState extends State<_TermsModal> {
                   child: Container(
                     height: 48,
                     decoration: BoxDecoration(
-                      color: primaryC,
+                      color: pal.primary,
                       borderRadius: GuidyRadius.lgBorder,
                     ),
                     child: Center(

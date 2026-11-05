@@ -12,15 +12,10 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgC = isDark ? GuidyColors.darkBg : GuidyColors.bg;
-    final textC = isDark ? GuidyColors.darkText : GuidyColors.ink;
-    final subC = isDark ? GuidyColors.darkSub : GuidyColors.sub;
-    final muteC = isDark ? GuidyColors.darkMute : GuidyColors.mute;
-    final lineC = isDark ? GuidyColors.darkLine : GuidyColors.line;
-    final primaryC = isDark ? GuidyColors.darkPrimary : GuidyColors.primary;
+    final pal = GuidyPalette.of(context);
 
     return Scaffold(
-      backgroundColor: bgC,
+      backgroundColor: pal.bg,
       body: SafeArea(
         child: Column(
           children: [
@@ -38,11 +33,11 @@ class LoginScreen extends StatelessWidget {
                     child: Container(
                       width: 36, height: 36,
                       decoration: BoxDecoration(
-                        color: isDark ? GuidyColors.darkSurface : GuidyColors.surface,
+                        color: pal.surface,
                         shape: BoxShape.circle,
-                        border: Border.all(color: lineC),
+                        border: Border.all(color: pal.line),
                       ),
-                      child: Icon(Icons.close_rounded, size: 18, color: muteC),
+                      child: Icon(Icons.close_rounded, size: 18, color: pal.mute),
                     ),
                   ),
                 ],
@@ -74,17 +69,17 @@ class LoginScreen extends StatelessWidget {
                     Text('Guidy', style: TextStyle(
                       fontFamily: GuidyText.fontFamily,
                       fontSize: 28, fontWeight: FontWeight.w800,
-                      letterSpacing: -1.0, color: textC,
+                      letterSpacing: -1.0, color: pal.text,
                     )),
                     const SizedBox(height: 6),
-                    Text('오디오 가이드 마켓플레이스', style: GuidyText.small(subC)),
+                    Text('오디오 가이드 마켓플레이스', style: GuidyText.small(pal.sub)),
 
                     const SizedBox(height: 40),
 
                     // 타이틀
-                    Text('로그인', style: GuidyText.h2(textC)),
+                    Text('로그인', style: GuidyText.h2(pal.text)),
                     const SizedBox(height: 6),
-                    Text('계속하려면 로그인해 주세요', style: GuidyText.body(subC)),
+                    Text('계속하려면 로그인해 주세요', style: GuidyText.body(pal.sub)),
 
                     const SizedBox(height: 32),
 
@@ -134,12 +129,12 @@ class LoginScreen extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 20),
                       child: Row(
                         children: [
-                          Expanded(child: Divider(color: lineC)),
+                          Expanded(child: Divider(color: pal.line)),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 14),
-                            child: Text('또는', style: GuidyText.small(muteC)),
+                            child: Text('또는', style: GuidyText.small(pal.mute)),
                           ),
-                          Expanded(child: Divider(color: lineC)),
+                          Expanded(child: Divider(color: pal.line)),
                         ],
                       ),
                     ),
@@ -147,10 +142,10 @@ class LoginScreen extends StatelessWidget {
                     // 이메일 로그인
                     _SocialLoginButton(
                       label: '이메일로 로그인',
-                      iconWidget: Icon(Icons.email_outlined, color: textC, size: 20),
-                      bgColor: isDark ? GuidyColors.darkSurface : GuidyColors.surface,
-                      textColor: textC,
-                      borderColor: lineC,
+                      iconWidget: Icon(Icons.email_outlined, color: pal.text, size: 20),
+                      bgColor: pal.surface,
+                      textColor: pal.text,
+                      borderColor: pal.line,
                       onTap: () {
                         Navigator.push(context, MaterialPageRoute(
                           builder: (_) => const EmailLoginScreen(),
@@ -164,14 +159,14 @@ class LoginScreen extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text('계정이 없으신가요? ', style: GuidyText.small(subC)),
+                        Text('계정이 없으신가요? ', style: GuidyText.small(pal.sub)),
                         GestureDetector(
                           onTap: () {
                             Navigator.push(context, MaterialPageRoute(
                               builder: (_) => const SignupScreen(),
                             ));
                           },
-                          child: Text('회원가입', style: GuidyText.small(primaryC).copyWith(
+                          child: Text('회원가입', style: GuidyText.small(pal.primary).copyWith(
                             fontWeight: FontWeight.w800,
                           )),
                         ),
@@ -183,7 +178,7 @@ class LoginScreen extends StatelessWidget {
                     // 약관 동의
                     Text(
                       '계속하면 Guidy의 이용약관 및 개인정보처리방침에 동의하는 것으로 간주됩니다.',
-                      style: GuidyText.kicker(muteC),
+                      style: GuidyText.kicker(pal.mute),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 40),

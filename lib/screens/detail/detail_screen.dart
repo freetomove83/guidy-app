@@ -41,19 +41,13 @@ class _DetailScreenState extends State<DetailScreen> {
     final canPlay = userStore.canAccess(exhibition);
 
     final isDark    = Theme.of(context).brightness == Brightness.dark;
-    final bgC       = isDark ? GuidyColors.darkBg      : GuidyColors.bg;
-    final textC     = isDark ? GuidyColors.darkText     : GuidyColors.ink;
-    final subC      = isDark ? GuidyColors.darkSub      : GuidyColors.sub;
-    final muteC     = isDark ? GuidyColors.darkMute     : GuidyColors.mute;
-    final surfaceC  = isDark ? GuidyColors.darkSurface  : GuidyColors.surface;
-    final lineC     = isDark ? GuidyColors.darkLine     : GuidyColors.line;
-    final accentC   = isDark ? GuidyColors.darkAccent   : GuidyColors.accent;
+    final pal = GuidyPalette.of(context);
     final accentSoftC = isDark
         ? GuidyColors.darkAccent.withValues(alpha: 0.14)
         : GuidyColors.accentSoft;
 
     return Scaffold(
-      backgroundColor: bgC,
+      backgroundColor: pal.bg,
       body: Stack(
         children: [
           CustomScrollView(
@@ -76,7 +70,7 @@ class _DetailScreenState extends State<DetailScreen> {
                               gradient: LinearGradient(
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
-                                colors: [Colors.transparent, bgC.withValues(alpha: 0.8)],
+                                colors: [Colors.transparent, pal.bg.withValues(alpha: 0.8)],
                                 stops: const [0.5, 1.0],
                               ),
                             ),
@@ -128,12 +122,12 @@ class _DetailScreenState extends State<DetailScreen> {
                                       context,
                                       exhibition,
                                       isDark: isDark,
-                                      bgC: bgC,
-                                      textC: textC,
-                                      subC: subC,
-                                      muteC: muteC,
-                                      lineC: lineC,
-                                      surfaceC: surfaceC,
+                                      bgC: pal.bg,
+                                      textC: pal.text,
+                                      subC: pal.sub,
+                                      muteC: pal.mute,
+                                      lineC: pal.line,
+                                      surfaceC: pal.surface,
                                     ),
                                     child: Container(
                                       width: 36, height: 36,
@@ -188,12 +182,12 @@ class _DetailScreenState extends State<DetailScreen> {
                                   decoration: BoxDecoration(
                                     color: isLiked
                                         ? Colors.red.withValues(alpha: 0.12)
-                                        : surfaceC,
+                                        : pal.surface,
                                     borderRadius: GuidyRadius.pillBorder,
                                     border: Border.all(
                                       color: isLiked
                                           ? Colors.red.withValues(alpha: 0.4)
-                                          : lineC,
+                                          : pal.line,
                                     ),
                                   ),
                                   child: Row(
@@ -204,13 +198,13 @@ class _DetailScreenState extends State<DetailScreen> {
                                             ? Icons.thumb_up_rounded
                                             : Icons.thumb_up_outlined,
                                         size: 16,
-                                        color: isLiked ? Colors.red : muteC,
+                                        color: isLiked ? Colors.red : pal.mute,
                                       ),
                                       const SizedBox(width: 5),
                                       Text(
                                         isLiked ? '좋아요' : '좋아요',
                                         style: GuidyText.small(
-                                          isLiked ? Colors.red : muteC,
+                                          isLiked ? Colors.red : pal.mute,
                                         ).copyWith(fontWeight: FontWeight.w600),
                                       ),
                                     ],
@@ -220,10 +214,10 @@ class _DetailScreenState extends State<DetailScreen> {
                             ],
                           ),
                           const SizedBox(height: 12),
-                          Text(exhibition.title, style: GuidyText.h1(textC)),
+                          Text(exhibition.title, style: GuidyText.h1(pal.text)),
                           const SizedBox(height: 10),
                           Text(exhibition.description,
-                            style: GuidyText.body(subC),
+                            style: GuidyText.body(pal.sub),
                             maxLines: 3, overflow: TextOverflow.ellipsis),
                           const SizedBox(height: 20),
 
@@ -231,25 +225,25 @@ class _DetailScreenState extends State<DetailScreen> {
                           Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: surfaceC,
+                              color: pal.surface,
                               borderRadius: GuidyRadius.lgBorder,
-                              border: Border.all(color: lineC),
+                              border: Border.all(color: pal.line),
                             ),
                             child: Column(
                               children: [
                                 Row(
                                   children: [
-                                    _metaItem(Icons.place_outlined, '장소', exhibition.venue, textC, muteC),
-                                    _metaItem(Icons.image_outlined, '작품 수', '${exhibition.workCount}개', textC, muteC),
+                                    _metaItem(Icons.place_outlined, '장소', exhibition.venue, pal.text, pal.mute),
+                                    _metaItem(Icons.image_outlined, '작품 수', '${exhibition.workCount}개', pal.text, pal.mute),
                                   ],
                                 ),
-                                Divider(color: lineC, height: 20),
+                                Divider(color: pal.line, height: 20),
                                 Row(
                                   children: [
-                                    _metaItem(Icons.timer_outlined, '소요 시간', exhibition.duration, textC, muteC),
+                                    _metaItem(Icons.timer_outlined, '소요 시간', exhibition.duration, pal.text, pal.mute),
                                     _metaItem(Icons.attach_money_rounded, '이용료',
                                       exhibition.price == 0 ? '무료' : '₩${formatPrice(exhibition.price)}',
-                                      textC, muteC),
+                                      pal.text, pal.mute),
                                   ],
                                 ),
                               ],
@@ -268,26 +262,26 @@ class _DetailScreenState extends State<DetailScreen> {
                                 decoration: BoxDecoration(
                                   color: accentSoftC,
                                   borderRadius: GuidyRadius.lgBorder,
-                                  border: Border.all(color: accentC.withValues(alpha: 0.3)),
+                                  border: Border.all(color: pal.accent.withValues(alpha: 0.3)),
                                 ),
                                 child: Row(
                                   children: [
-                                    Icon(Icons.mic_rounded, color: accentC, size: 20),
+                                    Icon(Icons.mic_rounded, color: pal.accent, size: 20),
                                     const SizedBox(width: 10),
                                     Expanded(
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Text('이 전시의 크리에이터 가이드',
-                                            style: GuidyText.small(accentC)
+                                            style: GuidyText.small(pal.accent)
                                                 .copyWith(fontWeight: FontWeight.w800)),
                                           Text('다른 관점에서 감상해보세요',
-                                            style: GuidyText.small(subC)),
+                                            style: GuidyText.small(pal.sub)),
                                         ],
                                       ),
                                     ),
                                     Text('${guides.length}개 →',
-                                      style: GuidyText.small(accentC)
+                                      style: GuidyText.small(pal.accent)
                                           .copyWith(fontWeight: FontWeight.w700)),
                                   ],
                                 ),
@@ -295,20 +289,20 @@ class _DetailScreenState extends State<DetailScreen> {
                             ),
 
                           // 섹션 리스트 (실제 데이터)
-                          Text('섹션 구성', style: GuidyText.h3(textC)),
+                          Text('섹션 구성', style: GuidyText.h3(pal.text)),
                           const SizedBox(height: 12),
                           if (sections.isEmpty)
                             // 더미 섹션 표시 (섹션 데이터 없을 때) — 탭 불가
                             ...List.generate(3, (i) =>
-                              _sectionItemDummy(i + 1, textC, subC, lineC, surfaceC))
+                              _sectionItemDummy(i + 1, pal.text, pal.sub, pal.line, pal.surface))
                           else
                             ...sections.map((section) => GestureDetector(
                               onTap: () => Navigator.pushNamed(
                                 context, '/section/${section.id}'),
                               child: _SectionCard(
                                 section: section,
-                                textC: textC, subC: subC,
-                                lineC: lineC, surfaceC: surfaceC,
+                                textC: pal.text, subC: pal.sub,
+                                lineC: pal.line, surfaceC: pal.surface,
                               ),
                             )),
 
@@ -329,8 +323,8 @@ class _DetailScreenState extends State<DetailScreen> {
               padding: EdgeInsets.fromLTRB(20, 16, 20,
                 MediaQuery.of(context).padding.bottom + 16),
               decoration: BoxDecoration(
-                color: bgC,
-                border: Border(top: BorderSide(color: lineC)),
+                color: pal.bg,
+                border: Border(top: BorderSide(color: pal.line)),
                 boxShadow: GuidyShadow.up,
               ),
               child: Column(
@@ -388,9 +382,7 @@ class _DetailScreenState extends State<DetailScreen> {
                               // 무료/이미구매 → 녹색, 유료구매 → 기본
                               color: canPlay
                                   ? GuidyColors.ok
-                                  : (isDark
-                                      ? GuidyColors.darkText
-                                      : GuidyColors.ink),
+                                  : (pal.text),
                               borderRadius: GuidyRadius.pillBorder,
                             ),
                             child: Row(
@@ -628,7 +620,7 @@ class _ExhibitionShareSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final primaryC = isDark ? GuidyColors.darkPrimary : GuidyColors.primary;
+    final primaryC = GuidyPalette.forDark(isDark).primary;
 
     return Container(
       margin: const EdgeInsets.fromLTRB(12, 0, 12, 24),
@@ -710,7 +702,7 @@ class _ExhibitionShareSheet extends StatelessWidget {
               margin: const EdgeInsets.fromLTRB(20, 12, 20, 0),
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               decoration: BoxDecoration(
-                color: isDark ? GuidyColors.darkBgAlt : GuidyColors.bgAlt,
+                color: GuidyPalette.forDark(isDark).bgAlt,
                 borderRadius: GuidyRadius.lgBorder,
                 border: Border.all(color: lineC),
               ),

@@ -27,17 +27,10 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgC = isDark ? GuidyColors.darkBg : GuidyColors.bg;
-    final textC = isDark ? GuidyColors.darkText : GuidyColors.ink;
-    final subC = isDark ? GuidyColors.darkSub : GuidyColors.sub;
-    final muteC = isDark ? GuidyColors.darkMute : GuidyColors.mute;
-    final surfaceC = isDark ? GuidyColors.darkSurface : GuidyColors.surface;
-    final lineC = isDark ? GuidyColors.darkLine : GuidyColors.line;
-    final primaryC = isDark ? GuidyColors.darkPrimary : GuidyColors.primary;
+    final pal = GuidyPalette.of(context);
 
     return Scaffold(
-      backgroundColor: bgC,
+      backgroundColor: pal.bg,
       body: SafeArea(
         child: Column(
           children: [
@@ -48,41 +41,41 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('환영합니다', style: GuidyText.h2(textC)),
+                    Text('환영합니다', style: GuidyText.h2(pal.text)),
                     const SizedBox(height: 6),
-                    Text('이메일과 비밀번호를 입력해주세요', style: GuidyText.body(subC)),
+                    Text('이메일과 비밀번호를 입력해주세요', style: GuidyText.body(pal.sub)),
                     const SizedBox(height: 32),
 
                     // 이메일 입력
-                    GuidyInputLabel(label: '이메일', textC: textC),
+                    GuidyInputLabel(label: '이메일', textC: pal.text),
                     const SizedBox(height: 6),
                     GuidyInputField(
                       controller: _emailController,
                       hint: 'example@email.com',
                       keyboardType: TextInputType.emailAddress,
-                      surfaceC: surfaceC,
-                      lineC: lineC,
-                      textC: textC,
-                      subC: subC,
+                      surfaceC: pal.surface,
+                      lineC: pal.line,
+                      textC: pal.text,
+                      subC: pal.sub,
                     ),
                     const SizedBox(height: 16),
 
                     // 비밀번호 입력
-                    GuidyInputLabel(label: '비밀번호', textC: textC),
+                    GuidyInputLabel(label: '비밀번호', textC: pal.text),
                     const SizedBox(height: 6),
                     GuidyInputField(
                       controller: _passwordController,
                       hint: '비밀번호 입력',
                       obscureText: _obscurePassword,
-                      surfaceC: surfaceC,
-                      lineC: lineC,
-                      textC: textC,
-                      subC: subC,
+                      surfaceC: pal.surface,
+                      lineC: pal.line,
+                      textC: pal.text,
+                      subC: pal.sub,
                       suffix: GestureDetector(
                         onTap: () => setState(() => _obscurePassword = !_obscurePassword),
                         child: Icon(
                           _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                          size: 20, color: muteC,
+                          size: 20, color: pal.mute,
                         ),
                       ),
                     ),
@@ -93,8 +86,8 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                       child: Padding(
                         padding: const EdgeInsets.only(top: 10),
                         child: GestureDetector(
-                          onTap: () => _showForgotPasswordDialog(context, primaryC, bgC, textC, subC, surfaceC, lineC, muteC),
-                          child: Text('비밀번호 찾기', style: GuidyText.small(primaryC).copyWith(fontWeight: FontWeight.w700)),
+                          onTap: () => _showForgotPasswordDialog(context, pal.primary, pal.bg, pal.text, pal.sub, pal.surface, pal.line, pal.mute),
+                          child: Text('비밀번호 찾기', style: GuidyText.small(pal.primary).copyWith(fontWeight: FontWeight.w700)),
                         ),
                       ),
                     ),
@@ -108,7 +101,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                         width: double.infinity,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         decoration: BoxDecoration(
-                          color: primaryC,
+                          color: pal.primary,
                           borderRadius: GuidyRadius.lgBorder,
                           boxShadow: GuidyShadow.pop,
                         ),
@@ -130,13 +123,13 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text('계정이 없으신가요? ', style: GuidyText.small(subC)),
+                          Text('계정이 없으신가요? ', style: GuidyText.small(pal.sub)),
                           GestureDetector(
                             onTap: () {
                               Navigator.pop(context);
                               Navigator.pushNamed(context, '/signup');
                             },
-                            child: Text('회원가입', style: GuidyText.small(primaryC).copyWith(fontWeight: FontWeight.w800)),
+                            child: Text('회원가입', style: GuidyText.small(pal.primary).copyWith(fontWeight: FontWeight.w800)),
                           ),
                         ],
                       ),

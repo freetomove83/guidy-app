@@ -13,28 +13,26 @@ class FollowingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgC = isDark ? GuidyColors.darkBg : GuidyColors.bg;
-    final textC = isDark ? GuidyColors.darkText : GuidyColors.ink;
-    final lineC = isDark ? GuidyColors.darkLine : GuidyColors.line;
+    final pal = GuidyPalette.of(context);
 
     return Scaffold(
-      backgroundColor: bgC,
+      backgroundColor: pal.bg,
       body: SafeArea(
         bottom: false,
         child: Column(
           children: [
             GuidyHeader(title: '팔로잉', showBack: true),
-            Container(height: 1, color: lineC),
+            Container(height: 1, color: pal.line),
             Expanded(
               child: ListView(
                 padding: EdgeInsets.zero,
                 children: [
                   // 스토리 스트립
                   _StoryStrip(),
-                  Container(height: 1, color: lineC),
+                  Container(height: 1, color: pal.line),
                   const SizedBox(height: 12),
                   // 피드
-                  ...DummyData.feedItems.map((item) => _FeedCard(item: item, isDark: isDark, textC: textC)),
+                  ...DummyData.feedItems.map((item) => _FeedCard(item: item, isDark: isDark, textC: pal.text)),
                   const SizedBox(height: 80),
                 ],
               ),
@@ -49,9 +47,7 @@ class FollowingScreen extends StatelessWidget {
 class _StoryStrip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final subC = isDark ? GuidyColors.darkSub : GuidyColors.sub;
-    final accentC = isDark ? GuidyColors.darkAccent : GuidyColors.accent;
+    final pal = GuidyPalette.of(context);
 
     return SizedBox(
       height: 90,
@@ -78,10 +74,10 @@ class _StoryStrip extends StatelessWidget {
                           child: Container(
                             width: 16, height: 16,
                             decoration: BoxDecoration(
-                              color: accentC,
+                              color: pal.accent,
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: isDark ? GuidyColors.darkBg : GuidyColors.bg,
+                                color: pal.bg,
                                 width: 2,
                               ),
                             ),
@@ -91,7 +87,7 @@ class _StoryStrip extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 4),
-                  Text(cr.name, style: GuidyText.kicker(subC),
+                  Text(cr.name, style: GuidyText.kicker(pal.sub),
                     maxLines: 1, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center),
                 ],
               ),
@@ -122,11 +118,11 @@ class _FeedCardState extends State<_FeedCard> {
     final isDark = widget.isDark;
     final textC = widget.textC;
     final item = widget.item;
-    final subC = isDark ? GuidyColors.darkSub : GuidyColors.sub;
-    final muteC = isDark ? GuidyColors.darkMute : GuidyColors.mute;
-    final surfaceC = isDark ? GuidyColors.darkSurface : GuidyColors.surface;
-    final lineC = isDark ? GuidyColors.darkLine : GuidyColors.line;
-    final accentC = isDark ? GuidyColors.darkAccent : GuidyColors.accent;
+    final subC = GuidyPalette.forDark(isDark).sub;
+    final muteC = GuidyPalette.forDark(isDark).mute;
+    final surfaceC = GuidyPalette.forDark(isDark).surface;
+    final lineC = GuidyPalette.forDark(isDark).line;
+    final accentC = GuidyPalette.forDark(isDark).accent;
 
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 0, 20, 12),
@@ -157,7 +153,7 @@ class _FeedCardState extends State<_FeedCard> {
                         Text(item.creator.name, style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w700)),
                         const SizedBox(width: 4),
                         if (item.creator.isVerified)
-                          Icon(Icons.verified_rounded, color: isDark ? GuidyColors.darkPrimary : GuidyColors.primary, size: 14),
+                          Icon(Icons.verified_rounded, color: GuidyPalette.forDark(isDark).primary, size: 14),
                       ],
                     ),
                     Text(_timeAgo(item.time), style: GuidyText.small(muteC)),

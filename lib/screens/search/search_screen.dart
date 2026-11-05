@@ -50,24 +50,17 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgC = isDark ? GuidyColors.darkBg : GuidyColors.bg;
-    final textC = isDark ? GuidyColors.darkText : GuidyColors.ink;
-    final subC = isDark ? GuidyColors.darkSub : GuidyColors.sub;
-    final muteC = isDark ? GuidyColors.darkMute : GuidyColors.mute;
-    final surfaceC = isDark ? GuidyColors.darkSurface : GuidyColors.surface;
-    final lineC = isDark ? GuidyColors.darkLine : GuidyColors.line;
-    final primaryC = isDark ? GuidyColors.darkPrimary : GuidyColors.primary;
-    final accentC = isDark ? GuidyColors.darkAccent : GuidyColors.accent;
+    final pal = GuidyPalette.of(context);
 
     return Scaffold(
-      backgroundColor: bgC,
+      backgroundColor: pal.bg,
       body: SafeArea(
         bottom: false,
         child: Column(
           children: [
             // 검색바 헤더
             Container(
-              color: bgC,
+              color: pal.bg,
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
               child: Row(
                 children: [
@@ -77,11 +70,11 @@ class _SearchScreenState extends State<SearchScreen> {
                     child: Container(
                       width: 36, height: 36,
                       decoration: BoxDecoration(
-                        color: surfaceC,
+                        color: pal.surface,
                         borderRadius: GuidyRadius.mdBorder,
-                        border: Border.all(color: lineC),
+                        border: Border.all(color: pal.line),
                       ),
-                      child: Icon(Icons.arrow_back_ios_new_rounded, size: 16, color: textC),
+                      child: Icon(Icons.arrow_back_ios_new_rounded, size: 16, color: pal.text),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -90,24 +83,24 @@ class _SearchScreenState extends State<SearchScreen> {
                     child: Container(
                       height: 42,
                       decoration: BoxDecoration(
-                        color: surfaceC,
+                        color: pal.surface,
                         borderRadius: GuidyRadius.lgBorder,
-                        border: Border.all(color: _hasFocus ? primaryC : lineC, width: _hasFocus ? 1.5 : 1),
+                        border: Border.all(color: _hasFocus ? pal.primary : pal.line, width: _hasFocus ? 1.5 : 1),
                       ),
                       child: Row(
                         children: [
                           const SizedBox(width: 12),
-                          Icon(Icons.search_rounded, size: 18, color: muteC),
+                          Icon(Icons.search_rounded, size: 18, color: pal.mute),
                           const SizedBox(width: 8),
                           Expanded(
                             child: TextField(
                               controller: _searchController,
                               focusNode: _focusNode,
                               onChanged: (v) => setState(() => _query = v),
-                              style: GuidyText.body(textC),
+                              style: GuidyText.body(pal.text),
                               decoration: InputDecoration(
                                 hintText: '전시, 크리에이터, 미술관 검색',
-                                hintStyle: GuidyText.body(muteC),
+                                hintStyle: GuidyText.body(pal.mute),
                                 border: InputBorder.none,
                                 isDense: true,
                                 contentPadding: EdgeInsets.zero,
@@ -122,7 +115,7 @@ class _SearchScreenState extends State<SearchScreen> {
                               },
                               child: Padding(
                                 padding: const EdgeInsets.only(right: 10),
-                                child: Icon(Icons.cancel_rounded, size: 16, color: muteC),
+                                child: Icon(Icons.cancel_rounded, size: 16, color: pal.mute),
                               ),
                             ),
                         ],
@@ -136,8 +129,8 @@ class _SearchScreenState extends State<SearchScreen> {
             // 콘텐츠
             Expanded(
               child: _query.isEmpty
-                  ? _buildEmptyState(context, textC, subC, muteC, surfaceC, lineC, primaryC, accentC, bgC, isDark)
-                  : _buildSearchResults(context, textC, subC, muteC),
+                  ? _buildEmptyState(context, pal.text, pal.sub, pal.mute, pal.surface, pal.line, pal.primary, pal.accent, pal.bg, isDark)
+                  : _buildSearchResults(context, pal.text, pal.sub, pal.mute),
             ),
           ],
         ),
@@ -281,9 +274,7 @@ class _SearchScreenState extends State<SearchScreen> {
       );
     }
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final surfaceC = isDark ? GuidyColors.darkSurface : GuidyColors.surface;
-    final lineC = isDark ? GuidyColors.darkLine : GuidyColors.line;
+    final pal = GuidyPalette.of(context);
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 100),
@@ -297,9 +288,9 @@ class _SearchScreenState extends State<SearchScreen> {
             child: Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: surfaceC,
+                color: pal.surface,
                 borderRadius: GuidyRadius.lgBorder,
-                border: Border.all(color: lineC),
+                border: Border.all(color: pal.line),
               ),
               child: Row(
                 children: [

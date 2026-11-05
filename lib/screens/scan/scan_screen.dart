@@ -340,16 +340,12 @@ class _BeaconToastState extends State<BeaconToast> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final surfaceC = isDark ? GuidyColors.darkSurface : GuidyColors.surface;
-    final textC = isDark ? GuidyColors.darkText : GuidyColors.ink;
-    final subC = isDark ? GuidyColors.darkSub : GuidyColors.sub;
-    final primaryC = isDark ? GuidyColors.darkPrimary : GuidyColors.primary;
+    final pal = GuidyPalette.of(context);
 
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: surfaceC,
+        color: pal.surface,
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(24),
           topRight: Radius.circular(24),
@@ -367,13 +363,13 @@ class _BeaconToastState extends State<BeaconToast> {
                 height: 60.0 + i * 30,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: primaryC.withValues(alpha: 0.04 * (3 - i).toDouble()),
+                  color: pal.primary.withValues(alpha: 0.04 * (3 - i).toDouble()),
                 ),
               )),
               Container(
                 width: 44, height: 44,
                 decoration: BoxDecoration(
-                  color: primaryC,
+                  color: pal.primary,
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.bluetooth_searching_rounded, color: Colors.white, size: 20),
@@ -381,10 +377,10 @@ class _BeaconToastState extends State<BeaconToast> {
             ],
           ),
           const SizedBox(height: 16),
-          Text('근처에서 감지됨', style: GuidyText.small(subC)),
+          Text('근처에서 감지됨', style: GuidyText.small(pal.sub)),
           const SizedBox(height: 4),
-          Text(widget.artworkTitle, style: GuidyText.h3(textC)),
-          Text(widget.artistName, style: GuidyText.body(subC)),
+          Text(widget.artworkTitle, style: GuidyText.h3(pal.text)),
+          Text(widget.artistName, style: GuidyText.body(pal.sub)),
           const SizedBox(height: 20),
 
           // 3초 프로그레스
@@ -393,7 +389,7 @@ class _BeaconToastState extends State<BeaconToast> {
             child: LinearProgressIndicator(
               value: _countdown / 3,
               backgroundColor: GuidyColors.line,
-              valueColor: AlwaysStoppedAnimation<Color>(primaryC),
+              valueColor: AlwaysStoppedAnimation<Color>(pal.primary),
               minHeight: 3,
             ),
           ),
@@ -407,11 +403,11 @@ class _BeaconToastState extends State<BeaconToast> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     decoration: BoxDecoration(
-                      color: isDark ? GuidyColors.darkBgAlt : GuidyColors.bgAlt,
+                      color: pal.bgAlt,
                       borderRadius: GuidyRadius.pillBorder,
                     ),
                     child: Text('나중에', textAlign: TextAlign.center,
-                      style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w700)),
+                      style: GuidyText.body(pal.text).copyWith(fontWeight: FontWeight.w700)),
                   ),
                 ),
               ),
@@ -422,7 +418,7 @@ class _BeaconToastState extends State<BeaconToast> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     decoration: BoxDecoration(
-                      color: primaryC,
+                      color: pal.primary,
                       borderRadius: GuidyRadius.pillBorder,
                     ),
                     child: Row(

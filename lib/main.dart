@@ -202,7 +202,7 @@ class _MainShellState extends State<MainShell> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final pal = GuidyPalette.of(context);
 
     // 현재 재생 중인 작품 → 미니플레이어 표시
     final audio = context.watch<GuidyAudioService>();
@@ -213,11 +213,6 @@ class _MainShellState extends State<MainShell> {
         ? null
         : store.exhibitionById(nowPlaying.exhibitionId);
 
-    final surfaceC = isDark ? GuidyColors.darkSurface : GuidyColors.surface;
-    final lineC = isDark ? GuidyColors.darkLine : GuidyColors.line;
-    final primaryC = isDark ? GuidyColors.darkPrimary : GuidyColors.primary;
-    final muteC = isDark ? GuidyColors.darkMute : GuidyColors.mute;
-    final textC = isDark ? GuidyColors.darkText : GuidyColors.ink;
 
     return Scaffold(
       body: IndexedStack(
@@ -226,8 +221,8 @@ class _MainShellState extends State<MainShell> {
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: surfaceC,
-          border: Border(top: BorderSide(color: lineC)),
+          color: pal.surface,
+          border: Border(top: BorderSide(color: pal.line)),
           boxShadow: GuidyShadow.up,
         ),
         child: SafeArea(
@@ -260,10 +255,10 @@ class _MainShellState extends State<MainShell> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    _navItem(Icons.home_rounded, Icons.home_outlined, '홈', 0, primaryC, muteC, textC),
-                    _navItemScan(primaryC),
-                    _navItem(Icons.library_books_rounded, Icons.library_books_outlined, '서재', 2, primaryC, muteC, textC),
-                    _navItem(Icons.person_rounded, Icons.person_outline_rounded, '내 정보', 3, primaryC, muteC, textC),
+                    _navItem(Icons.home_rounded, Icons.home_outlined, '홈', 0, pal.primary, pal.mute, pal.text),
+                    _navItemScan(pal.primary),
+                    _navItem(Icons.library_books_rounded, Icons.library_books_outlined, '서재', 2, pal.primary, pal.mute, pal.text),
+                    _navItem(Icons.person_rounded, Icons.person_outline_rounded, '내 정보', 3, pal.primary, pal.mute, pal.text),
                   ],
                 ),
               ),
@@ -298,8 +293,7 @@ class _MainShellState extends State<MainShell> {
   }
 
   Widget _navItemScan(Color primaryC) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final accentC = isDark ? GuidyColors.darkAccent : GuidyColors.accent;
+    final pal = GuidyPalette.of(context);
 
     return GestureDetector(
       onTap: () => Navigator.pushNamed(context, '/scan'),
@@ -311,16 +305,16 @@ class _MainShellState extends State<MainShell> {
             Container(
               width: 36, height: 36,
               decoration: BoxDecoration(
-                color: accentC.withValues(alpha: 0.12),
+                color: pal.accent.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(Icons.qr_code_scanner_rounded, color: accentC, size: 20),
+              child: Icon(Icons.qr_code_scanner_rounded, color: pal.accent, size: 20),
             ),
             const SizedBox(height: 2),
             Text('스캔', style: TextStyle(
               fontFamily: GuidyText.fontFamily, fontSize: 10,
               fontWeight: FontWeight.w700,
-              color: accentC,
+              color: pal.accent,
             )),
           ],
         ),
@@ -336,22 +330,17 @@ class _SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgC = isDark ? GuidyColors.darkBg : GuidyColors.bg;
-    final textC = isDark ? GuidyColors.darkText : GuidyColors.ink;
-    final subC = isDark ? GuidyColors.darkSub : GuidyColors.sub;
-    final muteC = isDark ? GuidyColors.darkMute : GuidyColors.mute;
-    final surfaceC = isDark ? GuidyColors.darkSurface : GuidyColors.surface;
-    final lineC = isDark ? GuidyColors.darkLine : GuidyColors.line;
+    final pal = GuidyPalette.of(context);
 
     return Scaffold(
-      backgroundColor: bgC,
+      backgroundColor: pal.bg,
       body: SafeArea(
         bottom: false,
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
             const SizedBox(height: 12),
-            Text('내 정보', style: GuidyText.h2(textC)),
+            Text('내 정보', style: GuidyText.h2(pal.text)),
             const SizedBox(height: 20),
 
             // 프로필 카드 (탭 시 로그인 화면)
@@ -360,9 +349,9 @@ class _SettingsPage extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: surfaceC,
+                  color: pal.surface,
                   borderRadius: GuidyRadius.xlBorder,
-                  border: Border.all(color: lineC),
+                  border: Border.all(color: pal.line),
                 ),
                 child: Row(
                   children: [
@@ -384,12 +373,12 @@ class _SettingsPage extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Guidy 사용자', style: GuidyText.h3(textC)),
-                          Text('로그인하여 더 많은 기능을 이용하세요', style: GuidyText.small(subC)),
+                          Text('Guidy 사용자', style: GuidyText.h3(pal.text)),
+                          Text('로그인하여 더 많은 기능을 이용하세요', style: GuidyText.small(pal.sub)),
                         ],
                       ),
                     ),
-                    Icon(Icons.chevron_right_rounded, color: muteC, size: 18),
+                    Icon(Icons.chevron_right_rounded, color: pal.mute, size: 18),
                   ],
                 ),
               ),
@@ -398,7 +387,7 @@ class _SettingsPage extends StatelessWidget {
             const SizedBox(height: 24),
 
             // 설정 메뉴
-            _settingItem(Icons.mic_rounded, '크리에이터 되기', '오디오 가이드를 만들어 수익을 창출하세요', context, surfaceC, lineC, textC, subC, () {
+            _settingItem(Icons.mic_rounded, '크리에이터 되기', '오디오 가이드를 만들어 수익을 창출하세요', context, pal.surface, pal.line, pal.text, pal.sub, () {
               final userStore = context.read<UserStore>();
               if (userStore.isCreator) {
                 // 이미 크리에이터 → 스튜디오로
@@ -415,20 +404,20 @@ class _SettingsPage extends StatelessWidget {
               builder: (context, themeP, _) => Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: surfaceC,
+                  color: pal.surface,
                   borderRadius: GuidyRadius.lgBorder,
-                  border: Border.all(color: lineC),
+                  border: Border.all(color: pal.line),
                 ),
                 child: Row(
                   children: [
-                    Icon(isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded, color: muteC, size: 20),
+                    Icon(isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded, color: pal.mute, size: 20),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('다크 모드', style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w600)),
-                          Text(isDark ? '현재 다크 모드' : '현재 라이트 모드', style: GuidyText.small(subC)),
+                          Text('다크 모드', style: GuidyText.body(pal.text).copyWith(fontWeight: FontWeight.w600)),
+                          Text(isDark ? '현재 다크 모드' : '현재 라이트 모드', style: GuidyText.small(pal.sub)),
                         ],
                       ),
                     ),
@@ -443,11 +432,11 @@ class _SettingsPage extends StatelessWidget {
             ),
             const SizedBox(height: 8),
 
-            _settingItem(Icons.help_outline_rounded, '도움말', '사용 방법 및 FAQ', context, surfaceC, lineC, textC, subC, () {
+            _settingItem(Icons.help_outline_rounded, '도움말', '사용 방법 및 FAQ', context, pal.surface, pal.line, pal.text, pal.sub, () {
               Navigator.pushNamed(context, '/help');
             }),
             const SizedBox(height: 8),
-            _settingItem(Icons.info_outline_rounded, 'Guidy 소개', '버전 ${AboutScreen.currentVersion}', context, surfaceC, lineC, textC, subC, () {
+            _settingItem(Icons.info_outline_rounded, 'Guidy 소개', '버전 ${AboutScreen.currentVersion}', context, pal.surface, pal.line, pal.text, pal.sub, () {
               Navigator.pushNamed(context, '/about');
             }),
 
@@ -469,10 +458,10 @@ class _SettingsPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Text('Guidy', style: GuidyText.h3(textC)),
-                  Text('오디오 가이드 마켓플레이스', style: GuidyText.small(subC)),
+                  Text('Guidy', style: GuidyText.h3(pal.text)),
+                  Text('오디오 가이드 마켓플레이스', style: GuidyText.small(pal.sub)),
                   const SizedBox(height: 4),
-                  Text('v${AboutScreen.currentVersion}', style: GuidyText.kicker(muteC)),
+                  Text('v${AboutScreen.currentVersion}', style: GuidyText.kicker(pal.mute)),
                 ],
               ),
             ),

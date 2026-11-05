@@ -20,16 +20,10 @@ class CreatorGuidesScreen extends StatelessWidget {
     final guides     = store.creatorGuidesFor(exhibitionId);
 
     final isDark   = Theme.of(context).brightness == Brightness.dark;
-    final bgC      = isDark ? GuidyColors.darkBg      : GuidyColors.bg;
-    final textC    = isDark ? GuidyColors.darkText     : GuidyColors.ink;
-    final subC     = isDark ? GuidyColors.darkSub      : GuidyColors.sub;
-    final lineC    = isDark ? GuidyColors.darkLine     : GuidyColors.line;
-    final surfaceC = isDark ? GuidyColors.darkSurface  : GuidyColors.surface;
-    final muteC    = isDark ? GuidyColors.darkMute     : GuidyColors.mute;
-    final accentC  = isDark ? GuidyColors.darkAccent   : GuidyColors.accent;
+    final pal = GuidyPalette.of(context);
 
     return Scaffold(
-      backgroundColor: bgC,
+      backgroundColor: pal.bg,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -45,12 +39,12 @@ class CreatorGuidesScreen extends StatelessWidget {
                     child: Container(
                       width: 36, height: 36,
                       decoration: BoxDecoration(
-                        color: surfaceC,
+                        color: pal.surface,
                         borderRadius: GuidyRadius.mdBorder,
-                        border: Border.all(color: lineC),
+                        border: Border.all(color: pal.line),
                       ),
                       child: Icon(Icons.arrow_back_ios_new_rounded,
-                          size: 16, color: textC),
+                          size: 16, color: pal.text),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -58,9 +52,9 @@ class CreatorGuidesScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('크리에이터 가이드', style: GuidyText.h3(textC)),
+                        Text('크리에이터 가이드', style: GuidyText.h3(pal.text)),
                         if (exhibition != null)
-                          Text(exhibition.title, style: GuidyText.small(subC)),
+                          Text(exhibition.title, style: GuidyText.small(pal.sub)),
                       ],
                     ),
                   ),
@@ -76,9 +70,9 @@ class CreatorGuidesScreen extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: accentC.withValues(alpha: 0.08),
+                    color: pal.accent.withValues(alpha: 0.08),
                     borderRadius: GuidyRadius.lgBorder,
-                    border: Border.all(color: accentC.withValues(alpha: 0.25)),
+                    border: Border.all(color: pal.accent.withValues(alpha: 0.25)),
                   ),
                   child: Row(
                     children: [
@@ -92,17 +86,17 @@ class CreatorGuidesScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(exhibition.title,
-                              style: GuidyText.body(textC)
+                              style: GuidyText.body(pal.text)
                                   .copyWith(fontWeight: FontWeight.w700),
                               maxLines: 1, overflow: TextOverflow.ellipsis),
                             Text(exhibition.venue,
-                                style: GuidyText.small(subC)),
+                                style: GuidyText.small(pal.sub)),
                             const SizedBox(height: 4),
                             Row(children: [
-                              Icon(Icons.mic_rounded, size: 12, color: accentC),
+                              Icon(Icons.mic_rounded, size: 12, color: pal.accent),
                               const SizedBox(width: 4),
                               Text('${guides.length}개의 크리에이터 가이드',
-                                style: GuidyText.kicker(accentC)
+                                style: GuidyText.kicker(pal.accent)
                                     .copyWith(fontWeight: FontWeight.w700)),
                             ]),
                           ],
@@ -119,7 +113,7 @@ class CreatorGuidesScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
               child: Row(
                 children: [
-                  Text('가이드 선택', style: GuidyText.h3(textC)),
+                  Text('가이드 선택', style: GuidyText.h3(pal.text)),
                   const Spacer(),
                   Container(
                     padding: const EdgeInsets.symmetric(
@@ -147,7 +141,7 @@ class CreatorGuidesScreen extends StatelessWidget {
             // ─── 가이드 목록 ────────────────────────────
             Expanded(
               child: guides.isEmpty
-                  ? _EmptyGuides(muteC: muteC)
+                  ? _EmptyGuides(muteC: pal.mute)
                   : ListView.builder(
                       padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
                       itemCount: guides.length,
@@ -155,9 +149,9 @@ class CreatorGuidesScreen extends StatelessWidget {
                         guide: guides[i],
                         exhibition: exhibition,
                         isDark: isDark,
-                        textC: textC, subC: subC,
-                        lineC: lineC, surfaceC: surfaceC,
-                        muteC: muteC, accentC: accentC,
+                        textC: pal.text, subC: pal.sub,
+                        lineC: pal.line, surfaceC: pal.surface,
+                        muteC: pal.mute, accentC: pal.accent,
                       ),
                     ),
             ),
@@ -484,13 +478,7 @@ class _BuyButton extends StatelessWidget {
   }
 
   void _showPurchaseDialog(BuildContext context) {
-    final isDark   = Theme.of(context).brightness == Brightness.dark;
-    final surfC    = isDark ? GuidyColors.darkSurface : GuidyColors.surface;
-    final bgC      = isDark ? GuidyColors.darkBg      : GuidyColors.bg;
-    final textC2   = isDark ? GuidyColors.darkText     : GuidyColors.ink;
-    final subC     = isDark ? GuidyColors.darkSub      : GuidyColors.sub;
-    final lineC2   = isDark ? GuidyColors.darkLine     : GuidyColors.line;
-    final muteC    = isDark ? GuidyColors.darkMute     : GuidyColors.mute;
+    final pal = GuidyPalette.of(context);
 
     // 아바타 색상
     Color avatarC;
@@ -507,7 +495,7 @@ class _BuyButton extends StatelessWidget {
       backgroundColor: Colors.transparent,
       builder: (_) => Container(
         decoration: BoxDecoration(
-          color: surfC,
+          color: pal.surface,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         padding: EdgeInsets.fromLTRB(
@@ -521,7 +509,7 @@ class _BuyButton extends StatelessWidget {
               child: Container(
                 width: 40, height: 4,
                 decoration: BoxDecoration(
-                  color: lineC2,
+                  color: pal.line,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -529,16 +517,16 @@ class _BuyButton extends StatelessWidget {
             const SizedBox(height: 20),
 
             // 제목
-            Text('가이드 구매', style: GuidyText.h3(textC2)),
+            Text('가이드 구매', style: GuidyText.h3(pal.text)),
             const SizedBox(height: 16),
 
             // 크리에이터 + 가이드 정보 카드
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: bgC,
+                color: pal.bg,
                 borderRadius: GuidyRadius.lgBorder,
-                border: Border.all(color: lineC2),
+                border: Border.all(color: pal.line),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -570,7 +558,7 @@ class _BuyButton extends StatelessWidget {
                       children: [
                         Row(children: [
                           Text(guide.creatorName,
-                            style: GuidyText.body(textC2)
+                            style: GuidyText.body(pal.text)
                                 .copyWith(fontWeight: FontWeight.w700)),
                           if (guide.isVerified) ...[
                             const SizedBox(width: 3),
@@ -579,24 +567,24 @@ class _BuyButton extends StatelessWidget {
                           ],
                         ]),
                         Text(guide.creatorTitle,
-                            style: GuidyText.small(subC)),
+                            style: GuidyText.small(pal.sub)),
                       ],
                     ),
                   ]),
-                  Divider(color: lineC2, height: 20),
+                  Divider(color: pal.line, height: 20),
                   Text(guide.guideTitle,
-                    style: GuidyText.body(textC2)
+                    style: GuidyText.body(pal.text)
                         .copyWith(fontWeight: FontWeight.w600)),
                   if (guide.description.isNotEmpty) ...[
                     const SizedBox(height: 4),
                     Text(guide.description,
-                      style: GuidyText.small(subC),
+                      style: GuidyText.small(pal.sub),
                       maxLines: 3, overflow: TextOverflow.ellipsis),
                   ],
                   const SizedBox(height: 10),
                   Row(children: [
                     _stat(Icons.timer_outlined,
-                      '${guide.durationSec ~/ 60}분', muteC),
+                      '${guide.durationSec ~/ 60}분', pal.mute),
                     const SizedBox(width: 12),
                     _stat(Icons.star_rounded,
                       guide.rating > 0
@@ -605,7 +593,7 @@ class _BuyButton extends StatelessWidget {
                       const Color(0xFFF59E0B)),
                     const SizedBox(width: 12),
                     _stat(Icons.play_circle_outline_rounded,
-                      _fmtCount(guide.plays), muteC),
+                      _fmtCount(guide.plays), pal.mute),
                   ]),
                 ],
               ),
@@ -635,7 +623,7 @@ class _BuyButton extends StatelessWidget {
                             style: GuidyText.small(
                                 const Color(0xFFF59E0B))),
                         Text('이 가이드는 1회 결제 후 영구 이용 가능합니다',
-                          style: GuidyText.kicker(muteC)),
+                          style: GuidyText.kicker(pal.mute)),
                       ],
                     ),
                   ),
@@ -660,13 +648,13 @@ class _BuyButton extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     decoration: BoxDecoration(
-                      color: bgC,
+                      color: pal.bg,
                       borderRadius: GuidyRadius.pillBorder,
-                      border: Border.all(color: lineC2),
+                      border: Border.all(color: pal.line),
                     ),
                     child: Center(
                       child: Text('취소',
-                          style: GuidyText.body(muteC)
+                          style: GuidyText.body(pal.mute)
                               .copyWith(fontWeight: FontWeight.w600)),
                     ),
                   ),
