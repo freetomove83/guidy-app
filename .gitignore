@@ -55,3 +55,8 @@ guidy_web_deploy.zip
 
 # Golden test diff output (regenerated on failure)
 test/goldens/failures/
+
+# Firebase secrets (never commit)
+google-services.json
+GoogleService-Info.plist
+*-adminsdk-*.json
