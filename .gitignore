@@ -52,3 +52,6 @@ guidy_web_deploy.zip
 
 # Android build reports (artifacts are redirected to the root /build)
 /android/build/
+
+# Golden test diff output (regenerated on failure)
+test/goldens/failures/
