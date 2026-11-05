@@ -52,3 +52,8 @@ guidy_web_deploy.zip
 
 # Android build reports (artifacts are redirected to the root /build)
 /android/build/
+
+# Firebase secrets (never commit)
+google-services.json
+GoogleService-Info.plist
+*-adminsdk-*.json
