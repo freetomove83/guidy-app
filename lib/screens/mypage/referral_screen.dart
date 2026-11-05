@@ -105,13 +105,16 @@ class ReferralScreen extends StatelessWidget {
                                     size: 13,
                                     color: Colors.white.withValues(alpha: 0.8)),
                                 const SizedBox(width: 6),
-                                Text('보상 정책은 운영 상황에 따라 변경될 수 있습니다',
-                                    style: TextStyle(
-                                      fontFamily: GuidyText.fontFamily,
-                                      fontSize: 11,
-                                      color:
-                                          Colors.white.withValues(alpha: 0.8),
-                                    )),
+                                // 글자 크기를 키우면 한 줄에 안 들어가므로 줄바꿈 허용
+                                Flexible(
+                                  child: Text('보상 정책은 운영 상황에 따라 변경될 수 있습니다',
+                                      style: TextStyle(
+                                        fontFamily: GuidyText.fontFamily,
+                                        fontSize: 11,
+                                        color:
+                                            Colors.white.withValues(alpha: 0.8),
+                                      )),
+                                ),
                               ],
                             ),
                           ),

@@ -36,6 +36,7 @@ class AdData {
 }
 
 // ─── 더미 광고 데이터 (Firebase 연결 전 더미) ──────────────
+// landingUrl은 DummyData에 실제로 있는 전시·크리에이터 ID여야 함 (store_test에서 검사)
 class AdDataStore {
   static final _splashAd = AdData(
     id: 'ad_splash_001',
@@ -43,29 +44,29 @@ class AdDataStore {
     mediaType: AdMediaType.image,
     imageUrl: null, // Firebase Storage URL 연결 예정
     landingType: AdLandingType.internal,
-    landingUrl: '/detail/expo_001',
+    landingUrl: '/detail/e1',
     endAt: DateTime(2026, 12, 31),
     active: true,
   );
 
   static final _popupAd = AdData(
     id: 'ad_popup_001',
-    title: '경복궁 심층 탐방 오디오 가이드',
+    title: '「침묵과 소음」 심층 탐방 오디오 가이드',
     mediaType: AdMediaType.image,
     imageUrl: null,
     landingType: AdLandingType.internal,
-    landingUrl: '/detail/expo_001',
+    landingUrl: '/detail/e4',
     endAt: DateTime(2026, 12, 31),
     active: true,
   );
 
   static final _slideUpAd = AdData(
     id: 'ad_slideup_001',
-    title: '신규 크리에이터 김민준 등장',
+    title: '신규 크리에이터 정재원 등장',
     mediaType: AdMediaType.image,
     imageUrl: null,
     landingType: AdLandingType.internal,
-    landingUrl: '/creator/creator_001',
+    landingUrl: '/creator/c4',
     endAt: DateTime(2026, 12, 31),
     active: true,
   );

@@ -76,4 +76,19 @@ void main() {
     expect(formatPrice(8000), '8,000');
     expect(formatPrice(1234567), '1,234,567');
   });
+
+  test('demo ad landing URLs point at existing items', () {
+    final store = AppStore();
+    for (final ad in [AdDataStore.splashAd, AdDataStore.popupAd, AdDataStore.slideUpAd]) {
+      final url = ad!.landingUrl!;
+      final id = url.split('/').last;
+      if (url.startsWith('/detail/')) {
+        expect(store.exhibitionById(id), isNotNull, reason: url);
+      } else if (url.startsWith('/creator/')) {
+        expect(store.creatorById(id), isNotNull, reason: url);
+      } else {
+        fail('unexpected landing url $url');
+      }
+    }
+  });
 }

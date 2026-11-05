@@ -248,9 +248,14 @@ class AboutScreen extends StatelessWidget {
                                                 fontWeight: FontWeight.w700)),
                                   ),
                                 ],
-                                const Spacer(),
-                                Text(ver.date,
-                                    style: GuidyText.small(pal.mute)),
+                                // Spacer 대신: 글자를 키워도 넘치지 않고 날짜만 줄임표로 축약
+                                Expanded(
+                                  child: Text(ver.date,
+                                      textAlign: TextAlign.right,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GuidyText.small(pal.mute)),
+                                ),
                               ],
                             ),
                           ),

@@ -144,6 +144,7 @@ class _PlayerScreenState extends State<PlayerScreen>
     }
     final audio   = context.watch<GuidyAudioService>();
     final artwork = _currentArtwork;
+    final exhibition = context.read<AppStore>().exhibitionById(artwork.exhibitionId);
 
     final pal = GuidyPalette.of(context);
 
@@ -401,8 +402,9 @@ class _PlayerScreenState extends State<PlayerScreen>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        if (exhibition != null)
                         Row(children: [
-                          ChannelBadge(type: ChannelType.curation),
+                          ChannelBadge(type: exhibition.channel),
                           const SizedBox(width: 6),
                           Container(
                             padding: const EdgeInsets.symmetric(
@@ -412,7 +414,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                               borderRadius: GuidyRadius.pillBorder,
                               border: Border.all(color: pal.line),
                             ),
-                            child: Text('국립현대미술관',
+                            child: Text(exhibition.venue,
                                 style: GuidyText.kicker(pal.mute)),
                           ),
                         ]),

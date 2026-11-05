@@ -177,7 +177,7 @@ class _CreatorDashboard extends StatelessWidget {
                           const SizedBox(height: 2),
                           Text(ex.title, style: GuidyText.body(pal.text).copyWith(fontWeight: FontWeight.w700),
                             maxLines: 1, overflow: TextOverflow.ellipsis),
-                          Text('청취 ${e.key * 324 + 89}회 · 수익 ₩${(e.key + 1) * 34200}',
+                          Text('청취 ${e.key * 324 + 89}회 · 수익 ₩${formatPrice((e.key + 1) * 34200)}',
                             style: GuidyText.small(pal.sub)),
                         ],
                       ),
