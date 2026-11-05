@@ -81,6 +81,11 @@ class UserStore extends ChangeNotifier {
     (p) => p.guideId == guideId && p.status != PurchaseStatus.cancelled,
   );
 
+  /// 전체 감상 가능 여부 (무료 전시 or 취소되지 않은 구매)
+  bool canAccess(Exhibition e) =>
+      e.price == 0 || e.isFreeAccess ||
+      _purchases.any((p) => p.exhibitionId == e.id && p.status != PurchaseStatus.cancelled);
+
   bool isFavorite(String exhibitionId) => _favorites.contains(exhibitionId);
   bool isLiked(String exhibitionId)    => _likes.contains(exhibitionId);
   bool isFollowing(String creatorId)   => _following.contains(creatorId);

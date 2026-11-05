@@ -18,7 +18,7 @@ class SectionDetailScreen extends StatelessWidget {
     final section = store.sectionById(sectionId);
 
     if (section == null) {
-      return _NotFound();
+      return const NotFoundScreen(message: '섹션을 찾을 수 없습니다');
     }
 
     final exhibition = store.exhibitionById(section.exhibitionId);
@@ -330,45 +330,3 @@ class _ArtworkItem extends StatelessWidget {
 }
 
 // ─── Not Found ────────────────────────────────────────────
-class _NotFound extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgC    = isDark ? GuidyColors.darkBg   : GuidyColors.bg;
-    final textC  = isDark ? GuidyColors.darkText  : GuidyColors.ink;
-    final muteC  = isDark ? GuidyColors.darkMute  : GuidyColors.mute;
-
-    return Scaffold(
-      backgroundColor: bgC,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Icon(Icons.arrow_back_ios_new_rounded, color: textC, size: 20),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.search_off_rounded, size: 56, color: muteC),
-                    const SizedBox(height: 12),
-                    Text('섹션을 찾을 수 없습니다', style: GuidyText.body(muteC)),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

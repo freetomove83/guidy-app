@@ -124,12 +124,12 @@ class AppStore extends ChangeNotifier {
 
   Exhibition? exhibitionById(String id) {
     try { return _exhibitions.firstWhere((e) => e.id == id); }
-    catch (_) { return _exhibitions.isNotEmpty ? _exhibitions.first : null; }
+    catch (_) { return null; }
   }
 
   Artwork? artworkById(String id) {
     try { return _artworks.firstWhere((a) => a.id == id); }
-    catch (_) { return _artworks.isNotEmpty ? _artworks.first : null; }
+    catch (_) { return null; }
   }
 
   ExhibitionSection? sectionById(String id) {

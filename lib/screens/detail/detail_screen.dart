@@ -22,10 +22,11 @@ class _DetailScreenState extends State<DetailScreen> {
   @override
   Widget build(BuildContext context) {
     final store = context.read<AppStore>();
-    final exhibition = store.exhibitionById(widget.exhibitionId)
-        ?? store.exhibitions.first;
+    final exhibition = store.exhibitionById(widget.exhibitionId);
+    if (exhibition == null) {
+      return const NotFoundScreen(message: '전시를 찾을 수 없습니다');
+    }
     final artworks   = store.artworksFor(widget.exhibitionId);
-    final firstArtworkId = artworks.isNotEmpty ? artworks.first.id : 'a1';
     final sections   = store.sectionsFor(widget.exhibitionId);
     final guides     = store.creatorGuidesFor(widget.exhibitionId);
 
@@ -36,10 +37,8 @@ class _DetailScreenState extends State<DetailScreen> {
     final hasPurchased = userStore.purchases.any((p) =>
         p.exhibitionId == widget.exhibitionId &&
         p.status != PurchaseStatus.cancelled);
-    // 무료 감상 가능 = price==0 OR isFreeAccess
-    final canAccessFree = exhibition.price == 0 || exhibition.isFreeAccess;
     // 이미 접근 가능 (=구매완료 or 무료)
-    final canPlay = hasPurchased || canAccessFree;
+    final canPlay = userStore.canAccess(exhibition);
 
     final isDark    = Theme.of(context).brightness == Brightness.dark;
     final bgC       = isDark ? GuidyColors.darkBg      : GuidyColors.bg;
@@ -373,39 +372,15 @@ class _DetailScreenState extends State<DetailScreen> {
                         PillButton(
                           label: '미리듣기',
                           size: 'md',
-                          onPressed: () => Navigator.pushNamed(
-                              context, '/player/$firstArtworkId'),
+                          onPressed: () => _openPlayer(artworks),
                         ),
                         const SizedBox(width: 10),
                       ],
                       Expanded(
                         child: GestureDetector(
-                          onTap: () {
-                            if (canPlay) {
-                              // 이미 접근 가능 → 바로 재생
-                              Navigator.pushNamed(
-                                  context, '/player/$firstArtworkId');
-                            } else {
-                              // 유료 구매 처리
-                              final purchase = Purchase(
-                                id: 'p_${DateTime.now().millisecondsSinceEpoch}',
-                                exhibitionId: widget.exhibitionId,
-                                exhibitionTitle: exhibition.title,
-                                venueName: exhibition.venue,
-                                coverSeed: exhibition.coverSeed,
-                                pricePaid: exhibition.price,
-                                purchasedAt: DateTime.now(),
-                                status: PurchaseStatus.unused,
-                              );
-                              context.read<UserStore>().addPurchase(purchase);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('「${exhibition.title}」 구매가 완료되었습니다'),
-                                  backgroundColor: GuidyColors.ok,
-                                ),
-                              );
-                            }
-                          },
+                          onTap: () => canPlay
+                              ? _openPlayer(artworks)
+                              : _confirmPurchase(exhibition),
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 200),
                             padding: const EdgeInsets.symmetric(vertical: 14),
@@ -455,6 +430,67 @@ class _DetailScreenState extends State<DetailScreen> {
           ),
 
         ],
+      ),
+    );
+  }
+
+  void _openPlayer(List<Artwork> artworks) {
+    if (artworks.isEmpty) {
+      // 다른 전시의 오디오로 대체 재생하지 않는다
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('이 전시의 오디오 가이드가 준비 중입니다')),
+      );
+      return;
+    }
+    Navigator.pushNamed(context, '/player/${artworks.first.id}');
+  }
+
+  // shortcut: 결제 연동 전이라 확인 후 바로 구매 기록만 추가, PG 연동 시 교체
+  Future<void> _confirmPurchase(Exhibition exhibition) async {
+    final isDark   = Theme.of(context).brightness == Brightness.dark;
+    final surfaceC = isDark ? GuidyColors.darkSurface : GuidyColors.surface;
+    final textC    = isDark ? GuidyColors.darkText    : GuidyColors.ink;
+    final subC     = isDark ? GuidyColors.darkSub     : GuidyColors.sub;
+    final muteC    = isDark ? GuidyColors.darkMute    : GuidyColors.mute;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: surfaceC,
+        title: Text('구매 확인', style: GuidyText.h3(textC)),
+        content: Text(
+          '「${exhibition.title}」 오디오 가이드를\n₩${_formatPrice(exhibition.price)}에 구매하시겠습니까?',
+          style: GuidyText.body(subC)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text('취소', style: GuidyText.body(muteC)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text('구매하기',
+              style: GuidyText.body(GuidyColors.primary).copyWith(fontWeight: FontWeight.w700)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    await context.read<UserStore>().addPurchase(Purchase(
+      id: 'p_${DateTime.now().millisecondsSinceEpoch}',
+      exhibitionId: exhibition.id,
+      exhibitionTitle: exhibition.title,
+      venueName: exhibition.venue,
+      coverSeed: exhibition.coverSeed,
+      pricePaid: exhibition.price,
+      purchasedAt: DateTime.now(),
+      status: PurchaseStatus.unused,
+    ));
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('「${exhibition.title}」 구매가 완료되었습니다'),
+        backgroundColor: GuidyColors.ok,
       ),
     );
   }

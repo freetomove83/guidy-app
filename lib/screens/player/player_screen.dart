@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../theme/app_theme.dart';
 import '../../models/models.dart';
 import '../../models/app_store.dart';
+import '../../models/user_store.dart';
 import '../../services/audio_service.dart';
 import '../../widgets/common_widgets.dart';
 
@@ -22,11 +23,16 @@ class _PlayerScreenState extends State<PlayerScreen>
 
   bool _captionsOn = false;
   int  _activeTab  = 0;                          // 0:해설 1:스크립트 2:큐레이터 3:작가
-  late int _artworkIndex;                        // 현재 작품 인덱스
+  int _artworkIndex = 0;                         // 현재 작품 인덱스
   List<Artwork> _playlist = [];                  // 같은 전시의 작품 리스트
 
   // 파형 애니메이션
   late AnimationController _waveCtrl;
+
+  // 미구매 전시는 미리듣기만 허용
+  static const _previewSec = 30.0;
+  bool _isPreview = false;
+  GuidyAudioService? _audio;
 
   @override
   void initState() {
@@ -40,12 +46,19 @@ class _PlayerScreenState extends State<PlayerScreen>
 
     // 작품 목록 & 인덱스 구성
     final store = context.read<AppStore>();
-    final artwork = store.artworkById(widget.artworkId) ?? store.artworks.first;
+    final artwork = store.artworkById(widget.artworkId);
+    if (artwork == null) return; // build에서 NotFoundScreen 표시
     _playlist = store.artworks
         .where((a) => a.exhibitionId == artwork.exhibitionId)
         .toList();
     _artworkIndex = _playlist.indexWhere((a) => a.id == artwork.id);
     if (_artworkIndex < 0) _artworkIndex = 0;
+
+    final exhibition = store.exhibitionById(artwork.exhibitionId);
+    _isPreview = exhibition != null && !context.read<UserStore>().canAccess(exhibition);
+    if (_isPreview) {
+      _audio = context.read<GuidyAudioService>()..addListener(_enforcePreview);
+    }
 
     // 자동 재생
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -60,8 +73,23 @@ class _PlayerScreenState extends State<PlayerScreen>
   @override
   void dispose() {
     _waveCtrl.dispose();
-    // 화면 이탈 시 자동 정지는 하지 않음 (미니플레이어 연계 대비)
+    // 구매 작품은 미니플레이어로 이어 듣도록 정지하지 않음. 미리듣기는 이탈 시 정지
+    if (_audio != null) {
+      _audio!.removeListener(_enforcePreview);
+      _audio!.stop();
+    }
     super.dispose();
+  }
+
+  void _enforcePreview() {
+    final audio = _audio!;
+    if (audio.isPlaying && audio.positionSec >= _previewSec) {
+      audio.pause();
+      audio.seekTo(_previewSec);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('미리듣기는 30초까지입니다. 구매 후 전체를 들어보세요')),
+      );
+    }
   }
 
   Artwork get _currentArtwork => _playlist[_artworkIndex];
@@ -109,6 +137,9 @@ class _PlayerScreenState extends State<PlayerScreen>
 
   @override
   Widget build(BuildContext context) {
+    if (_playlist.isEmpty) {
+      return const NotFoundScreen(message: '작품을 찾을 수 없습니다');
+    }
     final audio   = context.watch<GuidyAudioService>();
     final artwork = _currentArtwork;
 

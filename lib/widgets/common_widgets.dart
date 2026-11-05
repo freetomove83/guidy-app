@@ -932,3 +932,51 @@ class SectionImageWidget extends StatelessWidget {
     return placeholder;
   }
 }
+
+// ─── 찾을 수 없음 화면 ───────────────────────────────────
+/// 잘못된 ID로 진입했을 때의 안내 화면
+class NotFoundScreen extends StatelessWidget {
+  final String message;
+  const NotFoundScreen({super.key, required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgC    = isDark ? GuidyColors.darkBg   : GuidyColors.bg;
+    final textC  = isDark ? GuidyColors.darkText  : GuidyColors.ink;
+    final muteC  = isDark ? GuidyColors.darkMute  : GuidyColors.mute;
+
+    return Scaffold(
+      backgroundColor: bgC,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Icon(Icons.arrow_back_ios_new_rounded, color: textC, size: 20),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.search_off_rounded, size: 56, color: muteC),
+                    const SizedBox(height: 12),
+                    Text(message, style: GuidyText.body(muteC)),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

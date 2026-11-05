@@ -31,7 +31,10 @@ class LoginScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   GestureDetector(
-                    onTap: () => Navigator.pop(context),
+                    // 로그아웃·탈퇴 후엔 스택에 로그인 화면만 남으므로 pop 대신 홈으로 복귀
+                    onTap: () => Navigator.canPop(context)
+                        ? Navigator.pop(context)
+                        : Navigator.pushReplacementNamed(context, '/home'),
                     child: Container(
                       width: 36, height: 36,
                       decoration: BoxDecoration(
