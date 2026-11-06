@@ -347,19 +347,27 @@ class _GuideCard extends StatelessWidget {
                 const SizedBox(height: 10),
                 Row(
                   children: [
-                    _metaStat(Icons.timer_outlined,
-                      '$durMin:${durSec.toString().padLeft(2, '0')}', muteC),
-                    const SizedBox(width: 14),
-                    _metaStat(Icons.play_circle_outline_rounded,
-                      _fmtCount(guide.plays), muteC),
-                    const SizedBox(width: 14),
-                    _metaStat(Icons.star_rounded,
-                      guide.rating > 0
-                          ? guide.rating.toStringAsFixed(1)
-                          : '-',
-                      muteC,
-                      iconColor: const Color(0xFFF59E0B)),
-                    const Spacer(),
+                    // 재생시간·조회수·평점: 버튼 옆 남은 폭을 채우고, 큰 글자에서 모자라면 다음 줄로
+                    Expanded(
+                      child: Wrap(
+                        spacing: 14,
+                        runSpacing: 4,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          _metaStat(Icons.timer_outlined,
+                            '$durMin:${durSec.toString().padLeft(2, '0')}', muteC),
+                          _metaStat(Icons.play_circle_outline_rounded,
+                            _fmtCount(guide.plays), muteC),
+                          _metaStat(Icons.star_rounded,
+                            guide.rating > 0
+                                ? guide.rating.toStringAsFixed(1)
+                                : '-',
+                            muteC,
+                            iconColor: const Color(0xFFF59E0B)),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
                     // ── 재생 or 잠금 버튼 ──────────────
                     canPlay
                         ? _PlayButton(

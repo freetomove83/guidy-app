@@ -265,7 +265,8 @@ class _DiscoverTab extends StatelessWidget {
               // ── 주목받는 크리에이터 ──
               const SectionHeader(title: '주목받는 크리에이터', action: '더보기 →'),
               SizedBox(
-                height: 170,
+                // 카드 170 중 글자 3줄(약 56)만 글자 배율에 맞춰 키움 → 큰 글자에서도 잘리지 않고, 1배일 땐 170 그대로
+                height: 114 + MediaQuery.textScalerOf(context).scale(56),
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -304,7 +305,9 @@ class _DiscoverTab extends StatelessWidget {
                               textAlign: TextAlign.center),
                             const SizedBox(height: 4),
                             Text('팔로워 ${_formatNum(cr.followerCount)}',
-                              style: GuidyText.kicker(pal.sub)),
+                              style: GuidyText.kicker(pal.sub),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis),
                           ],
                         ),
                       ),

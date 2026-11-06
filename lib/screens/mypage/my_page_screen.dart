@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../theme/app_theme.dart';
+import '../../theme/theme_provider.dart';
 import '../../models/models.dart';
 import '../../models/user_store.dart';
 import '../../widgets/common_widgets.dart';
@@ -11,6 +12,7 @@ import 'notification_settings_screen.dart';
 import 'change_password_screen.dart';
 import 'delete_account_screen.dart';
 import 'referral_screen.dart';
+import 'about_screen.dart';
 
 class MyPageScreen extends StatefulWidget {
   const MyPageScreen({super.key});
@@ -41,19 +43,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
               child: Row(
                 children: [
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Container(
-                      width: 36, height: 36,
-                      decoration: BoxDecoration(
-                        color: pal.surface,
-                        borderRadius: GuidyRadius.mdBorder,
-                        border: Border.all(color: pal.line),
-                      ),
-                      child: Icon(Icons.arrow_back_ios_new_rounded, size: 16, color: pal.text),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
+                  // 하단 탭 화면이라 뒤로가기 없음
                   Text('내 정보', style: GuidyText.h3(pal.text)),
                 ],
               ),
@@ -298,6 +288,50 @@ class _ProfileTabState extends State<_ProfileTab> {
           trailingHint: userStore.userEmail.isEmpty
               ? 'Google · Apple 로그인 시 자동으로 가져옵니다' : null),
 
+
+        const SizedBox(height: 24),
+
+        // 설정 (이전 하단 탭 '내 정보' 화면에서 이동)
+        Text('설정', style: GuidyText.h3(pal.text)),
+        const SizedBox(height: 12),
+        _menuItem(Icons.mic_rounded, '크리에이터 되기', pal.surface, pal.line, pal.text, pal.sub, () {
+          // 이미 크리에이터면 스튜디오, 아니면 신청/진행 화면
+          Navigator.pushNamed(context, userStore.isCreator ? '/creator-studio' : '/creator-apply');
+        }),
+        const SizedBox(height: 8),
+        Consumer<ThemeProvider>(
+          builder: (context, themeP, _) => Container(
+            padding: const EdgeInsets.fromLTRB(14, 6, 8, 6),
+            decoration: BoxDecoration(
+              color: pal.surface,
+              borderRadius: GuidyRadius.lgBorder,
+              border: Border.all(color: pal.line),
+            ),
+            child: Row(
+              children: [
+                Icon(themeP.isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
+                    size: 20, color: GuidyColors.mute),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text('다크 모드', style: GuidyText.body(pal.text)
+                      .copyWith(fontWeight: FontWeight.w500)),
+                ),
+                Switch(
+                  value: themeP.isDark,
+                  onChanged: (_) => themeP.toggle(),
+                  activeThumbColor: GuidyColors.primary,
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        _menuItem(Icons.help_outline_rounded, '도움말', pal.surface, pal.line, pal.text, pal.sub,
+          () => Navigator.pushNamed(context, '/help')),
+        const SizedBox(height: 8),
+        _menuItem(Icons.info_outline_rounded, 'Guidy 소개 · v${AboutScreen.currentVersion}',
+          pal.surface, pal.line, pal.text, pal.sub,
+          () => Navigator.pushNamed(context, '/about')),
 
         const SizedBox(height: 24),
 

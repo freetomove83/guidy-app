@@ -300,8 +300,11 @@ class _SignupScreenState extends State<SignupScreen> {
                             Icon(Icons.card_giftcard_rounded,
                                 size: 13, color: pal.mute),
                             const SizedBox(width: 5),
-                            Text('친구의 초대 코드를 입력하면 가입 혜택이 제공됩니다',
-                                style: GuidyText.kicker(pal.mute)),
+                            // 큰 글자에서 한 줄을 넘으면 줄바꿈
+                            Expanded(
+                              child: Text('친구의 초대 코드를 입력하면 가입 혜택이 제공됩니다',
+                                  style: GuidyText.kicker(pal.mute)),
+                            ),
                           ],
                         ),
                       ),

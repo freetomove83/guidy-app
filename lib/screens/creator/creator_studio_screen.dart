@@ -706,7 +706,9 @@ class _CreatorOnboardingScreen extends StatelessWidget {
       child: Row(
         children: [
           SizedBox(width: 80, child: Text(label, style: GuidyText.small(subC))),
-          Text(value, style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w600)),
+          Expanded(
+            child: Text(value, style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w600)),
+          ),
         ],
       ),
     );
