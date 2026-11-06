@@ -84,6 +84,13 @@ Future<void> _pump(WidgetTester tester, Widget screen, bool dark) async {
   ));
   // 반복 애니메이션이 있어 pumpAndSettle 대신 고정 시간만 진행
   await tester.pump(const Duration(milliseconds: 600));
+  // 이미지 디코딩은 비동기라, 캐시 여부(테스트 실행 순서)에 따라 결과가 달라지지 않게 모두 로드 후 캡처
+  await tester.runAsync(() async {
+    for (final e in find.byType(Image).evaluate()) {
+      await precacheImage((e.widget as Image).image, e);
+    }
+  });
+  await tester.pump();
 }
 
 // 골든 전용: 테스트 환경에서만 생기는 오류는 무시
@@ -108,10 +115,14 @@ void main() {
     messenger.setMockMethodCallHandler(MethodChannel(ch), (_) async => null);
   }
 
-  setUp(() => SharedPreferences.setMockInitialValues({
-        // 홈 팝업 광고가 화면을 가리지 않도록
-        'guidy_popup_ad_hidden_on': DateTime.now().toIso8601String().substring(0, 10),
-      }));
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({
+      // 홈 팝업 광고가 화면을 가리지 않도록
+      'guidy_popup_ad_hidden_on': DateTime.now().toIso8601String().substring(0, 10),
+    });
+    // 오디오 서비스는 싱글톤이라 플레이어 테스트의 재생 상태(미니플레이어)가 다음 테스트로 새지 않게 초기화
+    await GuidyAudioService().stop();
+  });
 
   for (final dark in [false, true]) {
     final mode = dark ? 'dark' : 'light';
