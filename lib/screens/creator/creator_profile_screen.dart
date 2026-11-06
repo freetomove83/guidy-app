@@ -33,17 +33,10 @@ class CreatorProfileScreen extends StatelessWidget {
         .toList();
 
     final isDark    = Theme.of(context).brightness == Brightness.dark;
-    final bgC       = isDark ? GuidyColors.darkBg      : GuidyColors.bg;
-    final textC     = isDark ? GuidyColors.darkText     : GuidyColors.ink;
-    final subC      = isDark ? GuidyColors.darkSub      : GuidyColors.sub;
-    final muteC     = isDark ? GuidyColors.darkMute     : GuidyColors.mute;
-    final surfaceC  = isDark ? GuidyColors.darkSurface  : GuidyColors.surface;
-    final lineC     = isDark ? GuidyColors.darkLine     : GuidyColors.line;
-    final primaryC  = isDark ? GuidyColors.darkPrimary  : GuidyColors.primary;
-    final accentC   = isDark ? GuidyColors.darkAccent   : GuidyColors.accent;
+    final pal = GuidyPalette.of(context);
 
     return Scaffold(
-      backgroundColor: bgC,
+      backgroundColor: pal.bg,
       body: SafeArea(
         bottom: false,
         child: CustomScrollView(
@@ -62,28 +55,28 @@ class CreatorProfileScreen extends StatelessWidget {
                           child: Container(
                             width: 36, height: 36,
                             decoration: BoxDecoration(
-                              color: surfaceC,
+                              color: pal.surface,
                               borderRadius: GuidyRadius.mdBorder,
-                              border: Border.all(color: lineC),
+                              border: Border.all(color: pal.line),
                             ),
                             child: Icon(Icons.arrow_back_ios_new_rounded,
-                                size: 16, color: textC),
+                                size: 16, color: pal.text),
                           ),
                         ),
                         GestureDetector(
                           onTap: () => _showShareSheet(context, creator,
-                              isDark: isDark, bgC: bgC, textC: textC,
-                              subC: subC, muteC: muteC, lineC: lineC,
-                              surfaceC: surfaceC, primaryC: primaryC),
+                              isDark: isDark, bgC: pal.bg, textC: pal.text,
+                              subC: pal.sub, muteC: pal.mute, lineC: pal.line,
+                              surfaceC: pal.surface, primaryC: pal.primary),
                           child: Container(
                             width: 36, height: 36,
                             decoration: BoxDecoration(
-                              color: surfaceC,
+                              color: pal.surface,
                               borderRadius: GuidyRadius.mdBorder,
-                              border: Border.all(color: lineC),
+                              border: Border.all(color: pal.line),
                             ),
                             child: Icon(Icons.share_outlined,
-                                size: 16, color: textC),
+                                size: 16, color: pal.text),
                           ),
                         ),
                       ],
@@ -103,34 +96,34 @@ class CreatorProfileScreen extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: primaryC.withValues(alpha: 0.1),
+                            color: pal.primary.withValues(alpha: 0.1),
                             borderRadius: GuidyRadius.pillBorder,
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(Icons.verified_rounded,
-                                  color: primaryC, size: 12),
+                                  color: pal.primary, size: 12),
                               const SizedBox(width: 4),
                               Text('인증 크리에이터',
-                                  style: GuidyText.kicker(primaryC)),
+                                  style: GuidyText.kicker(pal.primary)),
                             ],
                           ),
                         ),
-                      Text(creator.name, style: GuidyText.h2(textC)),
+                      Text(creator.name, style: GuidyText.h2(pal.text)),
                       const SizedBox(height: 4),
-                      Text(creator.title, style: GuidyText.body(subC)),
+                      Text(creator.title, style: GuidyText.body(pal.sub)),
                       const SizedBox(height: 16),
 
                       // ── 통계 ──────────────────────────────────
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          _statItem('가이드', '${creator.guideCount}', textC, subC),
-                          _divider(lineC),
-                          _statItem('팔로워', _formatNum(displayFollowers), textC, subC),
-                          _divider(lineC),
-                          _statItem('총 청취', _formatNum(creator.totalPlays), textC, subC),
+                          _statItem('가이드', '${creator.guideCount}', pal.text, pal.sub),
+                          _divider(pal.line),
+                          _statItem('팔로워', _formatNum(displayFollowers), pal.text, pal.sub),
+                          _divider(pal.line),
+                          _statItem('총 청취', _formatNum(creator.totalPlays), pal.text, pal.sub),
                         ],
                       ),
 
@@ -144,7 +137,7 @@ class CreatorProfileScreen extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 40, vertical: 12),
                           decoration: BoxDecoration(
-                            color: isFollowing ? lineC : textC,
+                            color: isFollowing ? pal.line : pal.text,
                             borderRadius: GuidyRadius.pillBorder,
                           ),
                           child: Row(
@@ -154,14 +147,14 @@ class CreatorProfileScreen extends StatelessWidget {
                                 isFollowing
                                     ? Icons.person_remove_outlined
                                     : Icons.person_add_outlined,
-                                color: isFollowing ? textC : bgC,
+                                color: isFollowing ? pal.text : pal.bg,
                                 size: 16,
                               ),
                               const SizedBox(width: 6),
                               Text(
                                 isFollowing ? '팔로잉' : '팔로우',
                                 style: TextStyle(
-                                  color: isFollowing ? textC : bgC,
+                                  color: isFollowing ? pal.text : pal.bg,
                                   fontSize: 14,
                                   fontWeight: FontWeight.w800,
                                   fontFamily: GuidyText.fontFamily,
@@ -180,13 +173,13 @@ class CreatorProfileScreen extends StatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                            color: surfaceC,
+                            color: pal.surface,
                             borderRadius: GuidyRadius.lgBorder,
                             border: Border(
-                                left: BorderSide(color: accentC, width: 3)),
+                                left: BorderSide(color: pal.accent, width: 3)),
                           ),
                           child: Text('"${creator.bio}"',
-                              style: GuidyText.body(subC),
+                              style: GuidyText.body(pal.sub),
                               textAlign: TextAlign.center),
                         ),
                       ),
@@ -225,10 +218,10 @@ class CreatorProfileScreen extends StatelessWidget {
                         child: Column(
                           children: [
                             Icon(Icons.library_music_outlined,
-                                size: 48, color: muteC),
+                                size: 48, color: pal.mute),
                             const SizedBox(height: 8),
                             Text('아직 출시된 가이드가 없습니다',
-                                style: GuidyText.body(muteC)),
+                                style: GuidyText.body(pal.mute)),
                           ],
                         ),
                       ),
@@ -250,10 +243,10 @@ class CreatorProfileScreen extends StatelessWidget {
                                 bottom: i < creator.activities.length - 1 ? 8 : 0),
                             child: _ActivityTile(
                               activity: act,
-                              lineC: lineC,
-                              textC: textC,
-                              subC: subC,
-                              muteC: muteC,
+                              lineC: pal.line,
+                              textC: pal.text,
+                              subC: pal.sub,
+                              muteC: pal.mute,
                             ),
                           );
                         }).toList(),
@@ -497,9 +490,7 @@ class _ShareSheet extends StatelessWidget {
               padding: const EdgeInsets.symmetric(
                   horizontal: 14, vertical: 12),
               decoration: BoxDecoration(
-                color: isDark
-                    ? GuidyColors.darkBgAlt
-                    : GuidyColors.bgAlt,
+                color: GuidyPalette.forDark(isDark).bgAlt,
                 borderRadius: GuidyRadius.lgBorder,
                 border: Border.all(color: lineC),
               ),

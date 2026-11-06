@@ -26,8 +26,9 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     // 홈 진입 0.8초 후 팝업 광고 표시
-    Future.delayed(const Duration(milliseconds: 800), () {
-      if (mounted && AdDataStore.popupAd != null) {
+    Future.delayed(const Duration(milliseconds: 800), () async {
+      if (AdDataStore.popupAd == null || await AdDataStore.isPopupHiddenToday()) return;
+      if (mounted) {
         setState(() => _showPopupAd = true);
       }
     });
@@ -41,11 +42,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgC = isDark ? GuidyColors.darkBg : GuidyColors.bg;
+    final pal = GuidyPalette.of(context);
 
     return Scaffold(
-      backgroundColor: bgC,
+      backgroundColor: pal.bg,
       body: Stack(
         children: [
           // ── 메인 콘텐츠 ────────────────────────────────
@@ -134,13 +134,7 @@ class _DiscoverTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textC = isDark ? GuidyColors.darkText : GuidyColors.ink;
-    final subC = isDark ? GuidyColors.darkSub : GuidyColors.sub;
-    final muteC = isDark ? GuidyColors.darkMute : GuidyColors.mute;
-    final surfaceC = isDark ? GuidyColors.darkSurface : GuidyColors.surface;
-    final lineC = isDark ? GuidyColors.darkLine : GuidyColors.line;
-    final primaryC = isDark ? GuidyColors.darkPrimary : GuidyColors.primary;
-    final accentC = isDark ? GuidyColors.darkAccent : GuidyColors.accent;
+    final pal = GuidyPalette.of(context);
 
     return Column(
       children: [
@@ -160,7 +154,7 @@ class _DiscoverTab extends StatelessWidget {
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
-                        colors: [primaryC, accentC],
+                        colors: [pal.primary, pal.accent],
                       ),
                       boxShadow: GuidyShadow.pop,
                     ),
@@ -252,7 +246,7 @@ class _DiscoverTab extends StatelessWidget {
                                       borderRadius: GuidyRadius.pillBorder,
                                     ),
                                     child: Text('가이드 보기', style: TextStyle(
-                                      color: primaryC, fontSize: 12,
+                                      color: pal.primary, fontSize: 12,
                                       fontWeight: FontWeight.w700,
                                       fontFamily: GuidyText.fontFamily,
                                     )),
@@ -286,9 +280,9 @@ class _DiscoverTab extends StatelessWidget {
                         width: 120,
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: surfaceC,
+                          color: pal.surface,
                           borderRadius: GuidyRadius.lgBorder,
-                          border: Border.all(color: lineC),
+                          border: Border.all(color: pal.line),
                         ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -297,20 +291,20 @@ class _DiscoverTab extends StatelessWidget {
                                 creator: cr, size: 52, showBadgeRing: true),
                             const SizedBox(height: 8),
                             Text(cr.name,
-                              style: GuidyText.body(textC)
+                              style: GuidyText.body(pal.text)
                                   .copyWith(fontWeight: FontWeight.w700),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               textAlign: TextAlign.center),
                             const SizedBox(height: 2),
                             Text(cr.title,
-                              style: GuidyText.small(muteC),
+                              style: GuidyText.small(pal.mute),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               textAlign: TextAlign.center),
                             const SizedBox(height: 4),
                             Text('팔로워 ${_formatNum(cr.followerCount)}',
-                              style: GuidyText.kicker(subC)),
+                              style: GuidyText.kicker(pal.sub)),
                           ],
                         ),
                       ),
@@ -359,12 +353,12 @@ class _DiscoverTab extends StatelessWidget {
         // ── 하단 고정 띠 배너 ──────────────────────────
         _CreatorNoticeBanner(
           isDark: isDark,
-          textC: textC,
-          subC: subC,
-          surfaceC: surfaceC,
-          lineC: lineC,
-          primaryC: primaryC,
-          accentC: accentC,
+          textC: pal.text,
+          subC: pal.sub,
+          surfaceC: pal.surface,
+          lineC: pal.line,
+          primaryC: pal.primary,
+          accentC: pal.accent,
           onTap: () => Navigator.pushNamed(context, '/creator-apply'),
         ),
       ],
@@ -521,13 +515,7 @@ class _ArchiveTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark    = Theme.of(context).brightness == Brightness.dark;
-    final textC     = isDark ? GuidyColors.darkText     : GuidyColors.ink;
-    final subC      = isDark ? GuidyColors.darkSub      : GuidyColors.sub;
-    final muteC     = isDark ? GuidyColors.darkMute     : GuidyColors.mute;
-    final surfaceC  = isDark ? GuidyColors.darkSurface  : GuidyColors.surface;
-    final lineC     = isDark ? GuidyColors.darkLine     : GuidyColors.line;
-    final primaryC  = isDark ? GuidyColors.darkPrimary  : GuidyColors.primary;
-    final accentC   = isDark ? GuidyColors.darkAccent   : GuidyColors.accent;
+    final pal = GuidyPalette.of(context);
 
     final archives = DummyData.exhibitions
         .where((e) => e.channel == ChannelType.archive)
@@ -538,9 +526,9 @@ class _ArchiveTab extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.inventory_2_outlined, size: 48, color: muteC),
+            Icon(Icons.inventory_2_outlined, size: 48, color: pal.mute),
             const SizedBox(height: 12),
-            Text('아카이브된 전시가 없습니다', style: GuidyText.body(muteC)),
+            Text('아카이브된 전시가 없습니다', style: GuidyText.body(pal.mute)),
           ],
         ),
       );
@@ -581,7 +569,7 @@ class _ArchiveTab extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       Text('표시된 전시는 결제 없이 감상 가능',
-                          style: GuidyText.small(muteC)),
+                          style: GuidyText.small(pal.mute)),
                     ],
                   ),
                 ),
@@ -615,12 +603,12 @@ class _ArchiveTab extends StatelessWidget {
         // ─── 하단 고정 띠 배너 ────────────────────────────
         _ArchiveNoticeBanner(
           isDark: isDark,
-          textC: textC,
-          subC: subC,
-          surfaceC: surfaceC,
-          lineC: lineC,
-          primaryC: primaryC,
-          accentC: accentC,
+          textC: pal.text,
+          subC: pal.sub,
+          surfaceC: pal.surface,
+          lineC: pal.line,
+          primaryC: pal.primary,
+          accentC: pal.accent,
           onTap: () => Navigator.pushNamed(context, '/detail/e3'),
         ),
       ],
@@ -778,15 +766,14 @@ class _ExhibitionListTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (items.isEmpty) {
-      final isDark = Theme.of(context).brightness == Brightness.dark;
-      final muteC = isDark ? GuidyColors.darkMute : GuidyColors.mute;
+      final pal = GuidyPalette.of(context);
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.photo_library_outlined, size: 48, color: muteC),
+            Icon(Icons.photo_library_outlined, size: 48, color: pal.mute),
             const SizedBox(height: 12),
-            Text(emptyMessage, style: GuidyText.body(muteC)),
+            Text(emptyMessage, style: GuidyText.body(pal.mute)),
           ],
         ),
       );

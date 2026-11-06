@@ -626,38 +626,4 @@ class DummyData {
     ),
   ];
 
-  // ─── 구매 더미 데이터 ──────────────────────────────────
-  static final List<Purchase> purchases = [
-    Purchase(
-      id: 'p1',
-      exhibitionId: 'e1',
-      exhibitionTitle: '빛과 표면',
-      venueName: '북서울미술관',
-      coverSeed: 0,
-      pricePaid: 8000,
-      purchasedAt: DateTime.now().subtract(const Duration(days: 3)),
-      status: PurchaseStatus.active,
-    ),
-    Purchase(
-      id: 'p2',
-      exhibitionId: 'e2',
-      exhibitionTitle: '도시의 결',
-      venueName: '서울시립미술관',
-      coverSeed: 1,
-      pricePaid: 6000,
-      purchasedAt: DateTime.now().subtract(const Duration(days: 10)),
-      status: PurchaseStatus.unused,
-    ),
-    Purchase(
-      id: 'p3',
-      exhibitionId: 'e3',
-      exhibitionTitle: '기억의 지형',
-      venueName: '국립현대미술관',
-      coverSeed: 2,
-      pricePaid: 4900,
-      purchasedAt: DateTime.now().subtract(const Duration(days: 30)),
-      status: PurchaseStatus.cancelled,
-      cancelledAt: DateTime.now().subtract(const Duration(days: 28)),
-    ),
-  ];
 }

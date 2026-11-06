@@ -49,6 +49,40 @@ class GuidyColors {
   static const darkArchive = Color(0xFFA8B4BE);
 }
 
+// ─── 라이트/다크 팔레트 ─────────────────────────────────────
+// 화면에서 `isDark ? GuidyColors.darkX : GuidyColors.x`를 반복하지 않도록 한 곳에서 매핑
+class GuidyPalette {
+  final Color bg, bgAlt, surface, text, sub, mute, line;
+  final Color primary, accent, curation, creator, archive;
+
+  const GuidyPalette._({
+    required this.bg, required this.bgAlt, required this.surface,
+    required this.text, required this.sub, required this.mute, required this.line,
+    required this.primary, required this.accent,
+    required this.curation, required this.creator, required this.archive,
+  });
+
+  static const light = GuidyPalette._(
+    bg: GuidyColors.bg, bgAlt: GuidyColors.bgAlt, surface: GuidyColors.surface,
+    text: GuidyColors.ink, sub: GuidyColors.sub, mute: GuidyColors.mute, line: GuidyColors.line,
+    primary: GuidyColors.primary, accent: GuidyColors.accent,
+    curation: GuidyColors.curation, creator: GuidyColors.creator, archive: GuidyColors.archive,
+  );
+
+  static const dark = GuidyPalette._(
+    bg: GuidyColors.darkBg, bgAlt: GuidyColors.darkBgAlt, surface: GuidyColors.darkSurface,
+    text: GuidyColors.darkText, sub: GuidyColors.darkSub, mute: GuidyColors.darkMute, line: GuidyColors.darkLine,
+    primary: GuidyColors.darkPrimary, accent: GuidyColors.darkAccent,
+    curation: GuidyColors.darkCuration, creator: GuidyColors.darkCreator, archive: GuidyColors.darkArchive,
+  );
+
+  static GuidyPalette of(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark ? dark : light;
+
+  /// isDark를 인자로 넘겨받는 위젯용
+  static GuidyPalette forDark(bool isDark) => isDark ? dark : light;
+}
+
 // ─── 라디우스 ───────────────────────────────────────────────
 class GuidyRadius {
   static const sm = Radius.circular(8);

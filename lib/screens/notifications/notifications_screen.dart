@@ -151,13 +151,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgC     = isDark ? GuidyColors.darkBg      : GuidyColors.bg;
-    final textC   = isDark ? GuidyColors.darkText     : GuidyColors.ink;
-    final subC    = isDark ? GuidyColors.darkSub      : GuidyColors.sub;
-    final muteC   = isDark ? GuidyColors.darkMute     : GuidyColors.mute;
-    final surfaceC= isDark ? GuidyColors.darkSurface  : GuidyColors.surface;
-    final lineC   = isDark ? GuidyColors.darkLine     : GuidyColors.line;
-    final primaryC= isDark ? GuidyColors.darkPrimary  : GuidyColors.primary;
+    final pal = GuidyPalette.of(context);
 
     // 오늘 / 이전 분리
     final todayNotifs = _notifs.where(
@@ -168,7 +162,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     ).toList();
 
     return Scaffold(
-      backgroundColor: bgC,
+      backgroundColor: pal.bg,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -183,19 +177,19 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     child: Container(
                       width: 36, height: 36,
                       decoration: BoxDecoration(
-                        color: surfaceC,
+                        color: pal.surface,
                         borderRadius: GuidyRadius.mdBorder,
-                        border: Border.all(color: lineC),
+                        border: Border.all(color: pal.line),
                       ),
                       child: Icon(Icons.arrow_back_ios_new_rounded,
-                          size: 16, color: textC),
+                          size: 16, color: pal.text),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Row(
                       children: [
-                        Text('알림', style: GuidyText.h2(textC)),
+                        Text('알림', style: GuidyText.h2(pal.text)),
                         if (_unreadCount > 0) ...[
                           const SizedBox(width: 8),
                           Container(
@@ -219,7 +213,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       onTap: _markAllRead,
                       child: Text(
                         '모두 읽음',
-                        style: GuidyText.small(primaryC)
+                        style: GuidyText.small(pal.primary)
                             .copyWith(fontWeight: FontWeight.w700),
                       ),
                     ),
@@ -232,20 +226,20 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             // ── 알림 목록 ────────────────────────────────
             Expanded(
               child: _notifs.isEmpty
-                  ? _EmptyState(muteC: muteC, subC: subC)
+                  ? _EmptyState(muteC: pal.mute, subC: pal.sub)
                   : ListView(
                       padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
                       children: [
                         if (todayNotifs.isNotEmpty) ...[
-                          _SectionLabel(label: '오늘', muteC: muteC),
+                          _SectionLabel(label: '오늘', muteC: pal.mute),
                           ...todayNotifs.map((n) => _NotifTile(
                             notif: n,
                             isDark: isDark,
-                            surfaceC: surfaceC,
-                            lineC: lineC,
-                            textC: textC,
-                            subC: subC,
-                            muteC: muteC,
+                            surfaceC: pal.surface,
+                            lineC: pal.line,
+                            textC: pal.text,
+                            subC: pal.sub,
+                            muteC: pal.mute,
                             onTap: () {
                               _markRead(n.id);
                               if (n.routeTo != null) {
@@ -256,15 +250,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         ],
                         if (olderNotifs.isNotEmpty) ...[
                           const SizedBox(height: 8),
-                          _SectionLabel(label: '이전 알림', muteC: muteC),
+                          _SectionLabel(label: '이전 알림', muteC: pal.mute),
                           ...olderNotifs.map((n) => _NotifTile(
                             notif: n,
                             isDark: isDark,
-                            surfaceC: surfaceC,
-                            lineC: lineC,
-                            textC: textC,
-                            subC: subC,
-                            muteC: muteC,
+                            surfaceC: pal.surface,
+                            lineC: pal.line,
+                            textC: pal.text,
+                            subC: pal.sub,
+                            muteC: pal.mute,
                             onTap: () {
                               _markRead(n.id);
                               if (n.routeTo != null) {

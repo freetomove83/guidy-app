@@ -6,6 +6,12 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../models/models.dart';
 
+/// 가격 천 단위 콤마 (₩ 기호는 호출부에서 붙임)
+String formatPrice(int price) => price.toString().replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (m) => '${m[1]},',
+    );
+
 // ─── Cover (SVG 그라디언트 플레이스홀더) ────────────────────
 class GuidyCover extends StatelessWidget {
   final int seed;
@@ -137,9 +143,9 @@ class ChannelBadge extends StatelessWidget {
 
   Color _bg(bool isDark) {
     switch (type) {
-      case ChannelType.curation: return isDark ? GuidyColors.darkCuration : GuidyColors.curation;
-      case ChannelType.creator: return isDark ? GuidyColors.darkCreator : GuidyColors.creator;
-      case ChannelType.archive: return isDark ? GuidyColors.darkArchive : GuidyColors.archive;
+      case ChannelType.curation: return GuidyPalette.forDark(isDark).curation;
+      case ChannelType.creator: return GuidyPalette.forDark(isDark).creator;
+      case ChannelType.archive: return GuidyPalette.forDark(isDark).archive;
     }
   }
 }
@@ -164,10 +170,10 @@ class PillButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textC = isDark ? GuidyColors.darkText : GuidyColors.ink;
+    final pal = GuidyPalette.of(context);
     final bgC = isDark ? GuidyColors.darkSurface : GuidyColors.chip;
-    final bg = primary ? (isDark ? GuidyColors.darkText : GuidyColors.ink) : bgC;
-    final fg = primary ? (isDark ? GuidyColors.darkBg : Colors.white) : textC;
+    final bg = primary ? (pal.text) : bgC;
+    final fg = primary ? (isDark ? GuidyColors.darkBg : Colors.white) : pal.text;
 
     final (py, px, fs) = switch (size) {
       'sm' => (8.0, 14.0, 12.0),
@@ -213,15 +219,11 @@ class CategoryTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textC = isDark ? GuidyColors.darkText : GuidyColors.ink;
-    final muteC = isDark ? GuidyColors.darkMute : GuidyColors.mute;
-    final lineC = isDark ? GuidyColors.darkLine : GuidyColors.line;
-    final primaryC = isDark ? GuidyColors.darkPrimary : GuidyColors.primary;
+    final pal = GuidyPalette.of(context);
 
     return Container(
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: lineC, width: 1)),
+        border: Border(bottom: BorderSide(color: pal.line, width: 1)),
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -237,7 +239,7 @@ class CategoryTabs extends StatelessWidget {
                 decoration: BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
-                      color: isActive ? primaryC : Colors.transparent,
+                      color: isActive ? pal.primary : Colors.transparent,
                       width: 2.5,
                     ),
                   ),
@@ -248,7 +250,7 @@ class CategoryTabs extends StatelessWidget {
                     fontFamily: GuidyText.fontFamily,
                     fontSize: 14,
                     fontWeight: isActive ? FontWeight.w800 : FontWeight.w500,
-                    color: isActive ? textC : muteC,
+                    color: isActive ? pal.text : pal.mute,
                     letterSpacing: -0.1,
                   ),
                 ),
@@ -493,11 +495,7 @@ class MiniPlayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final surface = isDark ? GuidyColors.darkSurface : GuidyColors.surface;
-    final textC = isDark ? GuidyColors.darkText : GuidyColors.ink;
-    final subC = isDark ? GuidyColors.darkSub : GuidyColors.sub;
-    final lineC = isDark ? GuidyColors.darkLine : GuidyColors.line;
+    final pal = GuidyPalette.of(context);
 
     return GestureDetector(
       onTap: onTap,
@@ -505,9 +503,9 @@ class MiniPlayer extends StatelessWidget {
         margin: const EdgeInsets.fromLTRB(12, 0, 12, 8),
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: surface,
+          color: pal.surface,
           borderRadius: GuidyRadius.pillBorder,
-          border: Border.all(color: lineC),
+          border: Border.all(color: pal.line),
           boxShadow: GuidyShadow.up,
         ),
         child: Row(
@@ -521,9 +519,9 @@ class MiniPlayer extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(artworkTitle, style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w700),
+                  Text(artworkTitle, style: GuidyText.body(pal.text).copyWith(fontWeight: FontWeight.w700),
                     maxLines: 1, overflow: TextOverflow.ellipsis),
-                  Text(exhibitionTitle, style: GuidyText.small(subC), maxLines: 1, overflow: TextOverflow.ellipsis),
+                  Text(exhibitionTitle, style: GuidyText.small(pal.sub), maxLines: 1, overflow: TextOverflow.ellipsis),
                 ],
               ),
             ),
@@ -572,9 +570,7 @@ class SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textC = isDark ? GuidyColors.darkText : GuidyColors.ink;
-    final muteC = isDark ? GuidyColors.darkMute : GuidyColors.mute;
+    final pal = GuidyPalette.of(context);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
@@ -583,11 +579,11 @@ class SectionHeader extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.baseline,
         textBaseline: TextBaseline.alphabetic,
         children: [
-          Text(title, style: GuidyText.h3(textC)),
+          Text(title, style: GuidyText.h3(pal.text)),
           if (action != null)
             GestureDetector(
               onTap: onAction,
-              child: Text(action!, style: GuidyText.small(muteC).copyWith(fontWeight: FontWeight.w600)),
+              child: Text(action!, style: GuidyText.small(pal.mute).copyWith(fontWeight: FontWeight.w600)),
             ),
         ],
       ),
@@ -611,21 +607,16 @@ class ExhibitionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final surface = isDark ? GuidyColors.darkSurface : GuidyColors.surface;
-    final textC = isDark ? GuidyColors.darkText : GuidyColors.ink;
-    final subC = isDark ? GuidyColors.darkSub : GuidyColors.sub;
-    final muteC = isDark ? GuidyColors.darkMute : GuidyColors.mute;
-    final lineC = isDark ? GuidyColors.darkLine : GuidyColors.line;
+    final pal = GuidyPalette.of(context);
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
         height: double.infinity,          // 그리드 셀 전체 높이 점유
         decoration: BoxDecoration(
-          color: surface,
+          color: pal.surface,
           borderRadius: GuidyRadius.lgBorder,
-          border: Border.all(color: lineC),
+          border: Border.all(color: pal.line),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -724,14 +715,14 @@ class ExhibitionCard extends StatelessWidget {
                       children: [
                         Text(
                           exhibition.title,
-                          style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w700),
+                          style: GuidyText.body(pal.text).copyWith(fontWeight: FontWeight.w700),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 4),
                         Text(
                           exhibition.venue,
-                          style: GuidyText.small(subC),
+                          style: GuidyText.small(pal.sub),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -747,7 +738,7 @@ class ExhibitionCard extends StatelessWidget {
                             Flexible(
                               child: Text(
                                 '${exhibition.workCount}작품 · ${exhibition.duration}',
-                                style: GuidyText.small(muteC),
+                                style: GuidyText.small(pal.mute),
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
@@ -755,9 +746,9 @@ class ExhibitionCard extends StatelessWidget {
                             Text(
                               exhibition.price == 0
                                   ? '무료'
-                                  : '₩${_formatPrice(exhibition.price)}',
+                                  : '₩${formatPrice(exhibition.price)}',
                               style: GuidyText.small(
-                                exhibition.price == 0 ? GuidyColors.ok : textC,
+                                exhibition.price == 0 ? GuidyColors.ok : pal.text,
                               ).copyWith(fontWeight: FontWeight.w700),
                             ),
                           ],
@@ -775,12 +766,6 @@ class ExhibitionCard extends StatelessWidget {
     );
   }
 
-  String _formatPrice(int price) {
-    return price.toString().replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (m) => '${m[1]},',
-    );
-  }
 }
 
 // ─── GuidyInputLabel ─────────────────────────────────────
@@ -930,5 +915,50 @@ class SectionImageWidget extends StatelessWidget {
       placeholder = ClipRRect(borderRadius: borderRadius!, child: placeholder);
     }
     return placeholder;
+  }
+}
+
+// ─── 찾을 수 없음 화면 ───────────────────────────────────
+/// 잘못된 ID로 진입했을 때의 안내 화면
+class NotFoundScreen extends StatelessWidget {
+  final String message;
+  const NotFoundScreen({super.key, required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    final pal = GuidyPalette.of(context);
+
+    return Scaffold(
+      backgroundColor: pal.bg,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Icon(Icons.arrow_back_ios_new_rounded, color: pal.text, size: 20),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.search_off_rounded, size: 56, color: pal.mute),
+                    const SizedBox(height: 12),
+                    Text(message, style: GuidyText.body(pal.mute)),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

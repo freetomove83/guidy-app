@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../theme/app_theme.dart';
 import '../../models/models.dart';
 import '../../models/app_store.dart';
+import '../../models/user_store.dart';
 import '../../services/audio_service.dart';
 import '../../widgets/common_widgets.dart';
 
@@ -22,11 +23,16 @@ class _PlayerScreenState extends State<PlayerScreen>
 
   bool _captionsOn = false;
   int  _activeTab  = 0;                          // 0:해설 1:스크립트 2:큐레이터 3:작가
-  late int _artworkIndex;                        // 현재 작품 인덱스
+  int _artworkIndex = 0;                         // 현재 작품 인덱스
   List<Artwork> _playlist = [];                  // 같은 전시의 작품 리스트
 
   // 파형 애니메이션
   late AnimationController _waveCtrl;
+
+  // 미구매 전시는 미리듣기만 허용
+  static const _previewSec = 30.0;
+  bool _isPreview = false;
+  GuidyAudioService? _audio;
 
   @override
   void initState() {
@@ -40,12 +46,19 @@ class _PlayerScreenState extends State<PlayerScreen>
 
     // 작품 목록 & 인덱스 구성
     final store = context.read<AppStore>();
-    final artwork = store.artworkById(widget.artworkId) ?? store.artworks.first;
+    final artwork = store.artworkById(widget.artworkId);
+    if (artwork == null) return; // build에서 NotFoundScreen 표시
     _playlist = store.artworks
         .where((a) => a.exhibitionId == artwork.exhibitionId)
         .toList();
     _artworkIndex = _playlist.indexWhere((a) => a.id == artwork.id);
     if (_artworkIndex < 0) _artworkIndex = 0;
+
+    final exhibition = store.exhibitionById(artwork.exhibitionId);
+    _isPreview = exhibition != null && !context.read<UserStore>().canAccess(exhibition);
+    if (_isPreview) {
+      _audio = context.read<GuidyAudioService>()..addListener(_enforcePreview);
+    }
 
     // 자동 재생
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -60,8 +73,23 @@ class _PlayerScreenState extends State<PlayerScreen>
   @override
   void dispose() {
     _waveCtrl.dispose();
-    // 화면 이탈 시 자동 정지는 하지 않음 (미니플레이어 연계 대비)
+    // 구매 작품은 미니플레이어로 이어 듣도록 정지하지 않음. 미리듣기는 이탈 시 정지
+    if (_audio != null) {
+      _audio!.removeListener(_enforcePreview);
+      _audio!.stop();
+    }
     super.dispose();
+  }
+
+  void _enforcePreview() {
+    final audio = _audio!;
+    if (audio.isPlaying && audio.positionSec >= _previewSec) {
+      audio.pause();
+      audio.seekTo(_previewSec);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('미리듣기는 30초까지입니다. 구매 후 전체를 들어보세요')),
+      );
+    }
   }
 
   Artwork get _currentArtwork => _playlist[_artworkIndex];
@@ -84,6 +112,8 @@ class _PlayerScreenState extends State<PlayerScreen>
     final a = _currentArtwork;
     if (a.audioUrl != null) {
       audio.play(a.audioUrl!, artworkId: a.id);
+    } else {
+      audio.stop(); // 이전 작품 오디오가 새 작품 화면 뒤에서 계속 나오지 않도록
     }
   }
 
@@ -109,18 +139,14 @@ class _PlayerScreenState extends State<PlayerScreen>
 
   @override
   Widget build(BuildContext context) {
+    if (_playlist.isEmpty) {
+      return const NotFoundScreen(message: '작품을 찾을 수 없습니다');
+    }
     final audio   = context.watch<GuidyAudioService>();
     final artwork = _currentArtwork;
+    final exhibition = context.read<AppStore>().exhibitionById(artwork.exhibitionId);
 
-    final isDark   = Theme.of(context).brightness == Brightness.dark;
-    final bgC      = isDark ? GuidyColors.darkBg      : GuidyColors.bg;
-    final textC    = isDark ? GuidyColors.darkText     : GuidyColors.ink;
-    final subC     = isDark ? GuidyColors.darkSub      : GuidyColors.sub;
-    final muteC    = isDark ? GuidyColors.darkMute     : GuidyColors.mute;
-    final surfaceC = isDark ? GuidyColors.darkSurface  : GuidyColors.surface;
-    final lineC    = isDark ? GuidyColors.darkLine     : GuidyColors.line;
-    final primaryC = isDark ? GuidyColors.darkPrimary  : GuidyColors.primary;
-    final accentC  = isDark ? GuidyColors.darkAccent   : GuidyColors.accent;
+    final pal = GuidyPalette.of(context);
 
     final positionSec = audio.positionSec;
     final durationSec = audio.durationSec > 0
@@ -128,7 +154,7 @@ class _PlayerScreenState extends State<PlayerScreen>
         : artwork.durationSec.toDouble();
 
     return Scaffold(
-      backgroundColor: bgC,
+      backgroundColor: pal.bg,
       body: SafeArea(
         child: Column(
           children: [
@@ -144,12 +170,12 @@ class _PlayerScreenState extends State<PlayerScreen>
                     child: Container(
                       width: 36, height: 36,
                       decoration: BoxDecoration(
-                        color: surfaceC,
+                        color: pal.surface,
                         borderRadius: GuidyRadius.mdBorder,
-                        border: Border.all(color: lineC),
+                        border: Border.all(color: pal.line),
                       ),
                       child: Icon(Icons.arrow_back_ios_new_rounded,
-                          size: 16, color: textC),
+                          size: 16, color: pal.text),
                     ),
                   ),
                   // 트랙 카운터
@@ -160,17 +186,17 @@ class _PlayerScreenState extends State<PlayerScreen>
                         children: [
                           Container(width: 4, height: 4,
                               decoration: BoxDecoration(
-                                  color: primaryC, shape: BoxShape.circle)),
+                                  color: pal.primary, shape: BoxShape.circle)),
                           const SizedBox(width: 6),
                           Text(
                             '${_artworkIndex + 1} / ${_playlist.length}',
-                            style: GuidyText.small(muteC)
+                            style: GuidyText.small(pal.mute)
                                 .copyWith(fontWeight: FontWeight.w700),
                           ),
                           const SizedBox(width: 6),
                           Container(width: 4, height: 4,
                               decoration: BoxDecoration(
-                                  color: lineC, shape: BoxShape.circle)),
+                                  color: pal.line, shape: BoxShape.circle)),
                         ],
                       ),
                     ),
@@ -186,21 +212,21 @@ class _PlayerScreenState extends State<PlayerScreen>
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
-                        color: _captionsOn ? textC : surfaceC,
+                        color: _captionsOn ? pal.text : pal.surface,
                         borderRadius: GuidyRadius.pillBorder,
                         border: Border.all(
-                            color: _captionsOn ? textC : lineC),
+                            color: _captionsOn ? pal.text : pal.line),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(Icons.closed_caption_outlined,
                               size: 14,
-                              color: _captionsOn ? bgC : muteC),
+                              color: _captionsOn ? pal.bg : pal.mute),
                           const SizedBox(width: 4),
                           Text('자막',
                               style: GuidyText.small(
-                                      _captionsOn ? bgC : muteC)
+                                      _captionsOn ? pal.bg : pal.mute)
                                   .copyWith(fontWeight: FontWeight.w700)),
                         ],
                       ),
@@ -346,7 +372,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                                               milliseconds: 120),
                                           height: h,
                                           decoration: BoxDecoration(
-                                            color: accentC,
+                                            color: pal.accent,
                                             borderRadius:
                                                 BorderRadius.circular(2),
                                           ),
@@ -376,28 +402,29 @@ class _PlayerScreenState extends State<PlayerScreen>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        if (exhibition != null)
                         Row(children: [
-                          ChannelBadge(type: ChannelType.curation),
+                          ChannelBadge(type: exhibition.channel),
                           const SizedBox(width: 6),
                           Container(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
-                              color: surfaceC,
+                              color: pal.surface,
                               borderRadius: GuidyRadius.pillBorder,
-                              border: Border.all(color: lineC),
+                              border: Border.all(color: pal.line),
                             ),
-                            child: Text('국립현대미술관',
-                                style: GuidyText.kicker(muteC)),
+                            child: Text(exhibition.venue,
+                                style: GuidyText.kicker(pal.mute)),
                           ),
                         ]),
                         const SizedBox(height: 7),
                         Text(artwork.title,
-                            style: GuidyText.h2(textC)),
+                            style: GuidyText.h2(pal.text)),
                         const SizedBox(height: 2),
                         Text(
                           '${artwork.artist} · ${artwork.material}',
-                          style: GuidyText.body(subC),
+                          style: GuidyText.body(pal.sub),
                         ),
                       ],
                     ),
@@ -416,11 +443,11 @@ class _PlayerScreenState extends State<PlayerScreen>
                   SliderTheme(
                     data: SliderThemeData(
                       trackHeight: 3,
-                      thumbColor: textC,
+                      thumbColor: pal.text,
                       thumbShape: const RoundSliderThumbShape(
                           enabledThumbRadius: 6),
-                      activeTrackColor: textC,
-                      inactiveTrackColor: lineC,
+                      activeTrackColor: pal.text,
+                      inactiveTrackColor: pal.line,
                       overlayShape: const RoundSliderOverlayShape(
                           overlayRadius: 14),
                     ),
@@ -437,11 +464,11 @@ class _PlayerScreenState extends State<PlayerScreen>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(GuidyAudioService.formatTime(positionSec),
-                            style: GuidyText.small(muteC)),
+                            style: GuidyText.small(pal.mute)),
                         // 남은 시간
                         Text(
                           '-${GuidyAudioService.formatTime(durationSec - positionSec)}',
-                          style: GuidyText.small(muteC),
+                          style: GuidyText.small(pal.mute),
                         ),
                       ],
                     ),
@@ -467,13 +494,13 @@ class _PlayerScreenState extends State<PlayerScreen>
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 6),
                       decoration: BoxDecoration(
-                        color: surfaceC,
+                        color: pal.surface,
                         borderRadius: GuidyRadius.pillBorder,
-                        border: Border.all(color: lineC),
+                        border: Border.all(color: pal.line),
                       ),
                       child: Text(
                         '${audio.speed % 1 == 0 ? audio.speed.toInt() : audio.speed}x',
-                        style: GuidyText.small(textC)
+                        style: GuidyText.small(pal.text)
                             .copyWith(fontWeight: FontWeight.w700),
                       ),
                     ),
@@ -482,7 +509,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                   GestureDetector(
                     onTap: () => audio.skipBackward(15),
                     child: Icon(Icons.replay_10_rounded,
-                        size: 32, color: subC),
+                        size: 32, color: pal.sub),
                   ),
                   // 재생/정지
                   GestureDetector(
@@ -495,10 +522,10 @@ class _PlayerScreenState extends State<PlayerScreen>
                     child: Container(
                       width: 64, height: 64,
                       decoration: BoxDecoration(
-                        color: textC, shape: BoxShape.circle,
+                        color: pal.text, shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: textC.withValues(alpha: 0.25),
+                            color: pal.text.withValues(alpha: 0.25),
                             blurRadius: 20,
                             offset: const Offset(0, 6),
                           ),
@@ -509,7 +536,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                               child: SizedBox(
                                 width: 24, height: 24,
                                 child: CircularProgressIndicator(
-                                  color: bgC, strokeWidth: 2.5,
+                                  color: pal.bg, strokeWidth: 2.5,
                                 ),
                               ),
                             )
@@ -517,7 +544,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                               audio.isPlaying
                                   ? Icons.pause_rounded
                                   : Icons.play_arrow_rounded,
-                              color: bgC, size: 32,
+                              color: pal.bg, size: 32,
                             ),
                     ),
                   ),
@@ -525,7 +552,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                   GestureDetector(
                     onTap: () => audio.skipForward(15),
                     child: Icon(Icons.forward_10_rounded,
-                        size: 32, color: subC),
+                        size: 32, color: pal.sub),
                   ),
                   // 자막 토글 (하단)
                   GestureDetector(
@@ -536,7 +563,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                     child: Icon(
                       Icons.closed_caption_outlined,
                       size: 28,
-                      color: _captionsOn ? accentC : subC,
+                      color: _captionsOn ? pal.accent : pal.sub,
                     ),
                   ),
                 ],
@@ -559,11 +586,11 @@ class _PlayerScreenState extends State<PlayerScreen>
                         children: [
                           Icon(Icons.skip_previous_rounded,
                               size: 18,
-                              color: _artworkIndex > 0 ? subC : lineC),
+                              color: _artworkIndex > 0 ? pal.sub : pal.line),
                           const SizedBox(width: 4),
                           Text('이전 작품',
                               style: GuidyText.small(
-                                  _artworkIndex > 0 ? subC : lineC)),
+                                  _artworkIndex > 0 ? pal.sub : pal.line)),
                         ],
                       ),
                     ),
@@ -576,8 +603,8 @@ class _PlayerScreenState extends State<PlayerScreen>
                           margin: const EdgeInsets.symmetric(horizontal: 2),
                           decoration: BoxDecoration(
                             color: i == _artworkIndex
-                                ? primaryC
-                                : lineC,
+                                ? pal.primary
+                                : pal.line,
                             borderRadius: BorderRadius.circular(3),
                           ),
                         ),
@@ -592,14 +619,14 @@ class _PlayerScreenState extends State<PlayerScreen>
                           Text('다음 작품',
                               style: GuidyText.small(
                                   _artworkIndex < _playlist.length - 1
-                                      ? subC
-                                      : lineC)),
+                                      ? pal.sub
+                                      : pal.line)),
                           const SizedBox(width: 4),
                           Icon(Icons.skip_next_rounded,
                               size: 18,
                               color: _artworkIndex < _playlist.length - 1
-                                  ? subC
-                                  : lineC),
+                                  ? pal.sub
+                                  : pal.line),
                         ],
                       ),
                     ),
@@ -626,7 +653,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                             border: Border(
                               bottom: BorderSide(
                                 color:
-                                    isActive ? primaryC : lineC,
+                                    isActive ? pal.primary : pal.line,
                                 width: isActive ? 2 : 1,
                               ),
                             ),
@@ -635,7 +662,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                             _tabs[i],
                             textAlign: TextAlign.center,
                             style: GuidyText.small(
-                                    isActive ? primaryC : muteC)
+                                    isActive ? pal.primary : pal.mute)
                                 .copyWith(
                                     fontWeight: isActive
                                         ? FontWeight.w800
@@ -654,13 +681,13 @@ class _PlayerScreenState extends State<PlayerScreen>
               child: IndexedStack(
                 index: _activeTab,
                 children: [
-                  _buildDescription(artwork, textC, subC),
+                  _buildDescription(artwork, pal.text, pal.sub),
                   _buildScript(
                       artwork, audio.positionSec,
-                      textC, subC, muteC, primaryC, accentC, lineC, audio),
+                      pal.text, pal.sub, pal.mute, pal.primary, pal.accent, pal.line, audio),
                   _buildCurator(
-                      artwork, textC, subC, surfaceC, lineC, primaryC),
-                  _buildArtist(artwork, textC, subC),
+                      artwork, pal.text, pal.sub, pal.surface, pal.line, pal.primary),
+                  _buildArtist(artwork, pal.text, pal.sub),
                 ],
               ),
             ),

@@ -2,9 +2,13 @@
 // 아카이브 화면
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../theme/app_theme.dart';
 import '../../models/models.dart';
+import '../../models/app_store.dart';
+import '../../models/user_store.dart';
 import '../../widgets/common_widgets.dart';
+import '../../widgets/exhibition_actions.dart';
 
 class ArchiveScreen extends StatelessWidget {
   final String exhibitionId;
@@ -12,22 +16,16 @@ class ArchiveScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final exhibition = DummyData.exhibitions.firstWhere(
-      (e) => e.id == exhibitionId && e.channel == ChannelType.archive,
-      orElse: () => DummyData.exhibitions.firstWhere((e) => e.channel == ChannelType.archive),
-    );
+    final exhibition = context.read<AppStore>().exhibitionById(exhibitionId);
+    if (exhibition == null) {
+      return const NotFoundScreen(message: '전시를 찾을 수 없습니다');
+    }
+    final canPlay = context.watch<UserStore>().canAccess(exhibition);
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgC = isDark ? GuidyColors.darkBg : GuidyColors.bg;
-    final textC = isDark ? GuidyColors.darkText : GuidyColors.ink;
-    final subC = isDark ? GuidyColors.darkSub : GuidyColors.sub;
-    final muteC = isDark ? GuidyColors.darkMute : GuidyColors.mute;
-    final surfaceC = isDark ? GuidyColors.darkSurface : GuidyColors.surface;
-    final lineC = isDark ? GuidyColors.darkLine : GuidyColors.line;
-    final primaryC = isDark ? GuidyColors.darkPrimary : GuidyColors.primary;
+    final pal = GuidyPalette.of(context);
 
     return Scaffold(
-      backgroundColor: bgC,
+      backgroundColor: pal.bg,
       body: Stack(
         children: [
           CustomScrollView(
@@ -50,7 +48,7 @@ class ArchiveScreen extends StatelessWidget {
                               gradient: LinearGradient(
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
-                                colors: [Colors.transparent, bgC.withValues(alpha: 0.9)],
+                                colors: [Colors.transparent, pal.bg.withValues(alpha: 0.9)],
                                 stops: const [0.4, 1.0],
                               ),
                             ),
@@ -125,9 +123,9 @@ class ArchiveScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(exhibition.title, style: GuidyText.h1(textC)),
+                          Text(exhibition.title, style: GuidyText.h1(pal.text)),
                           const SizedBox(height: 6),
-                          Text(exhibition.venue, style: GuidyText.body(subC)),
+                          Text(exhibition.venue, style: GuidyText.body(pal.sub)),
                           const SizedBox(height: 20),
 
                           // 액션 버튼
@@ -135,21 +133,24 @@ class ArchiveScreen extends StatelessWidget {
                             children: [
                               Expanded(
                                 child: GestureDetector(
-                                  onTap: () => Navigator.pushNamed(context, '/player/a1'),
+                                  onTap: () => canPlay
+                                      ? openExhibitionPlayer(context, exhibition)
+                                      : confirmPurchase(context, exhibition),
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(vertical: 14),
                                     decoration: BoxDecoration(
-                                      color: textC,
+                                      color: pal.text,
                                       borderRadius: GuidyRadius.pillBorder,
                                     ),
                                     child: Text('전체 감상하기', textAlign: TextAlign.center,
-                                      style: TextStyle(color: bgC, fontSize: 15, fontWeight: FontWeight.w800,
+                                      style: TextStyle(color: pal.bg, fontSize: 15, fontWeight: FontWeight.w800,
                                         fontFamily: GuidyText.fontFamily)),
                                   ),
                                 ),
                               ),
                               const SizedBox(width: 10),
-                              PillButton(label: '미리듣기', size: 'lg'),
+                              PillButton(label: '미리듣기', size: 'lg',
+                                onPressed: () => openExhibitionPlayer(context, exhibition)),
                             ],
                           ),
                           const SizedBox(height: 20),
@@ -158,9 +159,9 @@ class ArchiveScreen extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: surfaceC,
+                              color: pal.surface,
                               borderRadius: GuidyRadius.lgBorder,
-                              border: Border.all(color: lineC),
+                              border: Border.all(color: pal.line),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -168,13 +169,13 @@ class ArchiveScreen extends StatelessWidget {
                                 Row(children: [
                                   Container(
                                     width: 3, height: 16,
-                                    decoration: BoxDecoration(color: primaryC, borderRadius: GuidyRadius.pillBorder),
+                                    decoration: BoxDecoration(color: pal.primary, borderRadius: GuidyRadius.pillBorder),
                                   ),
                                   const SizedBox(width: 8),
-                                  Text('큐레이터 노트', style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w800)),
+                                  Text('큐레이터 노트', style: GuidyText.body(pal.text).copyWith(fontWeight: FontWeight.w800)),
                                 ]),
                                 const SizedBox(height: 8),
-                                Text(exhibition.description, style: GuidyText.body(subC), maxLines: 4, overflow: TextOverflow.ellipsis),
+                                Text(exhibition.description, style: GuidyText.body(pal.sub), maxLines: 4, overflow: TextOverflow.ellipsis),
                               ],
                             ),
                           ),
@@ -184,24 +185,24 @@ class ArchiveScreen extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: surfaceC,
+                              color: pal.surface,
                               borderRadius: GuidyRadius.lgBorder,
-                              border: Border.all(color: lineC),
+                              border: Border.all(color: pal.line),
                             ),
                             child: Row(
                               children: [
-                                _metaItem3(Icons.image_outlined, '작품 수', '${exhibition.workCount}개', textC, muteC),
-                                _divider(lineC),
-                                _metaItem3(Icons.headphones_outlined, '총 청취', '8,420회', textC, muteC),
-                                _divider(lineC),
-                                _metaItem3(Icons.translate_rounded, '언어', '한국어', textC, muteC),
+                                _metaItem3(Icons.image_outlined, '작품 수', '${exhibition.workCount}개', pal.text, pal.mute),
+                                _divider(pal.line),
+                                _metaItem3(Icons.headphones_outlined, '총 청취', '8,420회', pal.text, pal.mute),
+                                _divider(pal.line),
+                                _metaItem3(Icons.translate_rounded, '언어', '한국어', pal.text, pal.mute),
                               ],
                             ),
                           ),
                           const SizedBox(height: 28),
 
                           // 작품 갤러리
-                          Text('수록 작품', style: GuidyText.h3(textC)),
+                          Text('수록 작품', style: GuidyText.h3(pal.text)),
                           const SizedBox(height: 12),
                           GridView.builder(
                             shrinkWrap: true,
@@ -257,25 +258,27 @@ class ArchiveScreen extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.fromLTRB(20, 16, 20, MediaQuery.of(context).padding.bottom + 16),
               decoration: BoxDecoration(
-                color: bgC,
-                border: Border(top: BorderSide(color: lineC)),
+                color: pal.bg,
+                border: Border(top: BorderSide(color: pal.line)),
                 boxShadow: GuidyShadow.up,
               ),
               child: GestureDetector(
-                onTap: () {},
+                onTap: () => canPlay
+                    ? openExhibitionPlayer(context, exhibition)
+                    : confirmPurchase(context, exhibition),
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   decoration: BoxDecoration(
-                    color: textC,
+                    color: pal.text,
                     borderRadius: GuidyRadius.pillBorder,
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.shopping_bag_outlined, color: bgC, size: 18),
+                      Icon(Icons.shopping_bag_outlined, color: pal.bg, size: 18),
                       const SizedBox(width: 8),
-                      Text('₩${exhibition.price} · 구매하고 감상하기',
-                        style: TextStyle(color: bgC, fontSize: 15, fontWeight: FontWeight.w800,
+                      Text(canPlay ? '지금 바로 감상하기' : '₩${formatPrice(exhibition.price)} · 구매하고 감상하기',
+                        style: TextStyle(color: pal.bg, fontSize: 15, fontWeight: FontWeight.w800,
                           fontFamily: GuidyText.fontFamily)),
                     ],
                   ),

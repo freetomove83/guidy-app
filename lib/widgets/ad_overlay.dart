@@ -6,6 +6,7 @@
 
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../theme/app_theme.dart';
 
 // ─── 더미 광고 데이터 모델 ─────────────────────────────────
@@ -35,6 +36,7 @@ class AdData {
 }
 
 // ─── 더미 광고 데이터 (Firebase 연결 전 더미) ──────────────
+// landingUrl은 DummyData에 실제로 있는 전시·크리에이터 ID여야 함 (store_test에서 검사)
 class AdDataStore {
   static final _splashAd = AdData(
     id: 'ad_splash_001',
@@ -42,36 +44,53 @@ class AdDataStore {
     mediaType: AdMediaType.image,
     imageUrl: null, // Firebase Storage URL 연결 예정
     landingType: AdLandingType.internal,
-    landingUrl: '/detail/expo_001',
-    endAt: DateTime(2025, 8, 31),
+    landingUrl: '/detail/e1',
+    endAt: DateTime(2026, 12, 31),
     active: true,
   );
 
   static final _popupAd = AdData(
     id: 'ad_popup_001',
-    title: '경복궁 심층 탐방 오디오 가이드',
+    title: '「침묵과 소음」 심층 탐방 오디오 가이드',
     mediaType: AdMediaType.image,
     imageUrl: null,
     landingType: AdLandingType.internal,
-    landingUrl: '/detail/expo_001',
-    endAt: DateTime(2025, 7, 31),
+    landingUrl: '/detail/e4',
+    endAt: DateTime(2026, 12, 31),
     active: true,
   );
 
   static final _slideUpAd = AdData(
     id: 'ad_slideup_001',
-    title: '신규 크리에이터 김민준 등장',
+    title: '신규 크리에이터 정재원 등장',
     mediaType: AdMediaType.image,
     imageUrl: null,
     landingType: AdLandingType.internal,
-    landingUrl: '/creator/creator_001',
-    endAt: DateTime(2025, 8, 15),
+    landingUrl: '/creator/c4',
+    endAt: DateTime(2026, 12, 31),
     active: true,
   );
 
-  static AdData? get splashAd => _splashAd.active ? _splashAd : null;
-  static AdData? get popupAd  => _popupAd.active  ? _popupAd  : null;
-  static AdData? get slideUpAd => _slideUpAd.active ? _slideUpAd : null;
+  static AdData? _live(AdData ad) =>
+      ad.active && DateTime.now().isBefore(ad.endAt) ? ad : null;
+
+  static AdData? get splashAd  => _live(_splashAd);
+  static AdData? get popupAd   => _live(_popupAd);
+  static AdData? get slideUpAd => _live(_slideUpAd);
+
+  // '오늘 하루 보지 않기' — 숨긴 날짜(yyyy-mm-dd)를 저장
+  static const _kPopupHiddenOn = 'guidy_popup_ad_hidden_on';
+  static String _today() => DateTime.now().toIso8601String().substring(0, 10);
+
+  static Future<bool> isPopupHiddenToday() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_kPopupHiddenOn) == _today();
+  }
+
+  static Future<void> hidePopupToday() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_kPopupHiddenOn, _today());
+  }
 }
 
 // ══════════════════════════════════════════════════════════
@@ -306,6 +325,7 @@ class _HomePopupAdState extends State<HomePopupAd>
   }
 
   Future<void> _close() async {
+    if (_dontShowToday) await AdDataStore.hidePopupToday();
     await _ctrl.reverse();
     widget.onClose();
   }
