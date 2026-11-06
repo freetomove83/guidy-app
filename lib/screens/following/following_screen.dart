@@ -50,7 +50,8 @@ class _StoryStrip extends StatelessWidget {
     final pal = GuidyPalette.of(context);
 
     return SizedBox(
-      height: 90,
+      // 90 중 이름 한 줄(약 14)만 글자 배율에 맞춰 키움 → 큰 글자에서도 잘리지 않고, 1배일 땐 90 그대로
+      height: 76 + MediaQuery.textScalerOf(context).scale(14),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 20),

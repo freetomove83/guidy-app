@@ -412,8 +412,10 @@ class ReferralScreen extends StatelessWidget {
                             Icon(Icons.science_outlined,
                                 size: 14, color: pal.mute),
                             const SizedBox(width: 6),
-                            Text('테스트: 초대 보상 받기 (개발 확인용)',
-                                style: GuidyText.small(pal.mute)),
+                            Flexible(
+                              child: Text('테스트: 초대 보상 받기 (개발 확인용)',
+                                  style: GuidyText.small(pal.mute)),
+                            ),
                           ],
                         ),
                       ),
@@ -484,13 +486,16 @@ class _StatCard extends StatelessWidget {
             child: Icon(icon, size: 18, color: color),
           ),
           const SizedBox(width: 10),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(value,
-                  style: GuidyText.h3(highlight ? color : textC)),
-              Text(label, style: GuidyText.small(subC)),
-            ],
+          // 남은 폭 안에서 줄바꿈되도록 (큰 글자에서 카드 밖으로 넘치지 않게)
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(value,
+                    style: GuidyText.h3(highlight ? color : textC)),
+                Text(label, style: GuidyText.small(subC)),
+              ],
+            ),
           ),
         ],
       ),
