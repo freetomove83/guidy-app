@@ -152,7 +152,8 @@ class _SplashScreenState extends State<SplashScreen>
     // 6) 광고 없을 때 → 바로 퇴장
     await _exitCtrl.forward();
     if (!mounted) return;
-    Navigator.of(context).pushReplacementNamed('/home');
+    // initialRoute('/splash') 아래에 '/'가 함께 쌓이므로 스택을 비워 홈이 유일한 화면이 되게 함
+    Navigator.of(context).pushNamedAndRemoveUntil('/home', (_) => false);
   }
 
   Future<void> _onAdClosed() async {
@@ -160,7 +161,7 @@ class _SplashScreenState extends State<SplashScreen>
     setState(() => _showSplashAd = false);
     await _exitCtrl.forward();
     if (!mounted) return;
-    Navigator.of(context).pushReplacementNamed('/home');
+    Navigator.of(context).pushNamedAndRemoveUntil('/home', (_) => false);
   }
 
   @override
@@ -340,7 +341,7 @@ class _SplashScreenState extends State<SplashScreen>
             onClose: _onAdClosed,
             onNavigate: (route) {
               // 광고 랜딩 후 홈으로 이동 (내부 라우트는 홈 진입 후 처리)
-              Navigator.of(context).pushReplacementNamed('/home');
+              Navigator.of(context).pushNamedAndRemoveUntil('/home', (_) => false);
             },
           ),
       ],

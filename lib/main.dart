@@ -161,8 +161,6 @@ class GuidyApp extends StatelessWidget {
     } else if (name.startsWith('/section/')) {
       final id = name.replaceFirst('/section/', '');
       page = SectionDetailScreen(sectionId: id);
-    } else if (name == '/mypage') {
-      page = const MyPageScreen();
     } else if (name == '/notification-settings') {
       page = const NotificationSettingsScreen();
     } else if (name == '/change-password') {
@@ -214,7 +212,7 @@ class _MainShellState extends State<MainShell> {
     HomeScreen(),
     SizedBox.shrink(), // 스캔 탭은 /scan 라우트로 push (상주 화면 불필요)
     LibraryScreen(),
-    _SettingsPage(),
+    MyPageScreen(),
   ];
 
   @override
@@ -333,186 +331,6 @@ class _MainShellState extends State<MainShell> {
               fontWeight: FontWeight.w700,
               color: pal.accent,
             )),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ─── 설정 페이지 ─────────────────────────────────────────
-class _SettingsPage extends StatelessWidget {
-  const _SettingsPage();
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final pal = GuidyPalette.of(context);
-
-    return Scaffold(
-      backgroundColor: pal.bg,
-      body: SafeArea(
-        bottom: false,
-        child: ListView(
-          padding: const EdgeInsets.all(20),
-          children: [
-            const SizedBox(height: 12),
-            Text('내 정보', style: GuidyText.h2(pal.text)),
-            const SizedBox(height: 20),
-
-            // 프로필 카드 (탭 시 로그인 화면)
-            GestureDetector(
-              onTap: () => Navigator.pushNamed(context, '/mypage'),
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: pal.surface,
-                  borderRadius: GuidyRadius.xlBorder,
-                  border: Border.all(color: pal.line),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 56, height: 56,
-                      decoration: const BoxDecoration(
-                        color: GuidyColors.primarySoft,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Center(
-                        child: Text('G', style: TextStyle(
-                          color: GuidyColors.primary, fontSize: 24, fontWeight: FontWeight.w800,
-                          fontFamily: GuidyText.fontFamily,
-                        )),
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Guidy 사용자', style: GuidyText.h3(pal.text)),
-                          Text('로그인하여 더 많은 기능을 이용하세요', style: GuidyText.small(pal.sub)),
-                        ],
-                      ),
-                    ),
-                    Icon(Icons.chevron_right_rounded, color: pal.mute, size: 18),
-                  ],
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
-            // 설정 메뉴
-            _settingItem(Icons.mic_rounded, '크리에이터 되기', '오디오 가이드를 만들어 수익을 창출하세요', context, pal.surface, pal.line, pal.text, pal.sub, () {
-              final userStore = context.read<UserStore>();
-              if (userStore.isCreator) {
-                // 이미 크리에이터 → 스튜디오로
-                Navigator.pushNamed(context, '/creator-studio');
-              } else {
-                // 신청 전 or 대기 중 → 신청/진행 화면으로
-                Navigator.pushNamed(context, '/creator-apply');
-              }
-            }),
-            const SizedBox(height: 8),
-
-            // 다크 모드 토글
-            Consumer<ThemeProvider>(
-              builder: (context, themeP, _) => Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: pal.surface,
-                  borderRadius: GuidyRadius.lgBorder,
-                  border: Border.all(color: pal.line),
-                ),
-                child: Row(
-                  children: [
-                    Icon(isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded, color: pal.mute, size: 20),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('다크 모드', style: GuidyText.body(pal.text).copyWith(fontWeight: FontWeight.w600)),
-                          Text(isDark ? '현재 다크 모드' : '현재 라이트 모드', style: GuidyText.small(pal.sub)),
-                        ],
-                      ),
-                    ),
-                    Switch(
-                      value: isDark,
-                      onChanged: (_) => themeP.toggle(),
-                      activeThumbColor: GuidyColors.primary,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 8),
-
-            _settingItem(Icons.help_outline_rounded, '도움말', '사용 방법 및 FAQ', context, pal.surface, pal.line, pal.text, pal.sub, () {
-              Navigator.pushNamed(context, '/help');
-            }),
-            const SizedBox(height: 8),
-            _settingItem(Icons.info_outline_rounded, 'Guidy 소개', '버전 ${AboutScreen.currentVersion}', context, pal.surface, pal.line, pal.text, pal.sub, () {
-              Navigator.pushNamed(context, '/about');
-            }),
-
-            const SizedBox(height: 40),
-
-            // 앱 정보
-            Center(
-              child: Column(
-                children: [
-                  Container(
-                    width: 56, height: 56,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(56 * 0.225),
-                    ),
-                    child: Image.asset(
-                      'assets/icon/app_icon.png',
-                      width: 56, height: 56,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text('Guidy', style: GuidyText.h3(pal.text)),
-                  Text('오디오 가이드 마켓플레이스', style: GuidyText.small(pal.sub)),
-                  const SizedBox(height: 4),
-                  Text('v${AboutScreen.currentVersion}', style: GuidyText.kicker(pal.mute)),
-                ],
-              ),
-            ),
-            const SizedBox(height: 80),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _settingItem(IconData icon, String title, String sub, BuildContext context, Color surfaceC, Color lineC, Color textC, Color subC, VoidCallback? onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: surfaceC,
-          borderRadius: GuidyRadius.lgBorder,
-          border: Border.all(color: lineC),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, size: 20, color: GuidyColors.mute),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title, style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w600)),
-                  Text(sub, style: GuidyText.small(subC)),
-                ],
-              ),
-            ),
-            const Icon(Icons.chevron_right_rounded, color: GuidyColors.mute, size: 18),
           ],
         ),
       ),
