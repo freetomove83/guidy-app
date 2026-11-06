@@ -1,6 +1,8 @@
 // lib/main.dart
 // Guidy 오디오 가이드 앱 메인
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'theme/app_theme.dart';
@@ -35,6 +37,7 @@ import 'widgets/common_widgets.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await _initFirebase();
   final appStore  = AppStore();
   final userStore = UserStore();
   await Future.wait([
@@ -42,6 +45,20 @@ void main() async {
     userStore.init(),  // localStorage에서 사용자 개인화 데이터 복원
   ]);
   runApp(GuidyRoot(appStore: appStore, userStore: userStore));
+}
+
+/// Firebase 기본 앱 초기화 — 설정은 네이티브 파일에서 읽음
+/// (iOS: ios/Runner/GoogleService-Info.plist, Android: android/app/google-services.json)
+// shortcut: 웹은 Firebase 웹 앱 미등록이라 건너뜀, 웹에서 Firebase 쓸 때 FirebaseOptions 추가
+Future<void> _initFirebase() async {
+  if (kIsWeb) return;
+  try {
+    final app = await Firebase.initializeApp();
+    debugPrint('[Firebase] initialized: ${app.options.projectId}');
+  } catch (e) {
+    // 아직 Firebase 기능을 쓰는 화면이 없으므로 설정 누락 시 앱은 계속 실행
+    debugPrint('[Firebase] init skipped: $e');
+  }
 }
 
 /// 앱 루트 — Provider 구성만 담당 (테스트에서 동일하게 재사용)

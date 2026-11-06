@@ -11,9 +11,9 @@
 |---|---|
 | 앱 이름 | Guidy Audio Guide |
 | 저장소 | https://github.com/freetomove83/guidy-app |
-| 브랜치 | `main` |
+| 브랜치 | `main` (작업 브랜치는 PR로 병합) |
 | Android 패키지 | `com.guidyaudioguide.tour` |
-| iOS Bundle ID | 인계 문서: `com.guidyaudioguide.tour` / 현재 저장소: `com.guidyaudioguide.guidyAudioGuide` **(불일치, 결정 필요)** |
+| iOS Bundle ID | `com.guidyaudioguide.tour` (2026-11-05 Android·Firebase와 통일. 이전 값 `com.guidyaudioguide.guidyAudioGuide`) |
 
 ---
 
@@ -32,10 +32,10 @@ git stash list
 
 확인 포인트:
 - `origin/main..HEAD` 결과가 있으면 로컬 커밋이 원격에 없는 상태입니다. push 여부를 먼저 정합니다.
-- `lib/firebase_options.dart`, `ios/Runner/GoogleService-Info.plist` 존재 여부를 확인합니다.
+- Firebase 설정 파일 2개가 제자리에 있는지 확인합니다 (Git에 없으므로 기기마다 직접 배치).
 
 ```bash
-ls lib/firebase_options.dart ios/Runner/GoogleService-Info.plist
+ls ios/Runner/GoogleService-Info.plist android/app/google-services.json
 ```
 
 ---
@@ -51,7 +51,8 @@ ls lib/firebase_options.dart ios/Runner/GoogleService-Info.plist
 | Storage Bucket | `guidy-platform.firebasestorage.app` |
 | Android App ID | `1:354832592482:android:40ed50da887b61d638ab3b` |
 | OAuth Web Client ID | `354832592482-ugtit23j1884f013o1jis0oj8mcffb30.apps.googleusercontent.com` |
-| OAuth iOS Client ID | `354832592482-m3johvcqod8ja3r4mfm1b6isp7b190mg.apps.googleusercontent.com` |
+| OAuth iOS Client ID | `354832592482-klquq36s4mg64epd6bmo087t9vpdb6go.apps.googleusercontent.com` (plist의 `CLIENT_ID`) |
+| OAuth Android Client ID | `354832592482-m3johvcqod8ja3r4mfm1b6isp7b190mg.apps.googleusercontent.com` (plist의 `ANDROID_CLIENT_ID`) |
 
 ### 3-2. 설정 파일 배치
 
@@ -60,84 +61,71 @@ ls lib/firebase_options.dart ios/Runner/GoogleService-Info.plist
 | `google-services.json` | Android Firebase 설정 | `android/app/` | **금지** (비밀 정보 포함) |
 | `GoogleService-Info.plist` | iOS Firebase 설정 | `ios/Runner/` | **금지** |
 | `*-adminsdk-*.json` | 서버용 관리자 키 | 저장소 외부 보관 | **절대 금지** |
-| `lib/firebase_options.dart` | FlutterFire 생성 설정 | `lib/` | 커밋 가능 (값에 비밀 없음) |
+| ~~`lib/firebase_options.dart`~~ | 사용 안 함 | — | 앱은 위 네이티브 파일로 초기화 (`Firebase.initializeApp()` 옵션 없이 호출, `lib/main.dart`의 `_initFirebase`). 웹에서 Firebase를 쓸 때만 필요 |
 
 원본 파일은 윈도우 `C:\Users\freet\Downloads\Guidy`에 있습니다. 맥으로 옮길 때는 USB나 개인 클라우드 등 안전한 경로를 사용하세요.
 
 ### 3-3. iOS URL Scheme (Google 로그인)
 
-`ios/Runner/Info.plist`에 `GoogleService-Info.plist`의 `REVERSED_CLIENT_ID` 값을 URL Scheme으로 등록해야 합니다.
+`ios/Runner/Info.plist`의 `CFBundleURLTypes`에 `GoogleService-Info.plist`의 **`REVERSED_CLIENT_ID`** 값이 등록되어 있습니다 (2026-11-05 추가).
 
-```xml
-<key>CFBundleURLTypes</key>
-<array>
-  <dict>
-    <key>CFBundleURLSchemes</key>
-    <array>
-      <string>com.googleusercontent.apps.354832592482-m3johvcqod8ja3r4mfm1b6isp7b190mg</string>
-    </array>
-  </dict>
-</array>
-```
-
-현재 저장소의 `Info.plist`에는 이 항목이 없습니다.
+> 주의: 이전 버전 문서의 예시 값(`...m3johvcqod8...`)은 **Android** Client ID였습니다. iOS URL Scheme에는 반드시 plist의 `REVERSED_CLIENT_ID`를 그대로 사용하세요.
 
 ---
 
 ## 4. 맥 개발 환경
 
+현재 개발 맥 (MacBook Air M3, 2026-11-05 기준):
+
 | 항목 | 버전 |
 |---|---|
-| macOS | 13.7.8 Ventura (인텔 x86_64) |
-| Xcode | 15.4 |
-| Flutter | 3.24.5 |
-| Dart | 3.5.4 |
-| CocoaPods | 1.17.0 |
-| Ruby | 3.1.4 (rbenv) |
-| 시뮬레이터 | iPhone 15 Pro Max / iOS 17.5 |
+| macOS | 27.0.1 (Apple Silicon arm64) |
+| Xcode | 27.2 |
+| Flutter | 3.47.7 (stable, `~/development/flutter`) |
+| Dart | 3.13.5 |
+| iOS 의존성 | Swift Package Manager (CocoaPods 불필요, `ios/Podfile` 없음) |
+| 시뮬레이터 | iPhone 18 Pro |
+
+> 예전 인텔 맥(macOS 13.7.8, Xcode 15.4, Flutter 3.24.5)은 더 이상 기준 환경이 아닙니다. 그 맥에서 빌드하려면 Flutter를 3.27 이상으로 올려야 합니다 (아래 5번 참고).
 
 ### PATH 설정 (`~/.zshrc`)
 
 ```bash
 export PATH="$HOME/development/flutter/bin:$PATH"
-export PATH="$HOME/.rbenv/bin:$PATH"
-eval "$(rbenv init -)"
 ```
 
 ### 자주 쓰는 명령
 
 ```bash
-open /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app
 cd ~/Documents/GitHub/guidy-app
 flutter pub get
-cd ios && pod install && cd ..
+open ios/Runner.xcworkspace        # Xcode는 반드시 이 경로로 열기 (~/GensparkCode 사본 아님)
 flutter devices
 flutter run
+flutter test                        # 골든 테스트 포함
 ```
 
 ---
 
-## 5. 코드 작성 규칙 (Flutter 3.24.5 호환)
+## 5. 코드 작성 규칙
 
-최신 API를 쓰면 맥에서 빌드가 깨집니다. 아래 대체 API를 사용하세요.
+기준 Flutter 버전은 **3.47.7**입니다. 코드는 이미 `withValues(alpha: x)`, `activeThumbColor`, `CardThemeData` 등 Flutter 3.27+ API를 사용하므로, 3.24.5 이하에서는 빌드되지 않습니다. 구버전 API(`withOpacity` 등)로 되돌리지 말고 빌드 환경의 Flutter를 올리세요.
 
-| 사용 금지 | 대체 |
-|---|---|
-| `withValues(alpha: x)` | `withOpacity(x)` |
-| `activeThumbColor` | `activeColor` |
-| `CardThemeData` | `CardTheme` |
+`audioplayers`는 `pubspec.yaml`에서 `^6.4.0`입니다.
 
-`audioplayers`는 Dart 3.5.4 호환을 위해 6.4.0을 사용합니다. 현재 `pubspec.yaml`은 6.5.0이므로 맥에서 확인이 필요합니다.
+UI를 바꾼 뒤에는 `flutter test`로 골든 테스트를 확인하고, 의도한 변경이면 `flutter test --update-goldens test/goldens`로 기준 이미지를 갱신합니다.
 
 ---
 
 ## 6. 맥에서 해야 할 남은 작업
 
-- [ ] `git status` / `git log origin/main..HEAD` 결과 확인
-- [ ] Firebase 설정 파일 배치 (`google-services.json`, `GoogleService-Info.plist`)
-- [ ] `lib/firebase_options.dart` iOS 섹션 실제 값 반영
-- [ ] `Info.plist`에 `REVERSED_CLIENT_ID` URL Scheme 추가
-- [ ] Bundle ID 통일 결정 (`com.guidyaudioguide.tour` 권장 여부 확인)
+- [x] `git status` / `git log origin/main..HEAD` 결과 확인
+- [x] `GoogleService-Info.plist` 배치 (`ios/Runner/`, Xcode Runner 타깃 포함)
+- [x] `google-services.json` 배치 (`android/app/`) + Android Gradle `google-services` 플러그인 4.4.4 추가 (빌드 리소스 생성 확인)
+- [ ] Android 기기/에뮬레이터에서 Firebase 초기화 로그 확인 (맥에 Android 에뮬레이터 없음)
+- [x] Firebase 초기화 코드 (`firebase_core`, iOS에서 `guidy-platform` 연결 확인)
+- [x] `Info.plist`에 `REVERSED_CLIENT_ID` URL Scheme 추가
+- [x] Bundle ID 통일: `com.guidyaudioguide.tour` (App Store 배포 프로파일은 새 ID로 재생성 필요)
 - [ ] iOS에서 Google 로그인 테스트
 - [ ] Apple 로그인 구현 (App Store 출시 필수)
 
