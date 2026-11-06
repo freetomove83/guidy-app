@@ -31,7 +31,8 @@ migrate_working_dir/
 .flutter-plugins-dependencies
 .pub-cache/
 .pub/
-/build/
+# /build/* (not /build/): git can't re-include files under an ignored directory
+/build/*
 !/build/web/
 /coverage/
 
