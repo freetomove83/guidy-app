@@ -2,6 +2,9 @@
 // 로그인 화면 - 소셜 로그인 (Google, Apple, Naver, Kakao) + 이메일
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../models/user_store.dart';
+import '../../services/auth_service.dart';
 import '../../theme/app_theme.dart';
 import 'signup_screen.dart';
 import 'email_login_screen.dart';
@@ -192,11 +195,34 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  void _handleSocialLogin(BuildContext context, String provider) {
-    // 소셜 로그인 처리 (실제 구현 시 각 SDK 연동)
+  Future<void> _handleSocialLogin(BuildContext context, String provider) async {
+    if (provider == 'google') return _handleGoogleLogin(context);
+    // Apple·네이버·카카오는 아직 SDK 미연동
+    _showMessage(context, '$provider 로그인 연동 준비 중입니다');
+  }
+
+  Future<void> _handleGoogleLogin(BuildContext context) async {
+    final userStore = context.read<UserStore>();
+    final navigator = Navigator.of(context);
+    try {
+      final user = await AuthService.signInWithGoogle();
+      if (user == null) return; // 사용자가 취소
+      await userStore.updateProfile(name: user.displayName, email: user.email);
+      if (navigator.canPop()) {
+        navigator.pop();
+      } else {
+        navigator.pushReplacementNamed('/home');
+      }
+    } catch (e) {
+      debugPrint('[Auth] Google login failed: $e');
+      if (context.mounted) _showMessage(context, 'Google 로그인에 실패했습니다. 잠시 후 다시 시도해주세요');
+    }
+  }
+
+  void _showMessage(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('$provider 로그인 연동 준비 중입니다'),
+        content: Text(message),
         backgroundColor: GuidyColors.primary,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: GuidyRadius.lgBorder),

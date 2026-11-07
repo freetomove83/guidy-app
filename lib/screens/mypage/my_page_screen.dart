@@ -7,6 +7,7 @@ import '../../theme/app_theme.dart';
 import '../../theme/theme_provider.dart';
 import '../../models/models.dart';
 import '../../models/user_store.dart';
+import '../../services/auth_service.dart';
 import '../../widgets/common_widgets.dart';
 import 'notification_settings_screen.dart';
 import 'change_password_screen.dart';
@@ -49,50 +50,99 @@ class _MyPageScreenState extends State<MyPageScreen> {
               ),
             ),
 
-            // ─── 탭 ────────────────────────────────────
-            const SizedBox(height: 12),
-            Container(
-              decoration: BoxDecoration(
-                border: Border(bottom: BorderSide(color: pal.line)),
-              ),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  children: List.generate(_tabs.length, (i) {
-                    final isA = i == _tabIndex;
-                    return GestureDetector(
-                      onTap: () => setState(() => _tabIndex = i),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 12),
-                        margin: const EdgeInsets.only(right: 20),
-                        decoration: BoxDecoration(
-                          border: Border(bottom: BorderSide(
-                            color: isA ? pal.primary : Colors.transparent,
-                            width: 2.5,
-                          )),
-                        ),
-                        child: Text(_tabs[i], style: TextStyle(
-                          fontFamily: GuidyText.fontFamily,
-                          fontSize: 14,
-                          fontWeight: isA ? FontWeight.w800 : FontWeight.w500,
-                          color: isA ? pal.text : pal.mute,
-                        )),
-                      ),
-                    );
-                  }),
-                ),
+            Expanded(
+              child: StreamBuilder(
+                stream: AuthService.authStateChanges(),
+                initialData: AuthService.currentUser,
+                builder: (context, snap) => snap.data == null
+                    ? const _LoginPrompt()
+                    : _buildTabs(pal),
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
 
-            Expanded(
-              child: IndexedStack(
-                index: _tabIndex,
-                children: [
-                  _ProfileTab(onGoHistory: () => setState(() => _tabIndex = 1)),
-                  const _PurchaseHistoryTab(),
-                ],
-              ),
+  Widget _buildTabs(GuidyPalette pal) {
+    return Column(
+      children: [
+      // ─── 탭 ────────────────────────────────────
+      const SizedBox(height: 12),
+      Container(
+        decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: pal.line)),
+        ),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Row(
+            children: List.generate(_tabs.length, (i) {
+              final isA = i == _tabIndex;
+              return GestureDetector(
+                onTap: () => setState(() => _tabIndex = i),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 12),
+                  margin: const EdgeInsets.only(right: 20),
+                  decoration: BoxDecoration(
+                    border: Border(bottom: BorderSide(
+                      color: isA ? pal.primary : Colors.transparent,
+                      width: 2.5,
+                    )),
+                  ),
+                  child: Text(_tabs[i], style: TextStyle(
+                    fontFamily: GuidyText.fontFamily,
+                    fontSize: 14,
+                    fontWeight: isA ? FontWeight.w800 : FontWeight.w500,
+                    color: isA ? pal.text : pal.mute,
+                  )),
+                ),
+              );
+            }),
+          ),
+        ),
+      ),
+
+      Expanded(
+        child: IndexedStack(
+          index: _tabIndex,
+          children: [
+            _ProfileTab(onGoHistory: () => setState(() => _tabIndex = 1)),
+            const _PurchaseHistoryTab(),
+          ],
+        ),
+      ),
+      ],
+    );
+  }
+}
+
+// ─── 로그아웃 상태 ───────────────────────────────────────
+class _LoginPrompt extends StatelessWidget {
+  const _LoginPrompt();
+
+  @override
+  Widget build(BuildContext context) {
+    final pal = GuidyPalette.of(context);
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.person_outline_rounded, size: 56, color: pal.mute),
+            const SizedBox(height: 16),
+            Text('로그인이 필요해요', style: GuidyText.h3(pal.text)),
+            const SizedBox(height: 8),
+            Text('로그인하면 구매한 전시와 즐겨찾기를 볼 수 있어요',
+                style: GuidyText.body(pal.sub), textAlign: TextAlign.center),
+            const SizedBox(height: 24),
+            PillButton(
+              label: '로그인하기',
+              primary: true,
+              size: 'lg',
+              onPressed: () => Navigator.pushNamed(context, '/login'),
             ),
           ],
         ),
@@ -377,6 +427,7 @@ class _ProfileTabState extends State<_ProfileTab> {
                 ),
                 TextButton(
                   onPressed: () {
+                    AuthService.signOut();
                     context.read<UserStore>().clearAll();
                     Navigator.pop(context);
                     Navigator.pushNamedAndRemoveUntil(context, '/login', (_) => false);

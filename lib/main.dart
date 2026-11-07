@@ -2,6 +2,7 @@
 // Guidy 오디오 가이드 앱 메인
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -51,17 +52,26 @@ void main() async {
   runApp(GuidyRoot(appStore: appStore, userStore: userStore));
 }
 
-/// Firebase 기본 앱 초기화 — 설정은 네이티브 파일에서 읽음
+/// 웹용 Firebase 설정 — guidy-cms와 같은 웹 앱 (API 키는 허용 주소로 제한돼 있음)
+const _webFirebaseOptions = FirebaseOptions(
+  apiKey: 'AIzaSyAkWRKkI4PcP7Ty_2_3niUO0lrMPxi2VWs',
+  appId: '1:354832592482:web:b82045214b6365c738ab3b',
+  messagingSenderId: '354832592482',
+  projectId: 'guidy-platform',
+  authDomain: 'guidy-platform.firebaseapp.com',
+  storageBucket: 'guidy-platform.firebasestorage.app',
+);
+
+/// Firebase 기본 앱 초기화 — iOS·Android 설정은 네이티브 파일에서 읽음
 /// (iOS: ios/Runner/GoogleService-Info.plist, Android: android/app/google-services.json)
-// shortcut: 웹은 Firebase 웹 앱 미등록이라 건너뜀, 웹에서 Firebase 쓸 때 FirebaseOptions 추가
 Future<bool> _initFirebase() async {
-  if (kIsWeb) return false;
   try {
-    final app = await Firebase.initializeApp();
+    final app = await Firebase.initializeApp(options: kIsWeb ? _webFirebaseOptions : null);
     debugPrint('[Firebase] initialized: ${app.options.projectId}');
     // 로컬 검증용: flutter run --dart-define=USE_EMULATOR=true (guidy-cms에서 firebase emulators:start)
     if (const bool.fromEnvironment('USE_EMULATOR')) {
       FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
+      await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
     }
     return true;
   } catch (e) {
