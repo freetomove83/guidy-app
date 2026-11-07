@@ -99,9 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
               },
               onNavigate: (route) {
                 setState(() => _showPopupAd = false);
-                if (route.startsWith('/')) {
-                  Navigator.pushNamed(context, route);
-                }
+                AdDataStore.open(Navigator.of(context), route);
               },
             ),
 
@@ -112,9 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
               onClose: () => setState(() => _showSlideUpAd = false),
               onNavigate: (route) {
                 setState(() => _showSlideUpAd = false);
-                if (route.startsWith('/')) {
-                  Navigator.pushNamed(context, route);
-                }
+                AdDataStore.open(Navigator.of(context), route);
               },
             ),
         ],

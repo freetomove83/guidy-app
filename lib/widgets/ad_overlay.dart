@@ -5,8 +5,10 @@
 //   3. HomeSlideUpAd     — 홈 하단 슬라이드업 광고
 
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../theme/app_theme.dart';
 
 // ─── 더미 광고 데이터 모델 ─────────────────────────────────
@@ -35,10 +37,10 @@ class AdData {
   });
 }
 
-// ─── 더미 광고 데이터 (Firebase 연결 전 더미) ──────────────
-// landingUrl은 DummyData에 실제로 있는 전시·크리에이터 ID여야 함 (store_test에서 검사)
+// ─── 광고 데이터 — CMS(Firestore banners)에서 불러오고, 못 불러오면 기본 광고 ──
+// 기본 광고의 landingUrl은 DummyData에 실제로 있는 전시·크리에이터 ID여야 함 (store_test에서 검사)
 class AdDataStore {
-  static final _splashAd = AdData(
+  static AdData? _splashAd = AdData(
     id: 'ad_splash_001',
     title: '여름 특별전 시작!',
     mediaType: AdMediaType.image,
@@ -49,7 +51,7 @@ class AdDataStore {
     active: true,
   );
 
-  static final _popupAd = AdData(
+  static AdData? _popupAd = AdData(
     id: 'ad_popup_001',
     title: '「침묵과 소음」 심층 탐방 오디오 가이드',
     mediaType: AdMediaType.image,
@@ -60,7 +62,7 @@ class AdDataStore {
     active: true,
   );
 
-  static final _slideUpAd = AdData(
+  static AdData? _slideUpAd = AdData(
     id: 'ad_slideup_001',
     title: '신규 크리에이터 정재원 등장',
     mediaType: AdMediaType.image,
@@ -71,8 +73,69 @@ class AdDataStore {
     active: true,
   );
 
-  static AdData? _live(AdData ad) =>
-      ad.active && DateTime.now().isBefore(ad.endAt) ? ad : null;
+  static AdData? _live(AdData? ad) =>
+      ad != null && ad.active && DateTime.now().isBefore(ad.endAt) ? ad : null;
+
+  /// CMS 광고 배너 관리에서 등록한 배너로 교체 — 구좌마다 지금 노출 기간인 배너 중 가장 최근 것.
+  /// 불러오면 CMS에 없는 구좌는 광고 없음. 오프라인·Firebase 없음 → 기본 광고 유지.
+  static Future<void> load({Duration timeout = const Duration(seconds: 6)}) async {
+    try {
+      final snap = await FirebaseFirestore.instance.collection('banners').get().timeout(timeout);
+      final now = DateTime.now();
+      final live = <String, (DateTime, AdData)>{};
+      for (final doc in snap.docs) {
+        final d = doc.data();
+        final start = d['start_at'], end = d['end_at'];
+        if (d['paused'] == true || start is! Timestamp || end is! Timestamp) continue;
+        final endAt = end.toDate().add(const Duration(days: 1)); // 종료일 당일까지
+        if (now.isBefore(start.toDate()) || !now.isBefore(endAt)) continue;
+        final ad = AdData(
+          id: doc.id,
+          title: (d['title'] as String?) ?? '',
+          mediaType: d['media_type'] == 'video' ? AdMediaType.video : AdMediaType.image,
+          imageUrl: d['media_type'] == 'video' ? null : d['media_url'] as String?,
+          landingType: d['landing_type'] == 'internal' ? AdLandingType.internal : AdLandingType.url,
+          landingUrl: _landingRoute(d),
+          endAt: endAt,
+          active: true,
+        );
+        final slot = d['slot'] as String? ?? '';
+        if (!live.containsKey(slot) || start.toDate().isAfter(live[slot]!.$1)) {
+          live[slot] = (start.toDate(), ad);
+        }
+      }
+      _splashAd  = live['splash']?.$2;
+      _popupAd   = live['homePopup']?.$2;
+      _slideUpAd = live['homeSlideUp']?.$2;
+      debugPrint('[Ads] CMS 배너 ${live.length}개 구좌 사용');
+    } catch (e) {
+      debugPrint('[Ads] 배너 불러오기 실패 → 기본 광고 사용: $e');
+    }
+  }
+
+  /// CMS 랜딩 설정 → 앱 라우트('/detail/e1') 또는 외부 URL
+  static String? _landingRoute(Map<String, dynamic> d) {
+    if (d['landing_type'] != 'internal') return d['landing_url'] as String?;
+    final id = d['internal_target_id'] as String?;
+    if (id == null || id.isEmpty) return null;
+    return switch (d['internal_target']) {
+      'exhibition' => '/detail/$id',
+      'creator'    => '/creator/$id',
+      _            => id, // 앱 화면 라우트 (/home 등)
+    };
+  }
+
+  /// 광고 탭 — 앱 라우트는 화면 이동, 그 외(https://)는 외부 브라우저
+  static Future<void> open(NavigatorState navigator, String landing) async {
+    if (landing.startsWith('/')) {
+      navigator.pushNamed(landing);
+    } else {
+      final uri = Uri.tryParse(landing);
+      if (uri != null && (uri.scheme == 'https' || uri.scheme == 'http')) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      }
+    }
+  }
 
   static AdData? get splashAd  => _live(_splashAd);
   static AdData? get popupAd   => _live(_popupAd);

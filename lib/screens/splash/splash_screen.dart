@@ -340,8 +340,10 @@ class _SplashScreenState extends State<SplashScreen>
             ad: AdDataStore.splashAd!,
             onClose: _onAdClosed,
             onNavigate: (route) {
-              // 광고 랜딩 후 홈으로 이동 (내부 라우트는 홈 진입 후 처리)
-              Navigator.of(context).pushNamedAndRemoveUntil('/home', (_) => false);
+              // 홈을 바닥에 깔고 그 위에 광고 랜딩을 엶
+              final nav = Navigator.of(context)
+                ..pushNamedAndRemoveUntil('/home', (_) => false);
+              AdDataStore.open(nav, route);
             },
           ),
       ],

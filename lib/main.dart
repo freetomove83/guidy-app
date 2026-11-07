@@ -36,6 +36,7 @@ import 'screens/mypage/delete_account_screen.dart';
 import 'screens/mypage/help_screen.dart';
 import 'screens/mypage/about_screen.dart';
 import 'screens/creator/creator_apply_screen.dart';
+import 'widgets/ad_overlay.dart';
 import 'widgets/common_widgets.dart';
 
 void main() async {
@@ -48,7 +49,7 @@ void main() async {
     userStore.init(),  // localStorage에서 사용자 개인화 데이터 복원
   ]);
   // CMS에서 게시한 전시가 있으면 그것으로 교체 (없거나 오프라인이면 앱 기본 데이터)
-  if (firebaseReady) await ContentService.load(appStore);
+  if (firebaseReady) await Future.wait([ContentService.load(appStore), AdDataStore.load()]);
   runApp(GuidyRoot(appStore: appStore, userStore: userStore));
 }
 
