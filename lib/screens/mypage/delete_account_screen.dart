@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../theme/app_theme.dart';
 import '../../models/models.dart';
 import '../../models/user_store.dart';
+import '../../services/auth_service.dart';
 
 class DeleteAccountScreen extends StatefulWidget {
   const DeleteAccountScreen({super.key});
@@ -30,8 +31,10 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
 
   Future<void> _deleteAccount() async {
     setState(() => _loading = true);
-    // 실제 환경에서는 Firebase Auth 계정 삭제 + Firestore 데이터 삭제도 필요
-    await context.read<UserStore>().clearAll();
+    // shortcut: Firebase 계정·Firestore 데이터 삭제는 아직 안 함 (로그아웃만), 탈퇴 기능 구현 시 추가
+    final userStore = context.read<UserStore>();
+    await AuthService.signOut();
+    await userStore.clearAll();
     if (!mounted) return;
     setState(() => _loading = false);
     Navigator.pushNamedAndRemoveUntil(context, '/login', (_) => false);

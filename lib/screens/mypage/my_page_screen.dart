@@ -7,6 +7,7 @@ import '../../theme/app_theme.dart';
 import '../../theme/theme_provider.dart';
 import '../../models/models.dart';
 import '../../models/user_store.dart';
+import '../../services/auth_service.dart';
 import '../../widgets/common_widgets.dart';
 import 'notification_settings_screen.dart';
 import 'change_password_screen.dart';
@@ -377,6 +378,7 @@ class _ProfileTabState extends State<_ProfileTab> {
                 ),
                 TextButton(
                   onPressed: () {
+                    AuthService.signOut();
                     context.read<UserStore>().clearAll();
                     Navigator.pop(context);
                     Navigator.pushNamedAndRemoveUntil(context, '/login', (_) => false);

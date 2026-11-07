@@ -66,6 +66,9 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<!-- Google 로그인: GoogleService-Info.plist의 CLIENT_ID -->
+	<key>GIDClientID</key>
+	<string>354832592482-klquq36s4mg64epd6bmo087t9vpdb6go.apps.googleusercontent.com</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
