@@ -7,6 +7,21 @@ import '../models/app_store.dart';
 import '../models/models.dart';
 
 class ContentService {
+  /// CMS 약관 관리에서 저장한 약관 (app_config/terms의 'service' 또는 'creator').
+  /// 아직 등록 안 됨·오프라인·Firebase 없음 → null
+  static Future<String?> terms(String field) async {
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('app_config').doc('terms').get()
+          .timeout(const Duration(seconds: 6));
+      final text = doc.data()?[field];
+      return text is String && text.trim().isNotEmpty ? text : null;
+    } catch (e) {
+      debugPrint('[Content] 약관 불러오기 실패: $e');
+      return null;
+    }
+  }
+
   /// Firestore에 게시된 전시가 있으면 앱 데이터를 그것으로 바꿈.
   /// 오프라인·권한 오류·게시된 전시 없음 → 앱에 들어 있는 기본 데이터를 그대로 씀.
   static Future<void> load(AppStore store, {Duration timeout = const Duration(seconds: 6)}) async {
