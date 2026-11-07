@@ -3,6 +3,8 @@
 
 import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
+import 'package:provider/provider.dart';
+import '../../models/app_store.dart';
 import '../../models/models.dart';
 import '../../widgets/common_widgets.dart';
 
@@ -24,7 +26,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   List<Exhibition> get _searchResults {
     if (_query.isEmpty) return [];
-    return DummyData.exhibitions.where((e) {
+    return context.read<AppStore>().exhibitions.where((e) {
       final q = _query.toLowerCase();
       return e.title.toLowerCase().contains(q) ||
              e.venue.toLowerCase().contains(q) ||
@@ -214,7 +216,7 @@ class _SearchScreenState extends State<SearchScreen> {
         // 추천 전시
         Text('추천 전시', style: GuidyText.h3(textC)),
         const SizedBox(height: 12),
-        ...DummyData.exhibitions.take(3).map((e) => Container(
+        ...context.read<AppStore>().exhibitions.take(3).map((e) => Container(
           margin: const EdgeInsets.only(bottom: 10),
           child: GestureDetector(
             onTap: () => Navigator.pushNamed(context, '/detail/${e.id}'),

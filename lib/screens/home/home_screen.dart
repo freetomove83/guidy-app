@@ -3,6 +3,8 @@
 
 import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
+import 'package:provider/provider.dart';
+import '../../models/app_store.dart';
 import '../../models/models.dart';
 import '../../widgets/common_widgets.dart';
 import '../../widgets/ad_overlay.dart';
@@ -321,7 +323,7 @@ class _DiscoverTab extends StatelessWidget {
               // ── 이번 주 새 가이드 (아카이브 제외) ──
               const SectionHeader(title: '이번 주 새 가이드', action: '더보기 →'),
               Builder(builder: (context) {
-                final newGuides = DummyData.exhibitions
+                final newGuides = context.watch<AppStore>().exhibitions
                     .where((e) => e.channel != ChannelType.archive)
                     .toList();
                 return Padding(
@@ -483,7 +485,7 @@ class _CurationTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final curations = DummyData.exhibitions
+    final curations = context.watch<AppStore>().exhibitions
         .where((e) => e.channel == ChannelType.curation)
         .toList();
 
@@ -500,7 +502,7 @@ class _CreatorTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final creatorsItems = DummyData.exhibitions
+    final creatorsItems = context.watch<AppStore>().exhibitions
         .where((e) => e.channel == ChannelType.creator)
         .toList();
 
@@ -520,7 +522,7 @@ class _ArchiveTab extends StatelessWidget {
     final isDark    = Theme.of(context).brightness == Brightness.dark;
     final pal = GuidyPalette.of(context);
 
-    final archives = DummyData.exhibitions
+    final archives = context.watch<AppStore>().exhibitions
         .where((e) => e.channel == ChannelType.archive)
         .toList();
 
