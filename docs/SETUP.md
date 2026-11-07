@@ -128,6 +128,24 @@ UI를 바꾼 뒤에는 `flutter test`로 골든 테스트를 확인하고, 의�
 - [x] Bundle ID 통일: `com.guidyaudioguide.tour` (App Store 배포 프로파일은 새 ID로 재생성 필요)
 - [ ] iOS에서 Google 로그인 테스트
 - [ ] Apple 로그인 구현 (App Store 출시 필수)
+- [ ] CMS 연동 콘솔 작업 (아래 6-1)
+
+### 6-1. CMS(guidy-cms) 연동
+
+앱은 시작할 때 Firestore `exhibitions`(status가 `published`인 것)·`artworks`·`sections`를 읽고, 게시된 전시가 없거나 오프라인이면 앱 기본 데이터를 씁니다 (`lib/services/content_service.dart`). 크리에이터·크리에이터 가이드는 아직 앱 기본 데이터입니다.
+
+콘솔 작업 (한 번만):
+1. **보안 규칙 게시**: Firebase 콘솔 → Firestore → 규칙에 `guidy-cms/related/firebase_rules/firestore.rules` 내용을 붙여넣고 게시 (Storage도 같은 폴더의 `storage.rules`)
+2. **로그인 방식 켜기**: Authentication → 로그인 방법 → 이메일/비밀번호 사용 설정
+3. **관리자 계정**: Authentication → 사용자 추가 → 생성된 UID 복사 → Firestore에 `users/{UID}` 문서를 만들고 `role` 필드(문자열) = `admin`
+4. **콘텐츠 올리기**: 아래 명령. 처음엔 `--apply` 없이 실행해 계획(덮어쓸 문서, 예전 시드가 남긴 문서)을 확인
+
+```bash
+flutter test tool/export_content_test.dart
+python3 tool/upload_content.py --email 관리자이메일
+```
+
+로컬 검증 (실제 Firebase에 영향 없음): guidy-cms에서 `firebase emulators:start --only auth,firestore,storage --project guidy-platform` → `python3 related/scripts/check_rules.py` (규칙 17개 확인) → 앱·CMS를 `--dart-define=USE_EMULATOR=true`로 실행.
 
 ---
 

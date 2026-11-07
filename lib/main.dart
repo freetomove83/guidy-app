@@ -1,6 +1,7 @@
 // lib/main.dart
 // Guidy 오디오 가이드 앱 메인
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'theme/app_theme.dart';
 import 'theme/theme_provider.dart';
 import 'services/audio_service.dart';
+import 'services/content_service.dart';
 import 'models/app_store.dart';
 import 'models/user_store.dart';
 import 'screens/home/home_screen.dart';
@@ -37,27 +39,35 @@ import 'widgets/common_widgets.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await _initFirebase();
+  final firebaseReady = await _initFirebase();
   final appStore  = AppStore();
   final userStore = UserStore();
   await Future.wait([
     appStore.init(),   // localStorage에서 CMS 추가 항목 불러오기
     userStore.init(),  // localStorage에서 사용자 개인화 데이터 복원
   ]);
+  // CMS에서 게시한 전시가 있으면 그것으로 교체 (없거나 오프라인이면 앱 기본 데이터)
+  if (firebaseReady) await ContentService.load(appStore);
   runApp(GuidyRoot(appStore: appStore, userStore: userStore));
 }
 
 /// Firebase 기본 앱 초기화 — 설정은 네이티브 파일에서 읽음
 /// (iOS: ios/Runner/GoogleService-Info.plist, Android: android/app/google-services.json)
 // shortcut: 웹은 Firebase 웹 앱 미등록이라 건너뜀, 웹에서 Firebase 쓸 때 FirebaseOptions 추가
-Future<void> _initFirebase() async {
-  if (kIsWeb) return;
+Future<bool> _initFirebase() async {
+  if (kIsWeb) return false;
   try {
     final app = await Firebase.initializeApp();
     debugPrint('[Firebase] initialized: ${app.options.projectId}');
+    // 로컬 검증용: flutter run --dart-define=USE_EMULATOR=true (guidy-cms에서 firebase emulators:start)
+    if (const bool.fromEnvironment('USE_EMULATOR')) {
+      FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
+    }
+    return true;
   } catch (e) {
-    // 아직 Firebase 기능을 쓰는 화면이 없으므로 설정 누락 시 앱은 계속 실행
+    // 설정 파일이 없으면 앱 기본 데이터로 계속 실행
     debugPrint('[Firebase] init skipped: $e');
+    return false;
   }
 }
 

@@ -152,6 +152,18 @@ class AppStore extends ChangeNotifier {
     catch (_) { return null; }
   }
 
+  /// CMS(Firestore)에서 받은 콘텐츠로 교체 — 크리에이터·크리에이터 가이드는 앱 기본 데이터 유지
+  void replaceContent({
+    required List<Exhibition> exhibitions,
+    required List<Artwork> artworks,
+    required List<ExhibitionSection> sections,
+  }) {
+    _exhibitions..clear()..addAll(exhibitions);
+    _artworks..clear()..addAll(artworks);
+    _sections..clear()..addAll(sections);
+    notifyListeners();
+  }
+
   // ── 크리에이터 활동 업데이트 ─────────────────────────────
   Future<void> updateCreatorActivities(
     String creatorId,
