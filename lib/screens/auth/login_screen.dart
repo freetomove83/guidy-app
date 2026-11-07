@@ -213,6 +213,8 @@ class LoginScreen extends StatelessWidget {
       } else {
         navigator.pushReplacementNamed('/home');
       }
+    } on AccountBlockedException catch (e) {
+      if (context.mounted) _showMessage(context, e.message);
     } catch (e) {
       debugPrint('[Auth] Google login failed: $e');
       if (context.mounted) _showMessage(context, 'Google 로그인에 실패했습니다. 잠시 후 다시 시도해주세요');
