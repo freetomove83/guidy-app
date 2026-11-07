@@ -74,7 +74,8 @@ def sign_in(email, api_key):
     req = urllib.request.Request(
         f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={api_key}",
         data=json.dumps({"email": email, "password": password, "returnSecureToken": True}).encode(),
-        headers={"Content-Type": "application/json"})
+        # web API 키는 허용 주소(referrer)로 제한돼 있어 localhost로 보냄
+        headers={"Content-Type": "application/json", "Referer": "http://localhost/"})
     try:
         with urllib.request.urlopen(req) as r:
             return json.loads(r.read())["idToken"]
