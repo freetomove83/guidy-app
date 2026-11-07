@@ -50,6 +50,14 @@ class AuthService {
     });
   }
 
+  /// 로그인 상태 — Firebase가 없으면(설정 파일 없음·테스트) 항상 로그아웃
+  static User? get currentUser =>
+      Firebase.apps.isEmpty ? null : FirebaseAuth.instance.currentUser;
+
+  static Stream<User?> authStateChanges() => Firebase.apps.isEmpty
+      ? Stream.value(null)
+      : FirebaseAuth.instance.authStateChanges();
+
   static Future<void> signOut() async {
     if (Firebase.apps.isEmpty) return;
     await FirebaseAuth.instance.signOut();
