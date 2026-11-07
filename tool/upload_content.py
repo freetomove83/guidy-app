@@ -122,7 +122,7 @@ def main():
         return
     if a.delete_stale and any(stale.values()):
         if input(f"\n위 기존 문서 {sum(map(len, stale.values()))}개를 삭제합니다. 되돌릴 수 없습니다. "
-                 "계속하려면 DELETE 입력: ") != "DELETE":
+                 "계속하려면 DELETE 입력 (대소문자 무관): ").strip().upper() != "DELETE":
             sys.exit("취소했습니다. 아무것도 바뀌지 않았습니다.")
 
     now = datetime.datetime.now(datetime.timezone.utc).isoformat().replace("+00:00", "Z")
