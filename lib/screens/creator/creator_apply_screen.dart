@@ -5,19 +5,17 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../theme/app_theme.dart';
 import '../../models/user_store.dart';
+import '../../services/content_service.dart';
 
-// SharedPreferences 키 — CMS와 동일 키 사용
-const _kTermsService = 'guidy_terms_service';
-const _kTermsCreator = 'guidy_terms_creator';
+// CMS 약관 관리(Firestore app_config/terms)의 필드 이름
+const _kTermsService = 'service';
+const _kTermsCreator = 'creator';
 
 // 약관 로드 함수
-Future<String> _loadTerms(String key, String fallback) async {
-  final prefs = await SharedPreferences.getInstance();
-  return prefs.getString(key) ?? fallback;
-}
+Future<String> _loadTerms(String field, String fallback) async =>
+    await ContentService.terms(field) ?? fallback;
 
 // 약관 모달 표시
 void _showTermsModal(
@@ -370,7 +368,7 @@ class _ApplyFormViewState extends State<_ApplyFormView> {
                                       title: '크리에이터 수익·정산 약관',
                                       contentFuture: _loadTerms(
                                         _kTermsCreator,
-                                        '약관을 불러오는 중입니다...\n관리자 페이지에서 약관을 등록해 주세요.',
+                                        '약관을 불러오지 못했습니다.\n잠시 후 다시 시도해 주세요.',
                                       ),
                                     ),
                                 ),
@@ -388,7 +386,7 @@ class _ApplyFormViewState extends State<_ApplyFormView> {
                                       title: '서비스 이용약관',
                                       contentFuture: _loadTerms(
                                         _kTermsService,
-                                        '약관을 불러오는 중입니다...\n관리자 페이지에서 약관을 등록해 주세요.',
+                                        '약관을 불러오지 못했습니다.\n잠시 후 다시 시도해 주세요.',
                                       ),
                                     ),
                                 ),

@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/user_store.dart';
+import '../../services/content_service.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/common_widgets.dart';
 
@@ -471,14 +472,19 @@ class _SignupScreenState extends State<SignupScreen> {
           width: double.maxFinite,
           height: 300,
           child: SingleChildScrollView(
-            child: Text(
-              'Guidy 서비스 이용약관\n\n'
+            child: FutureBuilder<String?>(
+              future: ContentService.terms('service'),
+              builder: (_, snap) => Text(
+              snap.connectionState != ConnectionState.done
+                  ? '약관을 불러오는 중입니다...'
+                  // CMS에 아직 등록 전이면 기본 문구
+                  : snap.data ?? 'Guidy 서비스 이용약관\n\n'
               '제1조 (목적)\n이 약관은 Guidy 서비스의 이용조건 및 절차, 회사와 회원 간의 권리, 의무 및 책임사항 등을 규정함을 목적으로 합니다.\n\n'
               '제2조 (이용약관의 효력)\n① 이 약관은 서비스를 이용하고자 하는 모든 회원에 대하여 그 효력을 발생합니다.\n'
               '② 이 약관에 동의함으로써 회원은 Guidy의 개인정보처리방침에도 동의한 것으로 간주됩니다.\n\n'
               '제3조 (서비스 이용)\n회원은 Guidy의 오디오 가이드 콘텐츠를 이용약관에 따라 이용할 수 있습니다.',
               style: GuidyText.small(subC),
-            ),
+            )),
           ),
         ),
         actions: [
