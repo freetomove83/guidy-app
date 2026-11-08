@@ -18,6 +18,8 @@ class DeleteAccountScreen extends StatefulWidget {
 class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
   int _step = 0; // 0: 안내, 1: 확인 입력
   final _confirmCtrl = TextEditingController();
+  final _pwCtrl = TextEditingController();
+  final _hasPassword = AuthService.hasPassword;
   bool _agreed  = false;
   bool _loading = false;
 
@@ -26,17 +28,26 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
   @override
   void dispose() {
     _confirmCtrl.dispose();
+    _pwCtrl.dispose();
     super.dispose();
   }
 
   Future<void> _deleteAccount() async {
     setState(() => _loading = true);
-    // shortcut: Firebase 계정·Firestore 데이터 삭제는 아직 안 함 (로그아웃만), 탈퇴 기능 구현 시 추가
     final userStore = context.read<UserStore>();
-    await AuthService.signOut();
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final done = await AuthService.deleteAccount(password: _pwCtrl.text);
+      if (!done) return; // 본인 확인 취소
+    } catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text(AuthService.errorMessage(e))));
+      return;
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
     await userStore.clearAll();
     if (!mounted) return;
-    setState(() => _loading = false);
+    messenger.showSnackBar(const SnackBar(content: Text('탈퇴가 완료되었습니다')));
     Navigator.pushNamedAndRemoveUntil(context, '/login', (_) => false);
   }
 
@@ -146,7 +157,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
           const SizedBox(height: 12),
           _infoCard(surfaceC, lineC, textC, subC, muteC, [
             (Icons.person_rounded,       '계정 정보',       '이름, 이메일, 프로필 사진'),
-            (Icons.receipt_long_rounded,  '구매 내역',       '$purchaseCount개 구매한 전시 이용 기록'),
+            (Icons.receipt_long_rounded,  '구매한 가이드',   '$purchaseCount개 전시 가이드 이용 권한'),
             (Icons.bookmark_rounded,      '즐겨찾기 목록',   '저장한 전시 ${userStore.favorites.length}개'),
             (Icons.people_rounded,        '팔로우 정보',     '크리에이터 팔로우 ${userStore.following.length}개'),
             (Icons.headphones_rounded,    '오디오 진행 기록', '이어듣기 및 재생 기록'),
@@ -167,6 +178,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
               children: [
                 _noticeItem('구매한 전시 가이드의 접근 권한이 즉시 사라집니다.', muteC),
                 _noticeItem('환불이 필요한 경우 탈퇴 전 고객센터에 문의하세요.', muteC),
+                _noticeItem('결제 기록은 전자상거래법에 따라 5년간 보관한 뒤 파기합니다.', muteC),
                 _noticeItem('탈퇴 후 동일 이메일로 재가입이 가능합니다.', muteC),
                 _noticeItem('탈퇴 처리 후 데이터 복구는 불가능합니다.', muteC, isLast: true),
               ],
@@ -240,7 +252,8 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
   Widget _buildStep1(BuildContext ctx, Color textC, Color subC,
       Color muteC, Color surfaceC, Color lineC) {
     final pal = GuidyPalette.of(ctx);
-    final inputOk  = _confirmCtrl.text == _confirmText;
+    final inputOk  = _confirmCtrl.text == _confirmText &&
+        (!_hasPassword || _pwCtrl.text.isNotEmpty);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
@@ -300,7 +313,38 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          Text('입력 후 버튼이 활성화됩니다.',
+          if (_hasPassword) ...[
+            const SizedBox(height: 16),
+            Text('본인 확인을 위해 비밀번호를 입력하세요',
+                style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w600)),
+            const SizedBox(height: 8),
+            TextField(
+              controller: _pwCtrl,
+              obscureText: true,
+              onChanged: (_) => setState(() {}),
+              style: GuidyText.body(textC),
+              decoration: InputDecoration(
+                hintText: '현재 비밀번호',
+                hintStyle: GuidyText.body(muteC),
+                filled: true,
+                fillColor: surfaceC,
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                border: OutlineInputBorder(
+                  borderRadius: GuidyRadius.lgBorder,
+                  borderSide: BorderSide(color: lineC),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: GuidyRadius.lgBorder,
+                  borderSide: BorderSide(color: lineC),
+                ),
+              ),
+            ),
+          ],
+          const SizedBox(height: 8),
+          Text(_hasPassword
+                  ? '입력 후 버튼이 활성화됩니다.'
+                  : '버튼을 누르면 로그인한 계정으로 한 번 더 확인합니다.',
               style: GuidyText.small(muteC)),
           const SizedBox(height: 32),
 

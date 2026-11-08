@@ -22,22 +22,9 @@ class AuthService {
     if (kIsWeb) {
       cred = await FirebaseAuth.instance.signInWithPopup(GoogleAuthProvider());
     } else {
-      final google = GoogleSignIn.instance;
-      if (!_googleReady) {
-        // 클라이언트 ID는 iOS Info.plist(GIDClientID), Android google-services.json에서 읽음
-        await google.initialize();
-        _googleReady = true;
-      }
-      final GoogleSignInAccount account;
-      try {
-        account = await google.authenticate();
-      } on GoogleSignInException catch (e) {
-        if (e.code == GoogleSignInExceptionCode.canceled) return null;
-        rethrow;
-      }
-      cred = await FirebaseAuth.instance.signInWithCredential(
-        GoogleAuthProvider.credential(idToken: account.authentication.idToken),
-      );
+      final credential = await _googleCredential();
+      if (credential == null) return null;
+      cred = await FirebaseAuth.instance.signInWithCredential(credential);
     }
     final user = cred.user!;
     await _ensureUserDoc(user, 'google');
@@ -56,11 +43,7 @@ class AuthService {
     try {
       cred = await FirebaseAuth.instance.signInWithProvider(provider);
     } on FirebaseAuthException catch (e) {
-      // 사용자 취소: SDK가 'canceled'로 주거나 'unknown' + AuthorizationError 1001로 줌
-      if (e.code == 'canceled' || e.code == 'web-context-cancelled' ||
-          (e.message?.contains('AuthorizationError error 1001') ?? false)) {
-        return null;
-      }
+      if (_isCancel(e)) return null;
       rethrow;
     }
     final user = cred.user!;
@@ -108,6 +91,65 @@ class AuthService {
     await user.updatePassword(next);
   }
 
+  // ── 회원 탈퇴 ─────────────────────────────────────
+
+  /// 본인 확인 → (Apple이면 토큰 해제) → 회원 문서·계정 삭제. 사용자가 확인을 취소하면 false
+  /// 구매 기록(purchases)은 전자상거래법 보관 의무 때문에 남김
+  static Future<bool> deleteAccount({String? password}) async {
+    final user = currentUser!;
+    final providers = user.providerData.map((p) => p.providerId).toSet();
+    try {
+      if (providers.contains('password')) {
+        await user.reauthenticateWithCredential(
+            EmailAuthProvider.credential(email: user.email!, password: password ?? ''));
+      } else if (providers.contains('apple.com') && appleAvailable) {
+        final cred = await user.reauthenticateWithProvider(AppleAuthProvider());
+        // App Store 심사 요건: 탈퇴 시 Apple 로그인 연결 해제
+        final code = cred.additionalUserInfo?.authorizationCode;
+        if (code != null) await FirebaseAuth.instance.revokeTokenWithAuthorizationCode(code);
+      } else if (providers.contains('google.com')) {
+        if (kIsWeb) {
+          await user.reauthenticateWithPopup(GoogleAuthProvider());
+        } else {
+          final credential = await _googleCredential();
+          if (credential == null) return false;
+          await user.reauthenticateWithCredential(credential);
+        }
+      }
+      // 그 밖(Android·웹의 Apple 계정)은 확인 없이 시도 — 오래됐으면 requires-recent-login
+    } on FirebaseAuthException catch (e) {
+      if (_isCancel(e)) return false;
+      rethrow;
+    }
+    await FirebaseFirestore.instance.collection('users').doc(user.uid).delete();
+    await user.delete();
+    await signOut();
+    return true;
+  }
+
+  /// 앱용 Google 자격 증명, 사용자가 취소하면 null
+  static Future<AuthCredential?> _googleCredential() async {
+    final google = GoogleSignIn.instance;
+    if (!_googleReady) {
+      // 클라이언트 ID는 iOS Info.plist(GIDClientID), Android google-services.json에서 읽음
+      await google.initialize();
+      _googleReady = true;
+    }
+    try {
+      final account = await google.authenticate();
+      return GoogleAuthProvider.credential(idToken: account.authentication.idToken);
+    } on GoogleSignInException catch (e) {
+      if (e.code == GoogleSignInExceptionCode.canceled) return null;
+      rethrow;
+    }
+  }
+
+  /// 사용자 취소: Apple SDK가 'canceled'로 주거나 'unknown' + AuthorizationError 1001로 줌, 웹은 팝업 닫힘
+  static bool _isCancel(FirebaseAuthException e) =>
+      const {'canceled', 'web-context-cancelled', 'popup-closed-by-user', 'cancelled-popup-request'}
+          .contains(e.code) ||
+      (e.message?.contains('AuthorizationError error 1001') ?? false);
+
   /// Firebase 오류 코드 → 사용자 안내 문구
   static String errorMessage(Object e) {
     if (e is! FirebaseAuthException) return '잠시 후 다시 시도해주세요';
@@ -121,6 +163,7 @@ class AuthService {
       'too-many-requests' => '시도가 너무 많습니다. 잠시 후 다시 시도해주세요',
       'network-request-failed' => '인터넷 연결을 확인해주세요',
       'requires-recent-login' => '보안을 위해 다시 로그인한 뒤 시도해주세요',
+      'user-mismatch' => '지금 로그인한 계정으로 확인해주세요',
       _ => '잠시 후 다시 시도해주세요',
     };
   }
