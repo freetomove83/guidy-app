@@ -7,6 +7,7 @@ import 'package:flutter/gestures.dart';
 import 'package:provider/provider.dart';
 import '../../theme/app_theme.dart';
 import '../../models/user_store.dart';
+import '../../services/auth_service.dart';
 import '../../services/content_service.dart';
 
 // CMS 약관 관리(Firestore app_config/terms)의 필드 이름
@@ -31,8 +32,20 @@ void _showTermsModal(
   );
 }
 
-class CreatorApplyScreen extends StatelessWidget {
+class CreatorApplyScreen extends StatefulWidget {
   const CreatorApplyScreen({super.key});
+
+  @override
+  State<CreatorApplyScreen> createState() => _CreatorApplyScreenState();
+}
+
+class _CreatorApplyScreenState extends State<CreatorApplyScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // CMS에서 승인·반려됐을 수 있으니 열 때마다 확인
+    context.read<UserStore>().syncCreatorStatus();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -151,11 +164,26 @@ class _ApplyFormViewState extends State<_ApplyFormView> {
   }
 
   Future<void> _submit() async {
+    final messenger = ScaffoldMessenger.of(context);
+    if (AuthService.currentUser == null) {
+      messenger.showSnackBar(const SnackBar(content: Text('로그인 후 신청할 수 있어요')));
+      Navigator.pushNamed(context, '/login');
+      return;
+    }
     setState(() => _loading = true);
-    await Future.delayed(const Duration(milliseconds: 800));
-    if (!mounted) return;
-    await context.read<UserStore>().applyCreator();
-    setState(() => _loading = false);
+    try {
+      await context.read<UserStore>().applyCreator(
+        name: _nameCtrl.text.trim(),
+        field: _selectedField!,
+        intro: _introCtrl.text.trim(),
+        link: _linkCtrl.text.trim(),
+      );
+    } catch (e) {
+      debugPrint('[Creator] 신청 실패: $e');
+      messenger.showSnackBar(const SnackBar(content: Text('신청을 보내지 못했어요. 잠시 후 다시 시도해주세요')));
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
   }
 
   @override
@@ -206,6 +234,25 @@ class _ApplyFormViewState extends State<_ApplyFormView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // 지난 신청 반려 안내
+                    if (context.watch<UserStore>().creatorRejected) ...[
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: Colors.red.withValues(alpha: 0.06),
+                          borderRadius: GuidyRadius.lgBorder,
+                          border: Border.all(color: Colors.red.withValues(alpha: 0.2)),
+                        ),
+                        child: Text(
+                          context.watch<UserStore>().creatorRejectReason.isEmpty
+                              ? '지난 신청이 반려되었어요. 내용을 보완해 다시 신청해주세요.'
+                              : '지난 신청이 반려되었어요.\n사유: ${context.watch<UserStore>().creatorRejectReason}',
+                          style: GuidyText.small(Colors.red).copyWith(height: 1.5),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
                     // 안내 배너
                     Container(
                       padding: const EdgeInsets.all(16),
