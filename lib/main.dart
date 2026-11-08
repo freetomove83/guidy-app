@@ -109,7 +109,7 @@ class GuidyRoot extends StatelessWidget {
 }
 
 /// 앱 전체 글자 확대 상한 (휴대폰 설정이 더 커도 이 배율에서 멈춤)
-const double maxTextScale = 1.5;
+const double maxTextScale = 2.0;
 
 class GuidyApp extends StatelessWidget {
   const GuidyApp({super.key});
@@ -126,8 +126,7 @@ class GuidyApp extends StatelessWidget {
       themeMode: themeProvider.isDark ? ThemeMode.dark : ThemeMode.light,
       initialRoute: '/splash',
       onGenerateRoute: _generateRoute,
-      // 기기 글자 크기 설정은 따르되 화면이 깨지지 않도록 1.5배까지만 키움
-      // shortcut: 레이아웃이 큰 글자를 견디게 고쳐지면 maxTextScale을 올릴 것 (test/large_text_test.dart 참고)
+      // 기기 글자 크기 설정은 따르되 화면이 깨지지 않도록 2배까지만 키움 (test/large_text_test.dart가 확인)
       builder: (context, child) => MediaQuery.withClampedTextScaling(
         maxScaleFactor: maxTextScale,
         child: child!,

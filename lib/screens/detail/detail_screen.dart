@@ -156,10 +156,9 @@ class _DetailScreenState extends State<DetailScreen> {
                           // 배지 + 좋아요
                           Row(
                             children: [
-                              Flexible(child: Wrap(spacing: 6, runSpacing: 6, children: [
+                              Expanded(child: Wrap(spacing: 6, runSpacing: 6, crossAxisAlignment: WrapCrossAlignment.center, children: [
                                 ChannelBadge(type: exhibition.channel, size: 'md'),
                                 if (exhibition.isActive)
-                                
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                   decoration: BoxDecoration(
@@ -173,7 +172,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                   )),
                                 ),
                               ])),
-                              const Spacer(),
+                              
                               // 좋아요 버튼 (YouTube/Instagram 스타일)
                               GestureDetector(
                                 onTap: () => userStore.toggleLike(widget.exhibitionId),
