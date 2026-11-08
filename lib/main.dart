@@ -126,6 +126,10 @@ class GuidyApp extends StatelessWidget {
       themeMode: themeProvider.isDark ? ThemeMode.dark : ThemeMode.light,
       initialRoute: '/splash',
       onGenerateRoute: _generateRoute,
+      // 시작 화면 하나만 — 기본 동작은 '/splash'를 '/'+'/splash'로 나눠 숨은 홈(광고 타이머 포함)을 하나 더 만듦
+      onGenerateInitialRoutes: (name) => [
+        _generateRoute(RouteSettings(name: name)) ?? _generateRoute(const RouteSettings(name: '/splash'))!,
+      ],
       // 기기 글자 크기 설정은 따르되 화면이 깨지지 않도록 2배까지만 키움 (test/large_text_test.dart가 확인)
       builder: (context, child) => MediaQuery.withClampedTextScaling(
         maxScaleFactor: maxTextScale,
