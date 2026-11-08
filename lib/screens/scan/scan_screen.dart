@@ -1,11 +1,18 @@
 // lib/screens/scan/scan_screen.dart
-// QR 스캔 화면 (웹 미리보기용 시뮬레이션)
+// QR 스캔 화면 — 카메라로 작품 QR을 읽어 해당 화면으로 이동
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:provider/provider.dart';
+import '../../models/app_store.dart';
+import '../../services/qr_link.dart';
 import '../../theme/app_theme.dart';
 
 class ScanScreen extends StatefulWidget {
-  const ScanScreen({super.key});
+  /// false면 카메라 없이 화면만 (테스트·골든용)
+  final bool camera;
+  const ScanScreen({super.key, this.camera = true});
 
   @override
   State<ScanScreen> createState() => _ScanScreenState();
@@ -13,6 +20,9 @@ class ScanScreen extends StatefulWidget {
 
 class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateMixin {
   bool _scanned = false;
+  bool _torchOn = false;
+  String? _lastInvalid; // 같은 QR로 안내가 반복되지 않게
+  MobileScannerController? _camera;
   late AnimationController _scanLineCtrl;
   late Animation<double> _scanLineAnim;
 
@@ -24,22 +34,44 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
     _scanLineAnim = Tween(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _scanLineCtrl, curve: Curves.easeInOut),
     );
+    if (widget.camera) {
+      _camera = MobileScannerController(formats: const [BarcodeFormat.qrCode]);
+    }
   }
 
   @override
   void dispose() {
     _scanLineCtrl.dispose();
+    _camera?.dispose();
     super.dispose();
   }
 
-  void _simulateScan() {
+  void _onDetect(BarcodeCapture capture) {
+    if (_scanned || capture.barcodes.isEmpty) return;
+    final raw = capture.barcodes.first.rawValue;
+    if (raw == null) return;
+    final route = qrRoute(raw, context.read<AppStore>());
+    if (route == null) {
+      if (raw == _lastInvalid) return;
+      _lastInvalid = raw;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(const SnackBar(content: Text('Guidy 작품 QR이 아니에요')));
+      return;
+    }
+    _open(route);
+  }
+
+  /// 인식 표시 후 이동, 돌아오면 다시 스캔
+  Future<void> _open(String route) async {
     setState(() => _scanned = true);
-    // shortcut: 카메라 연동 전 시뮬레이션(e1 고정), QR 패키지 도입 시 인식 결과로 교체
-    Future.delayed(const Duration(seconds: 1), () async {
-      if (!mounted) return;
-      await Navigator.pushNamed(context, '/detail/e1');
-      if (mounted) setState(() => _scanned = false); // 돌아오면 다시 스캔 가능
-    });
+    await _camera?.stop();
+    await Future.delayed(const Duration(milliseconds: 600));
+    if (!mounted) return;
+    await Navigator.pushNamed(context, route);
+    if (!mounted) return;
+    setState(() { _scanned = false; _lastInvalid = null; _torchOn = false; });
+    await _camera?.start();
   }
 
   @override
@@ -48,9 +80,15 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // 카메라 배경 시뮬
+          // 카메라 (없으면 어두운 배경)
           Positioned.fill(
-            child: Container(
+            child: _camera != null
+                ? MobileScanner(
+                    controller: _camera,
+                    onDetect: _onDetect,
+                    errorBuilder: (context, error) => _cameraError(error),
+                  )
+                : Container(
               decoration: BoxDecoration(
                 gradient: RadialGradient(
                   center: Alignment.center,
@@ -133,7 +171,14 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
                         color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700,
                         fontFamily: GuidyText.fontFamily,
                       )),
-                      const Icon(Icons.flash_off_rounded, color: Colors.white, size: 24),
+                      GestureDetector(
+                        onTap: _camera == null ? null : () async {
+                          await _camera!.toggleTorch();
+                          if (mounted) setState(() => _torchOn = !_torchOn);
+                        },
+                        child: Icon(_torchOn ? Icons.flash_on_rounded : Icons.flash_off_rounded,
+                            color: Colors.white, size: 24),
+                      ),
                     ],
                   ),
                 ),
@@ -159,11 +204,12 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
             ),
           ),
 
-          // 하단 개발 모드 카드
+          // 하단 개발 모드 카드 (개발 빌드에서만, 카메라 없이 e1로 이동)
+          if (kDebugMode)
           Positioned(
             bottom: 40, left: 20, right: 20,
             child: GestureDetector(
-              onTap: _simulateScan,
+              onTap: () => _open('/detail/e1'),
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -203,6 +249,26 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _cameraError(MobileScannerException error) {
+    final denied = error.errorCode == MobileScannerErrorCode.permissionDenied;
+    return ColoredBox(
+      color: Colors.black,
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Text(
+            denied
+                ? '카메라 권한이 필요해요\n설정에서 Guidy의 카메라 접근을 허용해주세요'
+                : '카메라를 사용할 수 없어요',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 14,
+                fontFamily: GuidyText.fontFamily, height: 1.5),
+          ),
+        ),
       ),
     );
   }
