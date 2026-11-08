@@ -6,6 +6,28 @@ import 'package:flutter/foundation.dart';
 import '../models/app_store.dart';
 import '../models/models.dart';
 
+/// CMS 설정 > 플랫폼 설정 (app_config/settings). 못 읽으면 기본값(모두 열림) 유지
+class AppSettings {
+  static bool maintenance = false;
+  static bool signupOpen = true;
+  static bool creatorApplyOpen = true;
+
+  static Future<void> load({Duration timeout = const Duration(seconds: 6)}) async {
+    try {
+      final d = (await FirebaseFirestore.instance
+              .collection('app_config').doc('settings').get()
+              .timeout(timeout))
+          .data();
+      if (d == null) return;
+      maintenance = d['maintenance'] == true;
+      signupOpen = d['signup_open'] != false;
+      creatorApplyOpen = d['creator_apply_open'] != false;
+    } catch (e) {
+      debugPrint('[Settings] 불러오기 실패 → 기본값: $e');
+    }
+  }
+}
+
 class ContentService {
   /// CMS 약관 관리에서 저장한 약관 (app_config/terms의 'service' 또는 'creator').
   /// 아직 등록 안 됨·오프라인·Firebase 없음 → null

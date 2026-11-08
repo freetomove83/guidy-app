@@ -49,7 +49,7 @@ void main() async {
     userStore.init(),  // localStorage에서 사용자 개인화 데이터 복원
   ]);
   // CMS에서 게시한 전시가 있으면 그것으로 교체 (없거나 오프라인이면 앱 기본 데이터)
-  if (firebaseReady) await Future.wait([ContentService.load(appStore), AdDataStore.load()]);
+  if (firebaseReady) await Future.wait([ContentService.load(appStore), AdDataStore.load(), AppSettings.load()]);
   runApp(GuidyRoot(appStore: appStore, userStore: userStore));
 }
 
@@ -133,7 +133,8 @@ class GuidyApp extends StatelessWidget {
       // 기기 글자 크기 설정은 따르되 화면이 깨지지 않도록 2배까지만 키움 (test/large_text_test.dart가 확인)
       builder: (context, child) => MediaQuery.withClampedTextScaling(
         maxScaleFactor: maxTextScale,
-        child: child!,
+        // CMS 점검 모드: 앱 전체를 안내 화면으로 (앱을 다시 열 때 해제 반영)
+        child: AppSettings.maintenance ? const _MaintenanceView() : child!,
       ),
     );
   }
@@ -365,6 +366,35 @@ class _MainShellState extends State<MainShell> {
               color: pal.accent,
             )),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// CMS에서 점검 모드를 켰을 때 보이는 화면
+class _MaintenanceView extends StatelessWidget {
+  const _MaintenanceView();
+
+  @override
+  Widget build(BuildContext context) {
+    final pal = GuidyPalette.of(context);
+    return Scaffold(
+      backgroundColor: pal.bg,
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.build_rounded, size: 40, color: pal.sub),
+              const SizedBox(height: 16),
+              Text('서비스 점검 중이에요', style: GuidyText.h2(pal.text), textAlign: TextAlign.center),
+              const SizedBox(height: 8),
+              Text('더 나은 서비스를 위해 잠시 점검하고 있어요.\n잠시 후 앱을 다시 열어주세요.',
+                  style: GuidyText.body(pal.sub).copyWith(height: 1.5), textAlign: TextAlign.center),
+            ],
+          ),
         ),
       ),
     );
