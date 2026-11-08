@@ -7,6 +7,7 @@ import '../../models/user_store.dart';
 import '../../services/content_service.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/common_widgets.dart';
+import 'login_screen.dart' show socialSignIn;
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -392,17 +393,10 @@ class _SignupScreenState extends State<SignupScreen> {
     });
   }
 
-  void _handleSocialSignup(BuildContext context, String provider) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('$provider 로그인 연동 준비 중입니다'),
-        backgroundColor: GuidyColors.primary,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: GuidyRadius.lgBorder),
-        margin: const EdgeInsets.all(16),
-      ),
-    );
-  }
+  // 소셜 가입은 로그인과 같음 — 처음 로그인하면 회원 문서가 만들어짐
+  void _handleSocialSignup(BuildContext context, String provider) => socialSignIn(
+      context, provider,
+      onDone: (navigator) => navigator.pushNamedAndRemoveUntil('/home', (_) => false));
 
   void _handleSignup(BuildContext context) {
     if (_nameController.text.trim().isEmpty ||

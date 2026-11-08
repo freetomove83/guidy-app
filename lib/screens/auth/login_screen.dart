@@ -1,6 +1,7 @@
 // lib/screens/auth/login_screen.dart
 // 로그인 화면 - 소셜 로그인 (Google, Apple, Naver, Kakao) + 이메일
 
+import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuthException;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/user_store.dart';
@@ -195,33 +196,49 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _handleSocialLogin(BuildContext context, String provider) async {
-    if (provider == 'google') return _handleGoogleLogin(context);
-    // Apple·네이버·카카오는 아직 SDK 미연동
-    _showMessage(context, '$provider 로그인 연동 준비 중입니다');
-  }
+  Future<void> _handleSocialLogin(BuildContext context, String provider) =>
+      socialSignIn(context, provider, onDone: (navigator) {
+        if (navigator.canPop()) {
+          navigator.pop();
+        } else {
+          navigator.pushReplacementNamed('/home');
+        }
+      });
+}
 
-  Future<void> _handleGoogleLogin(BuildContext context) async {
-    final userStore = context.read<UserStore>();
-    final navigator = Navigator.of(context);
-    try {
-      final user = await AuthService.signInWithGoogle();
-      if (user == null) return; // 사용자가 취소
-      await userStore.updateProfile(name: user.displayName, email: user.email);
-      if (navigator.canPop()) {
-        navigator.pop();
-      } else {
-        navigator.pushReplacementNamed('/home');
-      }
-    } on AccountBlockedException catch (e) {
-      if (context.mounted) _showMessage(context, e.message);
-    } catch (e) {
-      debugPrint('[Auth] Google login failed: $e');
-      if (context.mounted) _showMessage(context, 'Google 로그인에 실패했습니다. 잠시 후 다시 시도해주세요');
-    }
+/// 소셜 로그인 공통 — 로그인 화면·회원가입 화면에서 같이 씀.
+/// 성공하면 프로필을 채우고 [onDone]으로 화면 이동, 취소면 아무것도 안 함.
+Future<void> socialSignIn(BuildContext context, String provider,
+    {required void Function(NavigatorState) onDone}) async {
+  final signIn = switch (provider.toLowerCase()) {
+    'google' => AuthService.signInWithGoogle,
+    'apple' when AuthService.appleAvailable => AuthService.signInWithApple,
+    _ => null, // 네이버·카카오, Android·웹의 Apple은 아직 미연동
+  };
+  if (signIn == null) return _showMessage(context, '$provider 로그인 연동 준비 중입니다');
+  final userStore = context.read<UserStore>();
+  final navigator = Navigator.of(context);
+  final label = provider.toLowerCase() == 'apple' ? 'Apple' : 'Google';
+  try {
+    final user = await signIn();
+    if (user == null) return; // 사용자가 취소
+    await userStore.updateProfile(name: user.displayName, email: user.email);
+    onDone(navigator);
+  } on AccountBlockedException catch (e) {
+    if (context.mounted) _showMessage(context, e.message);
+  } on FirebaseAuthException catch (e) {
+    debugPrint('[Auth] $label login failed: ${e.code} ${e.message}');
+    if (!context.mounted) return;
+    _showMessage(context, e.code == 'account-exists-with-different-credential'
+        ? '같은 이메일로 가입한 다른 로그인 방법이 있습니다. 처음 가입한 방법으로 로그인해주세요'
+        : '$label 로그인에 실패했습니다. 잠시 후 다시 시도해주세요');
+  } catch (e) {
+    debugPrint('[Auth] $label login failed: $e');
+    if (context.mounted) _showMessage(context, '$label 로그인에 실패했습니다. 잠시 후 다시 시도해주세요');
   }
+}
 
-  void _showMessage(BuildContext context, String message) {
+void _showMessage(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
@@ -231,7 +248,6 @@ class LoginScreen extends StatelessWidget {
         margin: const EdgeInsets.all(16),
       ),
     );
-  }
 }
 
 // ─── 소셜 로그인 버튼 공통 컴포넌트 ──────────────────────
