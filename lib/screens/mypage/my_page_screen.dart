@@ -163,30 +163,29 @@ class _ProfileTab extends StatefulWidget {
 class _ProfileTabState extends State<_ProfileTab> {
   late TextEditingController _nameCtrl;
   late TextEditingController _emailCtrl;
+  late final UserStore _userStore;
   bool _editing = false;
 
   @override
   void initState() {
     super.initState();
-    // didChangeDependencies에서 초기화하여 BuildContext 안전성 확보
-    final userStore = context.read<UserStore>();
-    _nameCtrl  = TextEditingController(text: userStore.userName);
-    _emailCtrl = TextEditingController(text: userStore.userEmail);
+    _userStore = context.read<UserStore>();
+    _nameCtrl  = TextEditingController(text: _userStore.userName);
+    _emailCtrl = TextEditingController(text: _userStore.userEmail);
+    // 로그인 직후엔 이 화면이 이름·이메일 저장보다 먼저 만들어지므로, 저장되면 입력칸도 갱신
+    _userStore.addListener(_syncFromStore);
   }
 
-  @override
-  void didUpdateWidget(covariant _ProfileTab oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // _editing이 false일 때만 외부 변경값 동기화 (수정 중 덮어쓰기 방지)
-    if (!_editing) {
-      final userStore = context.read<UserStore>();
-      _nameCtrl.text  = userStore.userName;
-      _emailCtrl.text = userStore.userEmail;
-    }
+  // 수정 중이 아닐 때만 저장값으로 맞춤 (입력 중 덮어쓰기 방지)
+  void _syncFromStore() {
+    if (_editing) return;
+    if (_nameCtrl.text != _userStore.userName) _nameCtrl.text = _userStore.userName;
+    if (_emailCtrl.text != _userStore.userEmail) _emailCtrl.text = _userStore.userEmail;
   }
 
   @override
   void dispose() {
+    _userStore.removeListener(_syncFromStore);
     _nameCtrl.dispose();
     _emailCtrl.dispose();
     super.dispose();
