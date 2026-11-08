@@ -116,7 +116,7 @@ class CreatorProfileScreen extends StatelessWidget {
                       const SizedBox(height: 16),
 
                       // ── 통계 ──────────────────────────────────
-                      Row(
+                      FittedBox(fit: BoxFit.scaleDown, child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           _statItem('가이드', '${creator.guideCount}', pal.text, pal.sub),
@@ -125,7 +125,7 @@ class CreatorProfileScreen extends StatelessWidget {
                           _divider(pal.line),
                           _statItem('총 청취', _formatNum(creator.totalPlays), pal.text, pal.sub),
                         ],
-                      ),
+                      )),
 
                       const SizedBox(height: 16),
 

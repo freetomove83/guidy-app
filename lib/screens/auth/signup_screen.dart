@@ -355,8 +355,9 @@ class _SignupScreenState extends State<SignupScreen> {
 
                     const SizedBox(height: 16),
                     Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           Text('이미 계정이 있으신가요? ', style: GuidyText.small(pal.sub)),
                           GestureDetector(

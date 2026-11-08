@@ -239,7 +239,7 @@ class _PlayerScreenState extends State<PlayerScreen>
             const SizedBox(height: 16),
 
             // ── 커버 + 자막 오버레이 ──────────────────────
-            Padding(
+            Flexible(child: Padding(
               padding:
                   EdgeInsets.symmetric(horizontal: _captionsOn ? 24 : 32),
               child: Stack(
@@ -389,7 +389,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                     ),
                 ],
               ),
-            ),
+            )),
 
             const SizedBox(height: 14),
 

@@ -160,8 +160,9 @@ class LoginScreen extends StatelessWidget {
                     const SizedBox(height: 24),
 
                     // 회원가입 링크
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         Text('계정이 없으신가요? ', style: GuidyText.small(pal.sub)),
                         GestureDetector(
