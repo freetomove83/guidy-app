@@ -2,6 +2,9 @@
 // 이메일 로그인 화면
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../models/user_store.dart';
+import '../../services/auth_service.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/common_widgets.dart';
 
@@ -144,38 +147,46 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
     );
   }
 
-  void _handleLogin(BuildContext context) {
+  void _snack(String message, {bool error = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: error ? Colors.red.shade400 : GuidyColors.primary,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: GuidyRadius.lgBorder),
+        margin: const EdgeInsets.all(16),
+      ),
+    );
+  }
+
+  Future<void> _handleLogin(BuildContext context) async {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
-
     if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('이메일과 비밀번호를 입력해주세요'),
-          backgroundColor: Colors.red.shade400,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: GuidyRadius.lgBorder),
-          margin: const EdgeInsets.all(16),
-        ),
-      );
-      return;
+      return _snack('이메일과 비밀번호를 입력해주세요', error: true);
     }
 
     setState(() => _isLoading = true);
-    final messenger = ScaffoldMessenger.of(context);
-    Future.delayed(const Duration(milliseconds: 1500), () {
-      if (!mounted) return;
-      setState(() => _isLoading = false);
-      messenger.showSnackBar(
-        SnackBar(
-          content: const Text('로그인 기능 연동 준비 중입니다'),
-          backgroundColor: GuidyColors.primary,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: GuidyRadius.lgBorder),
-          margin: const EdgeInsets.all(16),
-        ),
-      );
-    });
+    final userStore = context.read<UserStore>();
+    final navigator = Navigator.of(context);
+    try {
+      final user = await AuthService.signInWithEmail(email, password);
+      await userStore.updateProfile(name: user.displayName, email: user.email);
+      // 이메일 로그인 화면을 닫고, 그 아래 로그인 화면도 닫거나(뒤에 화면이 있을 때) 홈으로
+      navigator.pop();
+      if (navigator.canPop()) {
+        navigator.pop();
+      } else {
+        navigator.pushReplacementNamed('/home');
+      }
+    } on AccountBlockedException catch (e) {
+      if (mounted) _snack(e.message, error: true);
+    } catch (e) {
+      debugPrint('[Auth] email login failed: $e');
+      if (mounted) _snack(AuthService.errorMessage(e), error: true);
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   void _showForgotPasswordDialog(BuildContext context, Color primaryC, Color bgC, Color textC, Color subC, Color surfaceC, Color lineC, Color muteC) {
@@ -209,17 +220,17 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
             child: Text('취소', style: GuidyText.body(muteC)),
           ),
           GestureDetector(
-            onTap: () {
+            onTap: () async {
+              final email = emailCtrl.text.trim();
+              if (!email.contains('@')) return _snack('이메일을 정확히 입력해주세요', error: true);
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text('재설정 링크를 이메일로 전송했습니다'),
-                  backgroundColor: GuidyColors.primary,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(borderRadius: GuidyRadius.lgBorder),
-                  margin: const EdgeInsets.all(16),
-                ),
-              );
+              try {
+                await AuthService.sendPasswordReset(email);
+                // 가입 여부를 알려주지 않는 것이 Firebase 기본 동작 (계정 존재 여부 노출 방지)
+                if (mounted) _snack('가입된 이메일이면 재설정 링크를 보냈습니다. 메일함을 확인해주세요');
+              } catch (e) {
+                if (mounted) _snack(AuthService.errorMessage(e), error: true);
+              }
             },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

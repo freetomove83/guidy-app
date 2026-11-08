@@ -2,6 +2,7 @@
 // 비밀번호 변경 화면
 
 import 'package:flutter/material.dart';
+import '../../services/auth_service.dart';
 import '../../theme/app_theme.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
@@ -45,22 +46,33 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     super.dispose();
   }
 
+  void _snack(String message, Color color) => ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: color,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: GuidyRadius.mdBorder),
+        ),
+      );
+
   Future<void> _submit() async {
+    // Google·Apple로 가입한 계정은 비밀번호가 없음 — 해당 계정 설정에서 관리
+    if (!AuthService.hasPassword) {
+      return _snack('Google·Apple 로그인 계정은 비밀번호가 없습니다. 해당 계정에서 관리해주세요',
+          GuidyColors.warn);
+    }
     if (!_formKey.currentState!.validate()) return;
     setState(() => _loading = true);
-    // 실제 환경에서는 Firebase Auth 또는 API 호출
-    await Future.delayed(const Duration(milliseconds: 800));
-    if (!mounted) return;
-    setState(() => _loading = false);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('비밀번호가 성공적으로 변경되었습니다'),
-        backgroundColor: GuidyColors.ok,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: GuidyRadius.mdBorder),
-      ),
-    );
-    Navigator.pop(context);
+    try {
+      await AuthService.changePassword(_currentCtrl.text, _newCtrl.text);
+      if (!mounted) return;
+      _snack('비밀번호가 성공적으로 변경되었습니다', GuidyColors.ok);
+      Navigator.pop(context);
+    } catch (e) {
+      if (mounted) _snack(AuthService.errorMessage(e), Colors.red.shade400);
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
   }
 
   @override
@@ -169,6 +181,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         validator: (v) {
                           if (v == null || v.isEmpty) return '새 비밀번호를 입력해주세요';
                           if (v.length < 8) return '8자 이상 입력해주세요';
+                          if (!RegExp(r'[A-Za-z]').hasMatch(v) || !RegExp(r'[0-9]').hasMatch(v)) {
+                            return '영문과 숫자를 함께 써주세요';
+                          }
                           if (v == _currentCtrl.text) return '현재 비밀번호와 다르게 설정해주세요';
                           return null;
                         },

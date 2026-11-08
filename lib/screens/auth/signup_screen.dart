@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/user_store.dart';
+import '../../services/auth_service.dart';
 import '../../services/content_service.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/common_widgets.dart';
@@ -398,61 +399,57 @@ class _SignupScreenState extends State<SignupScreen> {
       context, provider,
       onDone: (navigator) => navigator.pushNamedAndRemoveUntil('/home', (_) => false));
 
-  void _handleSignup(BuildContext context) {
-    if (_nameController.text.trim().isEmpty ||
-        _emailController.text.trim().isEmpty ||
-        _passwordController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('모든 항목을 입력해주세요'),
-          backgroundColor: Colors.red.shade400,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: GuidyRadius.lgBorder),
-          margin: const EdgeInsets.all(16),
-        ),
-      );
-      return;
-    }
+  void _snack(String message, {bool error = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: error ? Colors.red.shade400 : GuidyColors.primary,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: GuidyRadius.lgBorder),
+        margin: const EdgeInsets.all(16),
+      ),
+    );
+  }
 
-    if (_passwordController.text != _confirmController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('비밀번호가 일치하지 않습니다'),
-          backgroundColor: Colors.red.shade400,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: GuidyRadius.lgBorder),
-          margin: const EdgeInsets.all(16),
-        ),
-      );
-      return;
+  /// 입력 안내와 같은 규칙: 8자 이상, 영문·숫자 포함
+  static bool _validPassword(String pw) =>
+      pw.length >= 8 && RegExp(r'[A-Za-z]').hasMatch(pw) && RegExp(r'[0-9]').hasMatch(pw);
+
+  Future<void> _handleSignup(BuildContext context) async {
+    final name = _nameController.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+    if (name.isEmpty || email.isEmpty || password.isEmpty) {
+      return _snack('모든 항목을 입력해주세요', error: true);
+    }
+    if (!_validPassword(password)) {
+      return _snack('비밀번호는 8자 이상, 영문과 숫자를 함께 써주세요', error: true);
+    }
+    if (password != _confirmController.text) {
+      return _snack('비밀번호가 일치하지 않습니다', error: true);
     }
 
     setState(() => _isLoading = true);
     final userStore = context.read<UserStore>();
-    final messenger = ScaffoldMessenger.of(context);
-    Future.delayed(const Duration(milliseconds: 1500), () async {
-      if (!mounted) return;
-
+    final navigator = Navigator.of(context);
+    try {
+      final user = await AuthService.signUpWithEmail(name, email, password,
+          marketingAgreed: _agreeMarketing);
       // 추천인 코드가 확인된 경우 UserStore에 저장
-      if (_referralVerified && _referralController.text.isNotEmpty) {
-        await userStore.applyReferralCode(_referralController.text.trim());
-      }
-
+      final referral = _referralVerified && _referralController.text.isNotEmpty &&
+          await userStore.applyReferralCode(_referralController.text.trim());
+      await userStore.updateProfile(name: name, email: user.email);
       if (!mounted) return;
-      setState(() => _isLoading = false);
-      final isVerified = _referralVerified;
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(isVerified
-              ? '가입 완료! 추천인 코드가 적용되었습니다 🎉'
-              : '회원가입 기능 연동 준비 중입니다'),
-          backgroundColor: GuidyColors.primary,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: GuidyRadius.lgBorder),
-          margin: const EdgeInsets.all(16),
-        ),
-      );
-    });
+      _snack(referral
+          ? '가입 완료! 추천인 코드가 적용되었습니다 🎉 인증 메일도 확인해주세요'
+          : '가입 완료! $email 로 보낸 인증 메일을 확인해주세요');
+      navigator.pushNamedAndRemoveUntil('/home', (_) => false);
+    } catch (e) {
+      debugPrint('[Auth] email signup failed: $e');
+      if (mounted) _snack(AuthService.errorMessage(e), error: true);
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   static const _fallbackTerms =
