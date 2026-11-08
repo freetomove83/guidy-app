@@ -5,6 +5,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'models.dart';
+import '../services/auth_service.dart';
+import '../services/creator_service.dart';
 
 const _kFavorites        = 'guidy_user_favorites';
 const _kLikes            = 'guidy_user_likes';
@@ -37,6 +39,8 @@ class UserStore extends ChangeNotifier {
   CreatorApplyStatus _creatorStatus    = CreatorApplyStatus.none;
   DateTime?          _creatorAppliedAt;
   DateTime?          _creatorApprovedAt;
+  bool               _creatorRejected = false; // 지난 신청이 CMS에서 반려됨
+  String             _creatorRejectReason = '';
 
   // ── 추천인 시스템 ─────────────────────────────────────
   String  _myReferralCode = '';   // 내 초대 코드 (6자리 대문자)
@@ -58,6 +62,8 @@ class UserStore extends ChangeNotifier {
   DateTime?          get creatorAppliedAt  => _creatorAppliedAt;
   DateTime?          get creatorApprovedAt => _creatorApprovedAt;
   bool get isCreator => _creatorStatus == CreatorApplyStatus.approved;
+  bool   get creatorRejected     => _creatorRejected;
+  String get creatorRejectReason => _creatorRejectReason;
 
   // 추천인 관련 getters
   String get myReferralCode  => _myReferralCode;
@@ -166,13 +172,41 @@ class UserStore extends ChangeNotifier {
   }
 
   // ── 크리에이터 신청 ──────────────────────────────────
-  Future<void> applyCreator() async {
+  /// Firestore에 신청서를 올린 뒤 기기에도 심사 대기로 기록 (로그인 필요)
+  Future<void> applyCreator({required String name, required String field,
+      required String intro, String link = ''}) async {
+    await CreatorService.apply(name: name, field: field, intro: intro, link: link);
+    _creatorRejected  = false;
     _creatorStatus    = CreatorApplyStatus.pending;
     _creatorAppliedAt = DateTime.now();
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_kCreatorStatus, _creatorStatus.index);
     await prefs.setString(_kCreatorAppliedAt, _creatorAppliedAt!.toIso8601String());
+  }
+
+  /// CMS 심사 결과를 기기 상태에 반영 (로그인 상태에서만, 실패하면 기존 상태 유지)
+  Future<void> syncCreatorStatus() async {
+    if (AuthService.currentUser == null) return;
+    try {
+      final (review, reason) = await CreatorService.myReview();
+      final next = switch (review) {
+        CreatorReview.pending  => CreatorApplyStatus.pending,
+        CreatorReview.approved => CreatorApplyStatus.approved,
+        _                      => CreatorApplyStatus.none,
+      };
+      _creatorRejected     = review == CreatorReview.rejected;
+      _creatorRejectReason = reason;
+      if (next != _creatorStatus) {
+        _creatorStatus = next;
+        if (next == CreatorApplyStatus.approved) _creatorApprovedAt ??= DateTime.now();
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setInt(_kCreatorStatus, next.index);
+      }
+      notifyListeners();
+    } catch (e) {
+      debugPrint('[Creator] 심사 상태 확인 실패: $e');
+    }
   }
 
   // (관리자 승인 시뮬레이션 — 테스트용)
