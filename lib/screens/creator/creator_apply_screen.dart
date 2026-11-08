@@ -170,6 +170,10 @@ class _ApplyFormViewState extends State<_ApplyFormView> {
       Navigator.pushNamed(context, '/login');
       return;
     }
+    if (!AppSettings.creatorApplyOpen) {
+      messenger.showSnackBar(const SnackBar(content: Text('지금은 크리에이터 신청을 받지 않아요')));
+      return;
+    }
     setState(() => _loading = true);
     try {
       await context.read<UserStore>().applyCreator(

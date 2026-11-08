@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'content_service.dart';
 
 /// CMS에서 정지·탈퇴 처리된 계정
 class AccountBlockedException implements Exception {
@@ -152,6 +153,7 @@ class AuthService {
 
   /// Firebase 오류 코드 → 사용자 안내 문구
   static String errorMessage(Object e) {
+    if (e is AccountBlockedException) return e.message;
     if (e is! FirebaseAuthException) return '잠시 후 다시 시도해주세요';
     return switch (e.code) {
       'invalid-credential' || 'invalid-login-credentials' || 'wrong-password' || 'user-not-found' =>
@@ -175,6 +177,16 @@ class AuthService {
     final ref = FirebaseFirestore.instance.collection('users').doc(user.uid);
     final doc = await ref.get();
     if (!doc.exists) {
+      // CMS에서 신규 가입을 닫았으면 방금 만든 계정을 지우고 막음
+      if (!AppSettings.signupOpen) {
+        try {
+          await user.delete();
+        } catch (e) {
+          debugPrint('[Auth] 가입 차단 중 계정 삭제 실패: $e');
+        }
+        await signOut();
+        throw const AccountBlockedException('지금은 신규 가입을 받지 않아요. 잠시 후 다시 시도해주세요');
+      }
       await ref.set({
         'name': name ?? user.displayName ?? '',
         'email': user.email ?? '',

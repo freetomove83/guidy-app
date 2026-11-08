@@ -12,6 +12,7 @@ void main() {
     expect(msg('too-many-requests'), contains('잠시 후'));
     expect(msg('something-new'), '잠시 후 다시 시도해주세요');
     expect(AuthService.errorMessage(Exception('x')), '잠시 후 다시 시도해주세요');
+    expect(AuthService.errorMessage(const AccountBlockedException('가입 중지')), '가입 중지');
   });
 
   test('without Firebase there is no signed-in user and no password', () {
