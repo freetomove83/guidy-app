@@ -40,20 +40,44 @@ class AuthService {
       );
     }
     final user = cred.user!;
-    await _ensureUserDoc(user);
+    await _ensureUserDoc(user, 'google');
+    return user;
+  }
+
+  /// Apple 로그인은 지금 iOS에서만 (Android·웹은 Apple 서비스 ID 설정이 더 필요)
+  static bool get appleAvailable => !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
+
+  /// 로그인 성공 시 Firebase 사용자, 사용자가 취소하면 null
+  static Future<User?> signInWithApple() async {
+    final provider = AppleAuthProvider()
+      ..addScope('email')
+      ..addScope('name');
+    final UserCredential cred;
+    try {
+      cred = await FirebaseAuth.instance.signInWithProvider(provider);
+    } on FirebaseAuthException catch (e) {
+      // 사용자 취소: SDK가 'canceled'로 주거나 'unknown' + AuthorizationError 1001로 줌
+      if (e.code == 'canceled' || e.code == 'web-context-cancelled' ||
+          (e.message?.contains('AuthorizationError error 1001') ?? false)) {
+        return null;
+      }
+      rethrow;
+    }
+    final user = cred.user!;
+    await _ensureUserDoc(user, 'apple');
     return user;
   }
 
   /// users/{uid} 회원 문서 — 처음이면 만들고, 있으면 정지 여부 확인 후 접속 시각 기록
   /// (role·status는 규칙상 관리자만 지정)
-  static Future<void> _ensureUserDoc(User user) async {
+  static Future<void> _ensureUserDoc(User user, String provider) async {
     final ref = FirebaseFirestore.instance.collection('users').doc(user.uid);
     final doc = await ref.get();
     if (!doc.exists) {
       await ref.set({
         'name': user.displayName ?? '',
         'email': user.email ?? '',
-        'provider': 'google',
+        'provider': provider,
         'created_at': FieldValue.serverTimestamp(),
         'last_login_at': FieldValue.serverTimestamp(),
       });
