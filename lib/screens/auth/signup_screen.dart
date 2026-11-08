@@ -455,28 +455,32 @@ class _SignupScreenState extends State<SignupScreen> {
     });
   }
 
+  static const _fallbackTerms =
+      'Guidy 서비스 이용약관\n\n'
+      '제1조 (목적)\n이 약관은 Guidy 서비스의 이용조건 및 절차, 회사와 회원 간의 권리, 의무 및 책임사항 등을 규정함을 목적으로 합니다.\n\n'
+      '제2조 (이용약관의 효력)\n① 이 약관은 서비스를 이용하고자 하는 모든 회원에 대하여 그 효력을 발생합니다.\n'
+      '② 이 약관에 동의함으로써 회원은 Guidy의 개인정보처리방침에도 동의한 것으로 간주됩니다.\n\n'
+      '제3조 (서비스 이용)\n회원은 Guidy의 오디오 가이드 콘텐츠를 이용약관에 따라 이용할 수 있습니다.';
+
   void _showTermsDialog(BuildContext context, Color bgC, Color textC, Color subC, Color primaryC) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: bgC,
         shape: RoundedRectangleBorder(borderRadius: GuidyRadius.xlBorder),
-        title: Text('이용약관', style: GuidyText.h3(textC)),
+        title: Text('이용약관 · 개인정보처리방침', style: GuidyText.h3(textC)),
         content: SizedBox(
           width: double.maxFinite,
           height: 300,
           child: SingleChildScrollView(
-            child: FutureBuilder<String?>(
-              future: ContentService.terms('service'),
+            child: FutureBuilder<List<String?>>(
+              future: Future.wait([ContentService.terms('service'), ContentService.terms('privacy')]),
               builder: (_, snap) => Text(
               snap.connectionState != ConnectionState.done
                   ? '약관을 불러오는 중입니다...'
-                  // CMS에 아직 등록 전이면 기본 문구
-                  : snap.data ?? 'Guidy 서비스 이용약관\n\n'
-              '제1조 (목적)\n이 약관은 Guidy 서비스의 이용조건 및 절차, 회사와 회원 간의 권리, 의무 및 책임사항 등을 규정함을 목적으로 합니다.\n\n'
-              '제2조 (이용약관의 효력)\n① 이 약관은 서비스를 이용하고자 하는 모든 회원에 대하여 그 효력을 발생합니다.\n'
-              '② 이 약관에 동의함으로써 회원은 Guidy의 개인정보처리방침에도 동의한 것으로 간주됩니다.\n\n'
-              '제3조 (서비스 이용)\n회원은 Guidy의 오디오 가이드 콘텐츠를 이용약관에 따라 이용할 수 있습니다.',
+                  // 동의 항목이 둘이라 함께 보여줌. CMS에 아직 등록 전이면 기본 문구
+                  : '${snap.data?[0] ?? _fallbackTerms}'
+                    '${snap.data?[1] == null ? '' : '\n\n────────────\n\n개인정보처리방침\n\n${snap.data![1]}'}',
               style: GuidyText.small(subC),
             )),
           ),
