@@ -104,6 +104,9 @@ class AdDataStore {
           live[slot] = (start.toDate(), ad);
         }
       }
+      _cmsIds
+        ..clear()
+        ..addAll(live.values.map((v) => v.$2.id));
       _splashAd  = live['splash']?.$2;
       _popupAd   = live['homePopup']?.$2;
       _slideUpAd = live['homeSlideUp']?.$2;
@@ -111,6 +114,17 @@ class AdDataStore {
     } catch (e) {
       debugPrint('[Ads] 배너 불러오기 실패 → 기본 광고 사용: $e');
     }
+  }
+
+  /// CMS에서 불러온 배너 ID (앱 기본 광고는 기록하지 않음)
+  static final Set<String> _cmsIds = {};
+
+  /// 노출·클릭 수 기록 — banners/{id}의 impressions·clicks를 1 올림 (규칙상 이 두 필드만 +1 허용)
+  static void track(AdData ad, String field) {
+    if (!_cmsIds.contains(ad.id)) return;
+    FirebaseFirestore.instance.collection('banners').doc(ad.id)
+        .update({field: FieldValue.increment(1)})
+        .catchError((Object e) => debugPrint('[Ads] $field 기록 실패: $e'));
   }
 
   /// CMS 랜딩 설정 → 앱 라우트('/detail/e1') 또는 외부 URL
@@ -190,6 +204,7 @@ class _SplashAdOverlayState extends State<SplashAdOverlay>
   @override
   void initState() {
     super.initState();
+    AdDataStore.track(widget.ad, 'impressions');
     _fadeCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 400));
     _fadeIn = CurvedAnimation(parent: _fadeCtrl, curve: Curves.easeOut);
     _fadeCtrl.forward();
@@ -227,6 +242,7 @@ class _SplashAdOverlayState extends State<SplashAdOverlay>
                   _timer?.cancel();
                   widget.onClose();
                   if (widget.ad.landingUrl != null) {
+                    AdDataStore.track(widget.ad, 'clicks');
                     widget.onNavigate(widget.ad.landingUrl!);
                   }
                 },
@@ -373,6 +389,7 @@ class _HomePopupAdState extends State<HomePopupAd>
   @override
   void initState() {
     super.initState();
+    AdDataStore.track(widget.ad, 'impressions');
     _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
     _fade  = CurvedAnimation(parent: _ctrl, curve: Curves.easeOut);
     _scale = Tween<double>(begin: 0.88, end: 1.0).animate(
@@ -427,6 +444,7 @@ class _HomePopupAdState extends State<HomePopupAd>
                         onTap: () {
                           _close();
                           if (widget.ad.landingUrl != null) {
+                            AdDataStore.track(widget.ad, 'clicks');
                             widget.onNavigate(widget.ad.landingUrl!);
                           }
                         },
@@ -540,6 +558,7 @@ class _HomeSlideUpAdState extends State<HomeSlideUpAd>
   @override
   void initState() {
     super.initState();
+    AdDataStore.track(widget.ad, 'impressions');
     _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 380));
     _slide = Tween<Offset>(
       begin: const Offset(0, 1.0),
@@ -618,6 +637,7 @@ class _HomeSlideUpAdState extends State<HomeSlideUpAd>
                     onTap: () {
                       _close();
                       if (widget.ad.landingUrl != null) {
+                        AdDataStore.track(widget.ad, 'clicks');
                         widget.onNavigate(widget.ad.landingUrl!);
                       }
                     },
