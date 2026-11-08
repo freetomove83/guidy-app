@@ -66,6 +66,9 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<!-- QR 스캔 카메라 권한 안내 문구 -->
+	<key>NSCameraUsageDescription</key>
+	<string>작품 옆 QR 코드를 찍어 오디오 가이드를 바로 열기 위해 카메라를 사용합니다.</string>
 	<!-- Google 로그인: GoogleService-Info.plist의 CLIENT_ID -->
 	<key>GIDClientID</key>
 	<string>354832592482-klquq36s4mg64epd6bmo087t9vpdb6go.apps.googleusercontent.com</string>
