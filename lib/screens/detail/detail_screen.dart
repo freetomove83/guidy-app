@@ -156,9 +156,9 @@ class _DetailScreenState extends State<DetailScreen> {
                           // 배지 + 좋아요
                           Row(
                             children: [
-                              ChannelBadge(type: exhibition.channel, size: 'md'),
-                              if (exhibition.isActive) ...[
-                                const SizedBox(width: 6),
+                              Expanded(child: Wrap(spacing: 6, runSpacing: 6, crossAxisAlignment: WrapCrossAlignment.center, children: [
+                                ChannelBadge(type: exhibition.channel, size: 'md'),
+                                if (exhibition.isActive)
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                   decoration: BoxDecoration(
@@ -171,8 +171,8 @@ class _DetailScreenState extends State<DetailScreen> {
                                     fontFamily: GuidyText.fontFamily,
                                   )),
                                 ),
-                              ],
-                              const Spacer(),
+                              ])),
+                              
                               // 좋아요 버튼 (YouTube/Instagram 스타일)
                               GestureDetector(
                                 onTap: () => userStore.toggleLike(widget.exhibitionId),
@@ -396,7 +396,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                   size: 18,
                                 ),
                                 const SizedBox(width: 6),
-                                Text(
+                                Flexible(child: FittedBox(fit: BoxFit.scaleDown, child: Text(
                                   canPlay
                                       ? '지금 바로 듣기'
                                       : (exhibition.price == 0
@@ -408,7 +408,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                     fontWeight: FontWeight.w800,
                                     fontFamily: GuidyText.fontFamily,
                                   ),
-                                ),
+                                ))),
                               ],
                             ),
                           ),
@@ -465,13 +465,13 @@ class _DetailScreenState extends State<DetailScreen> {
         children: [
           Icon(icon, size: 16, color: muteC),
           const SizedBox(width: 6),
-          Column(
+          Flexible(child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(label, style: GuidyText.kicker(muteC)),
               Text(value, style: GuidyText.small(textC).copyWith(fontWeight: FontWeight.w700)),
             ],
-          ),
+          )),
         ],
       ),
     );

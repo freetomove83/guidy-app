@@ -240,8 +240,10 @@ class _PlayerScreenState extends State<PlayerScreen>
 
             // ── 커버 + 자막 오버레이 ──────────────────────
             Padding(
-              padding:
-                  EdgeInsets.symmetric(horizontal: _captionsOn ? 24 : 32),
+              // 큰 글자에서는 커버를 줄여 아래 정보·컨트롤 자리를 확보 (1.0배에선 그대로)
+              padding: EdgeInsets.symmetric(
+                  horizontal: (_captionsOn ? 24 : 32) +
+                      80 * (MediaQuery.textScalerOf(context).scale(1) - 1).clamp(0, 1)),
               child: Stack(
                 children: [
                   AnimatedScale(

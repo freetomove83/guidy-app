@@ -123,8 +123,9 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
 
                     // 회원가입 링크
                     Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           Text('계정이 없으신가요? ', style: GuidyText.small(pal.sub)),
                           GestureDetector(

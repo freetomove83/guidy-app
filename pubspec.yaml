@@ -28,3 +28,9 @@ flutter:
   assets:
     - assets/icon/
     - assets/audio/
+  # Noto Sans KR 가변 글꼴(OFL) 일부 — 자주 쓰는 한글 2,350자·영문·기호. 다시 만들기: tool/font_subset_chars.py
+  # 빠진 글자는 기기 글꼴(웹은 Google 글꼴 서버)로 대신 표시됨
+  fonts:
+    - family: Noto Sans KR
+      fonts:
+        - asset: assets/fonts/NotoSansKR-Subset.ttf

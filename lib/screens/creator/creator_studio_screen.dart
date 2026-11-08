@@ -557,7 +557,7 @@ class _CreatorOnboardingScreen extends StatelessWidget {
                     Row(children: [
                       Icon(Icons.calendar_today_outlined, color: Colors.white.withValues(alpha: 0.7), size: 14),
                       const SizedBox(width: 4),
-                      Text('신청일: 2026.09.01', style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 12, fontFamily: GuidyText.fontFamily)),
+                      Flexible(child: Text('신청일: 2026.09.01', style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 12, fontFamily: GuidyText.fontFamily))),
                     ]),
                   ],
                 ),
@@ -682,7 +682,7 @@ class _CreatorOnboardingScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(width: 12),
-          Padding(
+          Expanded(child: Padding(
             padding: const EdgeInsets.only(top: 2),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -694,7 +694,7 @@ class _CreatorOnboardingScreen extends StatelessWidget {
                 const SizedBox(height: 12),
               ],
             ),
-          ),
+          )),
         ],
       );
     }).toList();

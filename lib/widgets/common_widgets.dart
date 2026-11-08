@@ -579,7 +579,8 @@ class SectionHeader extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.baseline,
         textBaseline: TextBaseline.alphabetic,
         children: [
-          Text(title, style: GuidyText.h3(pal.text)),
+          Flexible(child: Text(title, style: GuidyText.h3(pal.text),
+              maxLines: 1, overflow: TextOverflow.ellipsis)),
           if (action != null)
             GestureDetector(
               onTap: onAction,
@@ -609,7 +610,8 @@ class ExhibitionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final pal = GuidyPalette.of(context);
 
-    return GestureDetector(
+    // 그리드 칸 높이가 고정이라 카드 안 글자는 1.5배까지만 키움
+    return MediaQuery.withClampedTextScaling(maxScaleFactor: 1.5, child: GestureDetector(
       onTap: onTap,
       child: Container(
         height: double.infinity,          // 그리드 셀 전체 높이 점유
@@ -763,7 +765,7 @@ class ExhibitionCard extends StatelessWidget {
           ],
         ),
       ),
-    );
+    ));
   }
 
 }

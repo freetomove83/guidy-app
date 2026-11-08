@@ -95,9 +95,9 @@ class CreatorGuidesScreen extends StatelessWidget {
                             Row(children: [
                               Icon(Icons.mic_rounded, size: 12, color: pal.accent),
                               const SizedBox(width: 4),
-                              Text('${guides.length}개의 크리에이터 가이드',
+                              Flexible(child: Text('${guides.length}개의 크리에이터 가이드',
                                 style: GuidyText.kicker(pal.accent)
-                                    .copyWith(fontWeight: FontWeight.w700)),
+                                    .copyWith(fontWeight: FontWeight.w700))),
                             ]),
                           ],
                         ),
@@ -113,8 +113,7 @@ class CreatorGuidesScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
               child: Row(
                 children: [
-                  Text('가이드 선택', style: GuidyText.h3(pal.text)),
-                  const Spacer(),
+                  Expanded(child: Text('가이드 선택', style: GuidyText.h3(pal.text))),
                   Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 8, vertical: 4),
