@@ -1,6 +1,7 @@
 // lib/services/auth_service.dart
 // Google 로그인 — Firebase Auth (웹은 팝업, iOS·Android는 google_sign_in)
 
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -197,14 +198,43 @@ class AuthService {
       });
       return;
     }
-    final status = doc.data()?['status'];
-    if (status == 'suspended' || status == 'deleted') {
+    final blocked = blockedMessage(doc.data()?['status']);
+    if (blocked != null) {
       await signOut();
-      throw AccountBlockedException(status == 'suspended'
-          ? '이용이 정지된 계정입니다. 고객센터로 문의해주세요'
-          : '탈퇴 처리된 계정입니다');
+      throw AccountBlockedException(blocked);
     }
     await ref.update({'last_login_at': FieldValue.serverTimestamp()});
+  }
+
+  /// CMS 회원 상태(users/{uid}.status)가 로그인을 막는 값이면 안내 문구
+  static String? blockedMessage(Object? status) => switch (status) {
+    'suspended' => '이용이 정지된 계정입니다. 고객센터로 문의해주세요',
+    'deleted' => '탈퇴 처리된 계정입니다',
+    _ => null,
+  };
+
+  /// 로그인해 있는 동안 회원 문서를 지켜보다 CMS에서 정지·탈퇴 처리하면 바로 로그아웃.
+  /// 앱을 다시 열 때 저장된 로그인으로 들어온 경우도 여기서 걸러짐
+  static void watchAccountStatus(void Function(String message) onBlocked) {
+    if (Firebase.apps.isEmpty) return;
+    StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? doc;
+    FirebaseAuth.instance.authStateChanges().listen((user) {
+      doc?.cancel();
+      doc = null;
+      if (user == null) return;
+      doc = FirebaseFirestore.instance.collection('users').doc(user.uid).snapshots().listen(
+        (snap) async {
+          // 기기에 남은 예전 값(정지 해제 전)으로 로그아웃하지 않도록 서버에서 온 값만 봄
+          if (snap.metadata.isFromCache) return;
+          final blocked = blockedMessage(snap.data()?['status']);
+          if (blocked == null) return;
+          await signOut();
+          onBlocked(blocked);
+        },
+        // 로그아웃 직후 권한 오류 등 — 다음 로그인 때 다시 지켜봄
+        onError: (e) => debugPrint('[Auth] 회원 상태 확인 실패: $e'),
+      );
+    });
   }
 
   /// 로그인 상태 — Firebase가 없으면(설정 파일 없음·테스트) 항상 로그아웃

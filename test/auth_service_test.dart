@@ -15,6 +15,14 @@ void main() {
     expect(AuthService.errorMessage(const AccountBlockedException('가입 중지')), '가입 중지');
   });
 
+  test('only suspended or deleted members are blocked', () {
+    expect(AuthService.blockedMessage('suspended'), contains('정지'));
+    expect(AuthService.blockedMessage('deleted'), contains('탈퇴'));
+    for (final s in [null, 'active', '', 1]) {
+      expect(AuthService.blockedMessage(s), isNull, reason: '$s');
+    }
+  });
+
   test('without Firebase there is no signed-in user and no password', () {
     expect(AuthService.currentUser, isNull);
     expect(AuthService.hasPassword, isFalse);
