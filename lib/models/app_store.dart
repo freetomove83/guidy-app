@@ -4,9 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'models.dart';
 
-/// CMS와 공유하는 localStorage key (같은 origin일 때 공유됨)
-const _kSharedArtworks   = 'guidy_shared_artworks';
-const _kCmsSections      = 'guidy_cms_sections';
+/// 앱 안에서만 쓰는 저장 key (CMS 콘텐츠는 ContentService가 Firestore에서 읽음)
 const _kCreatorActivities = 'guidy_creator_activities';  // 크리에이터 활동 데이터
 
 class AppStore extends ChangeNotifier {
@@ -16,90 +14,27 @@ class AppStore extends ChangeNotifier {
   final List<CreatorGuide> _creatorGuides = List<CreatorGuide>.from(DummyData.creatorGuides);
   // 크리에이터 데이터 (activities 편집 가능하도록 mutable copy)
   final List<Creator> _creators = List<Creator>.from(DummyData.creators);
+  // 기기에 저장된 활동 — Firestore 크리에이터는 init 뒤에 들어오므로 mergeCreators에서 붙임
+  Map<String, List<CreatorActivity>> _savedActivities = {};
 
-  // ── 초기화: localStorage에서 CMS 추가 항목 읽기 ──────────
+  // ── 초기화: 기기에 저장한 크리에이터 활동 읽기 ──────────
   Future<void> init() async {
     try {
       final prefs = await SharedPreferences.getInstance();
 
-      // 1. 아트워크 동기화 (CMS 업로드 오디오)
-      final rawArtworks = prefs.getString(_kSharedArtworks);
-      if (rawArtworks != null) {
-        final List<dynamic> list = jsonDecode(rawArtworks);
-        final existingIds = _artworks.map((a) => a.id).toSet();
-        for (final item in list) {
-          final Artwork artwork;
-          try {
-            artwork = _artworkFromJson(item as Map<String, dynamic>);
-          } catch (e) {
-            debugPrint('[AppStore] 손상된 작품 데이터 건너뜀: $e');
-            continue;
-          }
-          if (!existingIds.contains(artwork.id)) {
-            _artworks.add(artwork);
-            existingIds.add(artwork.id);
-          } else {
-            final idx = _artworks.indexWhere((a) => a.id == artwork.id);
-            if (idx >= 0) _artworks[idx] = artwork;
-          }
-        }
-      }
-
-      // 2. 섹션 동기화 (CMS 섹션 imageBase64 포함)
-      final rawSections = prefs.getString(_kCmsSections);
-      if (rawSections != null) {
-        final List<dynamic> list = jsonDecode(rawSections);
-        final cmsData = list.map((e) => e as Map<String, dynamic>).toList();
-
-        for (final j in cmsData) {
-          final sectionId = j['id'];
-          if (sectionId is! String) continue; // 손상된 섹션 데이터 건너뜀
-          final imageBase64 = j['imageBase64'] as String?;
-          final idx = _sections.indexWhere((s) => s.id == sectionId);
-
-          if (idx >= 0) {
-            final existing = _sections[idx];
-            _sections[idx] = ExhibitionSection(
-              id:            existing.id,
-              exhibitionId:  existing.exhibitionId,
-              order:         j['order'] as int? ?? existing.order,
-              title:         j['title'] as String? ?? existing.title,
-              description:   j['description'] as String? ?? existing.description,
-              imageSeed:     j['imageSeed'] as int? ?? existing.imageSeed,
-              imageBase64:   imageBase64,
-              artworkIds:    (j['artworkIds'] as List<dynamic>?)
-                              ?.map((e) => e as String).toList()
-                             ?? existing.artworkIds,
-            );
-          } else {
-            _sections.add(ExhibitionSection(
-              id:           sectionId,
-              exhibitionId: j['exhibitionId'] as String,
-              order:        j['order'] as int? ?? 99,
-              title:        j['title'] as String? ?? '',
-              description:  j['description'] as String? ?? '',
-              imageSeed:    j['imageSeed'] as int? ?? 0,
-              imageBase64:  imageBase64,
-              artworkIds:   (j['artworkIds'] as List<dynamic>?)
-                              ?.map((e) => e as String).toList() ?? [],
-            ));
-          }
-        }
-      }
-
-      // 3. 크리에이터 활동 동기화
+      // 크리에이터 활동 복원
       final rawActivities = prefs.getString(_kCreatorActivities);
       if (rawActivities != null) {
         final Map<String, dynamic> map = jsonDecode(rawActivities);
-        map.forEach((creatorId, activitiesJson) {
-          final idx = _creators.indexWhere((c) => c.id == creatorId);
-          if (idx >= 0 && activitiesJson is List) {
-            final activities = activitiesJson
-                .map((e) => CreatorActivity.fromJson(e as Map<String, dynamic>))
-                .toList();
-            _creators[idx] = _creators[idx].copyWith(activities: activities);
-          }
-        });
+        _savedActivities = {
+          for (final e in map.entries)
+            if (e.value is List)
+              e.key: [for (final a in e.value as List) CreatorActivity.fromJson(a as Map<String, dynamic>)],
+        };
+        for (final e in _savedActivities.entries) {
+          final idx = _creators.indexWhere((c) => c.id == e.key);
+          if (idx >= 0) _creators[idx] = _creators[idx].copyWith(activities: e.value);
+        }
       }
 
       notifyListeners();
@@ -171,7 +106,7 @@ class AppStore extends ChangeNotifier {
       if (idx >= 0) {
         _creators[idx] = c.copyWith(activities: _creators[idx].activities);
       } else {
-        _creators.add(c);
+        _creators.add(c.copyWith(activities: _savedActivities[c.id]));
       }
     }
     notifyListeners();
@@ -201,19 +136,4 @@ class AppStore extends ChangeNotifier {
       await prefs.setString(_kCreatorActivities, jsonEncode(map));
     } catch (_) {}
   }
-
-  // ── JSON 역직렬화 ────────────────────────────────────────
-  static Artwork _artworkFromJson(Map<String, dynamic> j) => Artwork(
-    id: j['id'] as String,
-    exhibitionId: j['exhibitionId'] as String,
-    title: j['title'] as String,
-    artist: j['artist'] as String? ?? '',
-    material: j['material'] as String? ?? '',
-    imageSeed: j['imageSeed'] as int? ?? 0,
-    audioUrl: j['audioUrl'] as String?,
-    durationSec: j['durationSec'] as int? ?? 180,
-    description: j['description'] as String? ?? '',
-    curatorNote: '',
-    captions: const [],
-  );
 }

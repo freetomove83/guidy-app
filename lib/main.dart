@@ -76,6 +76,8 @@ Future<bool> _initFirebase() async {
   try {
     final app = await Firebase.initializeApp(options: kIsWeb ? _webFirebaseOptions : null);
     debugPrint('[Firebase] initialized: ${app.options.projectId}');
+    // 비밀번호 재설정·인증 메일을 Firebase 기본 한국어 문구로
+    await FirebaseAuth.instance.setLanguageCode('ko');
     // 로컬 검증용: flutter run --dart-define=USE_EMULATOR=true (guidy-cms에서 firebase emulators:start)
     if (const bool.fromEnvironment('USE_EMULATOR')) {
       FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
