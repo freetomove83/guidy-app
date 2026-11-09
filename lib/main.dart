@@ -49,7 +49,7 @@ void main() async {
     userStore.init(),  // localStorage에서 사용자 개인화 데이터 복원
   ]);
   // CMS에서 게시한 전시가 있으면 그것으로 교체 (없거나 오프라인이면 앱 기본 데이터)
-  if (firebaseReady) await Future.wait([ContentService.load(appStore), AdDataStore.load(), AppSettings.load()]);
+  if (firebaseReady) await Future.wait([ContentService.load(appStore), ContentService.loadCreators(appStore), AdDataStore.load(), AppSettings.load()]);
   runApp(GuidyRoot(appStore: appStore, userStore: userStore));
 }
 

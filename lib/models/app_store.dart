@@ -164,6 +164,19 @@ class AppStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// CMS에서 승인한 크리에이터 반영 — 같은 id는 바꾸고(앱에서 편집한 활동은 유지) 새 사람은 뒤에 붙임
+  void mergeCreators(List<Creator> creators) {
+    for (final c in creators) {
+      final idx = _creators.indexWhere((x) => x.id == c.id);
+      if (idx >= 0) {
+        _creators[idx] = c.copyWith(activities: _creators[idx].activities);
+      } else {
+        _creators.add(c);
+      }
+    }
+    notifyListeners();
+  }
+
   // ── 크리에이터 활동 업데이트 ─────────────────────────────
   Future<void> updateCreatorActivities(
     String creatorId,
