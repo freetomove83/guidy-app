@@ -21,8 +21,13 @@ class CreatorProfileScreen extends StatelessWidget {
     final appStore  = context.watch<AppStore>();
     final userStore = context.watch<UserStore>();
 
-    final creator = appStore.creatorById(creatorId)
-        ?? DummyData.creators.first;
+    final creator = appStore.creatorById(creatorId);
+    if (creator == null) {
+      return Scaffold(
+        appBar: AppBar(),
+        body: const Center(child: Text('크리에이터를 찾을 수 없어요')),
+      );
+    }
     final isFollowing = userStore.isFollowing(creatorId);
 
     // 팔로우 수치: 실제 팔로잉 여부에 따라 +1

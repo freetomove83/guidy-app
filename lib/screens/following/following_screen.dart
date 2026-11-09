@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/app_store.dart';
+import '../../models/user_store.dart';
 import '../../theme/app_theme.dart';
 import '../../models/models.dart';
 import '../../widgets/common_widgets.dart';
@@ -16,6 +17,16 @@ class FollowingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final pal = GuidyPalette.of(context);
+    final store = context.watch<AppStore>();
+    final following = context.watch<UserStore>().following;
+    // 팔로우한 크리에이터의 가이드 (CMS에 게시된 전시)
+    final feed = [
+      for (final e in store.exhibitions)
+        if (e.creatorId != null && following.contains(e.creatorId))
+          if (store.creatorById(e.creatorId!) case final creator?)
+            FeedItem(id: e.id, creator: creator, type: FeedItemType.newGuide,
+                description: e.description, exhibition: e),
+    ];
 
     return Scaffold(
       backgroundColor: pal.bg,
@@ -34,7 +45,18 @@ class FollowingScreen extends StatelessWidget {
                   Container(height: 1, color: pal.line),
                   const SizedBox(height: 12),
                   // 피드
-                  ...DummyData.feedItems.map((item) => _FeedCard(item: item, isDark: isDark, textC: pal.text)),
+                  if (feed.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(32, 48, 32, 0),
+                      child: Text(
+                        following.isEmpty
+                            ? '크리에이터를 팔로우하면 새 가이드 소식이 여기에 모여요'
+                            : '팔로우한 크리에이터의 가이드가 아직 없어요',
+                        textAlign: TextAlign.center,
+                        style: GuidyText.body(pal.sub),
+                      ),
+                    ),
+                  ...feed.map((item) => _FeedCard(item: item, isDark: isDark, textC: pal.text)),
                   const SizedBox(height: 80),
                 ],
               ),
@@ -114,7 +136,6 @@ class _FeedCard extends StatefulWidget {
 }
 
 class _FeedCardState extends State<_FeedCard> {
-  bool _liked = false;
 
   @override
   Widget build(BuildContext context) {
@@ -159,7 +180,7 @@ class _FeedCardState extends State<_FeedCard> {
                           Icon(Icons.verified_rounded, color: GuidyPalette.forDark(isDark).primary, size: 14),
                       ],
                     ),
-                    Text(_timeAgo(item.time), style: GuidyText.small(muteC)),
+                    if (item.time != null) Text(_timeAgo(item.time!), style: GuidyText.small(muteC)),
                   ],
                 ),
               ),
@@ -242,35 +263,6 @@ class _FeedCardState extends State<_FeedCard> {
 
           const SizedBox(height: 12),
 
-          // 좋아요 / 저장
-          Row(
-            children: [
-              GestureDetector(
-                onTap: () => setState(() => _liked = !_liked),
-                child: Row(
-                  children: [
-                    Icon(
-                      _liked ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                      size: 18,
-                      color: _liked ? Colors.red : muteC,
-                    ),
-                    const SizedBox(width: 4),
-                    Text('${item.likes + (_liked ? 1 : 0)}', style: GuidyText.small(muteC)),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 16),
-              Row(
-                children: [
-                  Icon(Icons.play_circle_outline_rounded, size: 18, color: muteC),
-                  const SizedBox(width: 4),
-                  Text('${item.plays}', style: GuidyText.small(muteC)),
-                ],
-              ),
-              const Spacer(),
-              Icon(Icons.bookmark_border_rounded, size: 20, color: muteC),
-            ],
-          ),
         ],
       ),
     );
