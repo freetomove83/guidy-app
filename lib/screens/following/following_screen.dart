@@ -2,6 +2,8 @@
 // 팔로잉 피드 화면
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../models/app_store.dart';
 import '../../theme/app_theme.dart';
 import '../../models/models.dart';
 import '../../widgets/common_widgets.dart';
@@ -55,9 +57,9 @@ class _StoryStrip extends StatelessWidget {
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 20),
-        itemCount: DummyData.creators.length,
+        itemCount: context.watch<AppStore>().creators.length,
         itemBuilder: (context, i) {
-          final cr = DummyData.creators[i];
+          final cr = context.watch<AppStore>().creators[i];
           return GestureDetector(
             onTap: () => Navigator.pushNamed(context, '/creator/${cr.id}'),
             child: Container(

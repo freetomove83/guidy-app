@@ -63,4 +63,21 @@ void main() {
     expect(store.artworks, isEmpty);
     expect(store.creators.length, creators);
   });
+
+  test('approved creator from a CMS application joins the app list', () {
+    // CreatorService.apply가 쓰는 필드만 있는 문서
+    final c = ContentService.creatorFromMap('u1', {
+      'name': '새 도슨트', 'title': '도슨트', 'field': '도슨트', 'bio': '소개', 'status': 'approved',
+    });
+    expect([c.name, c.title, c.bio, c.followerCount, c.isVerified], ['새 도슨트', '도슨트', '소개', 0, false]);
+    expect(c.avatarColor, ContentService.creatorFromMap('u1', const {}).avatarColor);
+
+    final store = AppStore();
+    final before = store.creators.length;
+    final renamed = ContentService.creatorFromMap('c1', {'name': '바뀐 이름'});
+    store.mergeCreators([c, renamed]);
+    expect(store.creators.length, before + 1);
+    expect(store.creatorById('u1')?.name, '새 도슨트');
+    expect(store.creatorById('c1')?.name, '바뀐 이름');
+  });
 }

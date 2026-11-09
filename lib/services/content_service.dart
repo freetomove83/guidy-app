@@ -77,6 +77,19 @@ class ContentService {
     }
   }
 
+  /// CMS에서 승인한 크리에이터를 앱 목록에 더함 (같은 id면 Firestore 값으로 바꿈)
+  static Future<void> loadCreators(AppStore store, {Duration timeout = const Duration(seconds: 6)}) async {
+    try {
+      final snap = await FirebaseFirestore.instance
+          .collection('creators').where('status', isEqualTo: 'approved').get()
+          .timeout(timeout);
+      store.mergeCreators([for (final d in snap.docs) creatorFromMap(d.id, d.data())]);
+      debugPrint('[Content] 승인된 크리에이터 ${snap.docs.length}명');
+    } catch (e) {
+      debugPrint('[Content] 크리에이터 불러오기 실패 → 기본 데이터 사용: $e');
+    }
+  }
+
   // ── Firestore map ↔ 모델 ──────────────────────────────────
 
   static Exhibition exhibitionFromMap(String id, Map<String, dynamic> d) {
@@ -102,6 +115,23 @@ class ContentService {
       isFreeAccess: d['is_free_access'] as bool? ?? false,
     );
   }
+
+  static const _avatarColors = ['#0B3D5C', '#D97757', '#2F8F5C', '#7D6A94', '#B5523B', '#3E6E8E'];
+
+  /// 필드 이름은 CmsFirestoreService._creatorToMap과 같음. 크리에이터 신청서는 name·title·bio만 있음
+  static Creator creatorFromMap(String id, Map<String, dynamic> d) => Creator(
+    id: id,
+    name: d['name'] as String? ?? '',
+    title: d['title'] as String? ?? '',
+    bio: d['bio'] as String? ?? '',
+    avatarUrl: d['avatar_url'] as String?,
+    // 사진이 없을 때 원 색 — id로 정해서 매번 같은 색
+    avatarColor: _avatarColors[id.codeUnits.fold(0, (a, c) => a + c) % _avatarColors.length],
+    followerCount: _int(d['follower_count']),
+    totalPlays: _int(d['total_plays']),
+    guideCount: _int(d['guide_count']),
+    isVerified: d['is_verified'] as bool? ?? false,
+  );
 
   static Artwork artworkFromMap(String id, Map<String, dynamic> d) => Artwork(
     id: id,

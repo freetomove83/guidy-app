@@ -371,8 +371,8 @@ class _CreatorsTab extends StatelessWidget {
       );
     }
 
-    // 팔로우 중인 크리에이터 목록 (DummyData에서)
-    final followedCreators = DummyData.creators
+    // 팔로우 중인 크리에이터 목록
+    final followedCreators = context.watch<AppStore>().creators
         .where((c) => following.contains(c.id))
         .toList();
 

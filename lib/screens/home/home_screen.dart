@@ -268,10 +268,10 @@ class _DiscoverTab extends StatelessWidget {
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  itemCount: DummyData.creators.length,
+                  itemCount: context.watch<AppStore>().creators.length,
                   separatorBuilder: (_, __) => const SizedBox(width: 10),
                   itemBuilder: (context, i) {
-                    final cr = DummyData.creators[i];
+                    final cr = context.watch<AppStore>().creators[i];
                     return GestureDetector(
                       onTap: () =>
                           Navigator.pushNamed(context, '/creator/${cr.id}'),
