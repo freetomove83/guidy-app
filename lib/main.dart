@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import 'theme/app_theme.dart';
 import 'theme/theme_provider.dart';
 import 'services/audio_service.dart';
+import 'services/auth_service.dart';
 import 'services/content_service.dart';
 import 'models/app_store.dart';
 import 'models/user_store.dart';
@@ -50,8 +51,14 @@ void main() async {
   ]);
   // CMS에서 게시한 전시가 있으면 그것으로 교체 (없거나 오프라인이면 앱 기본 데이터)
   if (firebaseReady) await Future.wait([ContentService.load(appStore), ContentService.loadCreators(appStore), AdDataStore.load(), AppSettings.load()]);
+  AuthService.watchAccountStatus((message) => _messenger.currentState
+    ?..hideCurrentSnackBar()
+    ..showSnackBar(SnackBar(content: Text(message), duration: const Duration(seconds: 6))));
   runApp(GuidyRoot(appStore: appStore, userStore: userStore));
 }
+
+/// 화면과 상관없이 안내를 띄우려고 (정지 회원 로그아웃 등)
+final _messenger = GlobalKey<ScaffoldMessengerState>();
 
 /// 웹용 Firebase 설정 — guidy-cms와 같은 웹 앱 (API 키는 허용 주소로 제한돼 있음)
 const _webFirebaseOptions = FirebaseOptions(
@@ -121,6 +128,7 @@ class GuidyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Guidy',
       debugShowCheckedModeBanner: false,
+      scaffoldMessengerKey: _messenger,
       theme: buildLightTheme(),
       darkTheme: buildDarkTheme(),
       themeMode: themeProvider.isDark ? ThemeMode.dark : ThemeMode.light,
