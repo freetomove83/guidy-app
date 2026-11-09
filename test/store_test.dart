@@ -91,4 +91,21 @@ void main() {
       }
     }
   });
+
+  test('saved activities reach a creator that arrives later from Firestore', () async {
+    final first = AppStore();
+    first.mergeCreators([const Creator(id: 'u9', name: 'n', title: 't', bio: 'b',
+        avatarColor: '#000000', followerCount: 0, totalPlays: 0, guideCount: 0)]);
+    await first.updateCreatorActivities('u9', [
+      CreatorActivity(id: 'a', type: ActivityType.values.first, label: 'YouTube', detail: 'd'),
+    ]);
+
+    // 앱을 다시 열면: init(저장값) → Firestore 크리에이터 합치기 순서
+    final next = AppStore();
+    await next.init();
+    expect(next.creatorById('u9'), isNull);
+    next.mergeCreators([const Creator(id: 'u9', name: 'n', title: 't', bio: 'b',
+        avatarColor: '#000000', followerCount: 0, totalPlays: 0, guideCount: 0)]);
+    expect(next.creatorById('u9')!.activities.map((a) => a.label), ['YouTube']);
+  });
 }
