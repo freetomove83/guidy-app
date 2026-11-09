@@ -69,6 +69,10 @@
 	<!-- QR 스캔 카메라 권한 안내 문구 -->
 	<key>NSCameraUsageDescription</key>
 	<string>작품 옆 QR 코드를 찍어 오디오 가이드를 바로 열기 위해 카메라를 사용합니다.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>전시장에서 가까이 있는 작품을 찾아 오디오 가이드를 바로 열기 위해 위치(비콘)를 사용합니다. 위치는 저장하거나 전송하지 않습니다.</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>전시장의 작품 옆 비콘을 감지하기 위해 블루투스를 사용합니다.</string>
 	<!-- Google 로그인: GoogleService-Info.plist의 CLIENT_ID -->
 	<key>GIDClientID</key>
 	<string>354832592482-klquq36s4mg64epd6bmo087t9vpdb6go.apps.googleusercontent.com</string>

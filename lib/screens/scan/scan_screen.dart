@@ -1,11 +1,14 @@
 // lib/screens/scan/scan_screen.dart
-// QR 스캔 화면 — 카메라로 작품 QR을 읽어 해당 화면으로 이동
+// QR 스캔 화면 — 카메라로 작품 QR을 읽어 해당 화면으로 이동. 화면이 열려 있는 동안 근처 비콘도 감지
 
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
 import '../../models/app_store.dart';
+import '../../models/models.dart';
+import '../../services/beacon_service.dart';
 import '../../services/qr_link.dart';
 import '../../theme/app_theme.dart';
 
@@ -23,6 +26,10 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
   bool _torchOn = false;
   String? _lastInvalid; // 같은 QR로 안내가 반복되지 않게
   MobileScannerController? _camera;
+  StreamSubscription<String>? _beacons;
+  bool _beaconsOn = false;
+  Artwork? _nearby;               // 지금 안내 중인 비콘 작품
+  final _announced = <String>{}; // 한 번 안내한 작품은 이 화면에서 다시 띄우지 않음
   late AnimationController _scanLineCtrl;
   late Animation<double> _scanLineAnim;
 
@@ -36,11 +43,35 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
     );
     if (widget.camera) {
       _camera = MobileScannerController(formats: const [BarcodeFormat.qrCode]);
+      if (BeaconService.supported) _startBeacons();
     }
+  }
+
+  Future<void> _startBeacons() async {
+    final links = await BeaconService.load();
+    if (links.isEmpty || !mounted || !await BeaconService.start() || !mounted) return;
+    setState(() => _beaconsOn = true);
+    _beacons = BeaconService.watch(links).listen((id) {
+      if (!mounted || _scanned || _nearby != null || _announced.contains(id)) return;
+      final artwork = context.read<AppStore>().artworkById(id);
+      if (artwork == null) return;
+      _announced.add(id);
+      setState(() => _nearby = artwork);
+    }, onError: (e) => debugPrint('[Beacon] 감지 오류: $e'));
+  }
+
+  /// 안내 카드에서 재생(버튼 또는 3초 뒤 자동). 두 번 불려도 한 번만 이동
+  void _playNearby() {
+    final id = _nearby?.id;
+    if (id == null) return;
+    setState(() => _nearby = null);
+    _open('/player/$id');
   }
 
   @override
   void dispose() {
+    _beacons?.cancel();
+    if (_beaconsOn) BeaconService.stop();
     _scanLineCtrl.dispose();
     _camera?.dispose();
     super.dispose();
@@ -194,7 +225,9 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
               children: [
                 const SizedBox(height: 260),
                 Text(
-                  _scanned ? 'QR 코드 인식됨!' : '작품 옆 QR을 사각형 안에 담아주세요',
+                  _scanned ? 'QR 코드 인식됨!'
+                      : _beaconsOn ? '작품 옆 QR을 비추거나 작품 가까이 가 보세요'
+                      : '작품 옆 QR을 사각형 안에 담아주세요',
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.8),
                     fontSize: 14, fontFamily: GuidyText.fontFamily,
@@ -204,8 +237,21 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
             ),
           ),
 
+          // 비콘으로 찾은 근처 작품
+          if (_nearby != null)
+            Positioned(
+              left: 0, right: 0, bottom: 0,
+              child: BeaconToast(
+                key: ValueKey(_nearby!.id),
+                artworkTitle: _nearby!.title,
+                artistName: _nearby!.artist,
+                onDismiss: () => setState(() => _nearby = null),
+                onAutoPlay: _playNearby,
+              ),
+            ),
+
           // 하단 개발 모드 카드 (개발 빌드에서만, 카메라 없이 e1로 이동)
-          if (kDebugMode)
+          if (kDebugMode && _nearby == null)
           Positioned(
             bottom: 40, left: 20, right: 20,
             child: GestureDetector(
