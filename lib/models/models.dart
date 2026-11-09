@@ -206,7 +206,7 @@ class FeedItem {
   final String? title;
   final String? description;
   final Exhibition? exhibition;
-  final DateTime time;
+  final DateTime? time; // 서버에 시각이 없으면 표시하지 않음
   final int likes;
   final int plays;
 
@@ -217,7 +217,7 @@ class FeedItem {
     this.title,
     this.description,
     this.exhibition,
-    required this.time,
+    this.time,
     this.likes = 0,
     this.plays = 0,
   });
@@ -408,11 +408,6 @@ class DummyData {
     ]),
   ];
 
-  static final List<FeedItem> feedItems = [
-    FeedItem(id: 'f1', creator: creators[0], type: FeedItemType.newGuide, title: '새 가이드: 빛과 표면', description: '북서울미술관 기획전 오디오 가이드를 새로 출시했습니다. 13명 작가의 이야기를 55분 동안 담았어요.', exhibition: exhibitions[0], time: DateTime.now().subtract(const Duration(hours: 2)), likes: 128, plays: 892),
-    FeedItem(id: 'f2', creator: creators[1], type: FeedItemType.announcement, title: '이번 주 라이브 해설', description: '이번 주 토요일 오후 2시, 서울시립미술관에서 라이브 해설 진행합니다. 현장에서 만나요!', time: DateTime.now().subtract(const Duration(hours: 6)), likes: 64, plays: 0),
-    FeedItem(id: 'f3', creator: creators[2], type: FeedItemType.newGuide, title: '도시의 결 가이드 업데이트', description: '큐레이터 인터뷰 추가 및 작가 노트 보완. 더욱 깊은 감상 경험을 선사합니다.', exhibition: exhibitions[1], time: DateTime.now().subtract(const Duration(days: 1)), likes: 45, plays: 312),
-  ];
 
   // ─── 섹션 더미 데이터 ──────────────────────────────────
   static final List<ExhibitionSection> sections = [
