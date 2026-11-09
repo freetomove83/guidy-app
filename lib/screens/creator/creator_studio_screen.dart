@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../theme/app_theme.dart';
 import '../../models/models.dart';
 import '../../models/app_store.dart';
+import '../../services/auth_service.dart';
 import '../../widgets/common_widgets.dart';
 
 // ─── 크리에이터 스튜디오 메인 ─────────────────────────────
@@ -17,13 +18,9 @@ class CreatorStudioScreen extends StatefulWidget {
 }
 
 class _CreatorStudioScreenState extends State<CreatorStudioScreen> {
-  bool _isApproved = false; // 심사 상태 시뮬
-
+  // 내 정보 화면이 승인된 크리에이터만 여기로 보냄 (UserStore.isCreator)
   @override
-  Widget build(BuildContext context) {
-    if (!_isApproved) return _CreatorOnboardingScreen(onApproved: () => setState(() => _isApproved = true));
-    return const _CreatorDashboard();
-  }
+  Widget build(BuildContext context) => const _CreatorDashboard();
 }
 
 // ─── 대시보드 ─────────────────────────────────────────────
@@ -34,6 +31,10 @@ class _CreatorDashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final pal = GuidyPalette.of(context);
+    final store = context.watch<AppStore>();
+    final uid = AuthService.currentUser?.uid;
+    final me = uid == null ? null : store.creatorById(uid);
+    final myGuides = store.exhibitions.where((e) => uid != null && e.creatorId == uid).toList();
 
     return Scaffold(
       backgroundColor: pal.bg,
@@ -62,7 +63,19 @@ class _CreatorDashboard extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
-              child: Text(DummyData.creators.first.name, style: GuidyText.h2(pal.text)),
+              child: Text(me?.name ?? '크리에이터', style: GuidyText.h2(pal.text)),
+            ),
+
+            // 수익·청취·판매는 결제·통계 연결 전까지 예시
+            Container(
+              margin: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: GuidyColors.warn.withValues(alpha: 0.12),
+                borderRadius: GuidyRadius.mdBorder,
+              ),
+              child: Text('수익·청취·판매 숫자와 가이드 만들기는 아직 미리보기예요. 결제와 오디오 업로드를 연결하면 실제로 동작해요.',
+                  style: GuidyText.small(pal.text)),
             ),
 
             // 이달 예상 수익 카드
@@ -79,8 +92,9 @@ class _CreatorDashboard extends StatelessWidget {
                   children: [
                     Text('이달 예상 수익', style: GuidyText.small(Colors.white.withValues(alpha: 0.6))),
                     const SizedBox(height: 8),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                    // 큰 글자에서 금액과 증감 배지가 한 줄에 안 들어가면 줄바꿈
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.end,
                       children: [
                         const Text('₩428,000', style: TextStyle(
                           color: Colors.white, fontSize: 28, fontWeight: FontWeight.w800,
@@ -140,11 +154,17 @@ class _CreatorDashboard extends StatelessWidget {
             // 내 가이드
             SectionHeader(title: '내 가이드', action: '새 가이드 +',
               onAction: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const GuideEditScreen()))),
-            ...DummyData.exhibitions.take(3).toList().asMap().entries.map((e) {
+            if (myGuides.isEmpty)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+                child: Text('아직 공개된 가이드가 없어요', style: GuidyText.body(pal.sub)),
+              ),
+            ...myGuides.asMap().entries.map((e) {
               final ex = e.value;
-              final statusLabels = ['공개', '심사중', '초안'];
-              final statusColors = [GuidyColors.ok, GuidyColors.warn, pal.mute];
-              final idx = e.key % 3;
+              // 앱은 CMS에서 게시된 전시만 받음
+              const statusLabels = ['공개'];
+              const statusColors = [GuidyColors.ok];
+              const idx = 0;
               return Container(
                 margin: const EdgeInsets.fromLTRB(20, 0, 20, 8),
                 padding: const EdgeInsets.all(14),
@@ -177,8 +197,7 @@ class _CreatorDashboard extends StatelessWidget {
                           const SizedBox(height: 2),
                           Text(ex.title, style: GuidyText.body(pal.text).copyWith(fontWeight: FontWeight.w700),
                             maxLines: 1, overflow: TextOverflow.ellipsis),
-                          Text('청취 ${e.key * 324 + 89}회 · 수익 ₩${formatPrice((e.key + 1) * 34200)}',
-                            style: GuidyText.small(pal.sub)),
+                          Text(ex.venue, style: GuidyText.small(pal.sub)),
                         ],
                       ),
                     ),
@@ -494,237 +513,6 @@ class _GuideEditScreenState extends State<GuideEditScreen> {
   }
 }
 
-// ─── 크리에이터 온보딩 (심사) ─────────────────────────────
-class _CreatorOnboardingScreen extends StatelessWidget {
-  final VoidCallback onApproved;
-  const _CreatorOnboardingScreen({required this.onApproved});
-
-  @override
-  Widget build(BuildContext context) {
-    final pal = GuidyPalette.of(context);
-
-    return Scaffold(
-      backgroundColor: pal.bg,
-      appBar: AppBar(
-        backgroundColor: pal.bg,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: pal.text),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text('크리에이터 신청 · 진행 상황', style: GuidyText.body(pal.text).copyWith(fontWeight: FontWeight.w700)),
-        elevation: 0,
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
-        children: [
-          // 히어로 카드
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: pal.accent,
-              borderRadius: GuidyRadius.xlBorder,
-            ),
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: CustomPaint(painter: _HeroBgPainterStudio()),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.25),
-                        borderRadius: GuidyRadius.pillBorder,
-                      ),
-                      child: const Text('PENDING', style: TextStyle(
-                        color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800,
-                        letterSpacing: 1, fontFamily: GuidyText.fontFamily,
-                      )),
-                    ),
-                    const SizedBox(height: 12),
-                    const Text('거의 다 왔어요!', style: TextStyle(
-                      color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800,
-                      fontFamily: GuidyText.fontFamily,
-                    )),
-                    const SizedBox(height: 4),
-                    Text('평균 3~5일 내에 결과를 알려드립니다', style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.85), fontSize: 13,
-                      fontFamily: GuidyText.fontFamily,
-                    )),
-                    const SizedBox(height: 12),
-                    Row(children: [
-                      Icon(Icons.calendar_today_outlined, color: Colors.white.withValues(alpha: 0.7), size: 14),
-                      const SizedBox(width: 4),
-                      Flexible(child: Text('신청일: 2026.09.01', style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 12, fontFamily: GuidyText.fontFamily))),
-                    ]),
-                  ],
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 24),
-
-          // 심사 타임라인
-          Text('심사 진행 상황', style: GuidyText.h3(pal.text)),
-          const SizedBox(height: 12),
-          ..._timelineItems(pal.text, pal.sub, pal.mute, pal.surface, pal.line, pal.accent, pal.primary),
-
-          const SizedBox(height: 24),
-
-          // 제출 정보
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: pal.surface,
-              borderRadius: GuidyRadius.lgBorder,
-              border: Border.all(color: pal.line),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('제출한 정보', style: GuidyText.body(pal.text).copyWith(fontWeight: FontWeight.w800)),
-                const SizedBox(height: 12),
-                _infoRow('활동명', '김도슨트', pal.text, pal.sub),
-                _infoRow('전문 분야', '미술사, 현대미술', pal.text, pal.sub),
-                _infoRow('포트폴리오', 'portfolio.com/kim', pal.text, pal.sub),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // 문의 안내
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: pal.bgAlt,
-              borderRadius: GuidyRadius.lgBorder,
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.mail_outline_rounded, color: pal.mute, size: 18),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('문의사항이 있으신가요?', style: GuidyText.body(pal.text).copyWith(fontWeight: FontWeight.w700)),
-                      Text('creator@guidy.app', style: GuidyText.small(pal.sub)),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          // 개발 모드: 승인 버튼
-          GestureDetector(
-            onTap: onApproved,
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              decoration: BoxDecoration(
-                color: GuidyColors.ok.withValues(alpha: 0.15),
-                borderRadius: GuidyRadius.pillBorder,
-                border: Border.all(color: GuidyColors.ok),
-              ),
-              child: const Text('[개발 모드] 심사 승인 시뮬레이션',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: GuidyColors.ok, fontWeight: FontWeight.w700,
-                  fontFamily: GuidyText.fontFamily)),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  List<Widget> _timelineItems(Color textC, Color subC, Color muteC, Color surfaceC, Color lineC, Color accentC, Color primaryC) {
-    final items = [
-      {'label': '신청서 제출', 'sub': '2026.09.01', 'done': true, 'active': false},
-      {'label': '기본 요건 확인', 'sub': '통과 · 인증됨', 'done': true, 'active': false},
-      {'label': '포트폴리오 심사', 'sub': '진행 중', 'done': false, 'active': true},
-      {'label': '최종 승인 · 스튜디오 개설', 'sub': '대기 중', 'done': false, 'active': false},
-    ];
-
-    return items.asMap().entries.map((e) {
-      final i = e.key;
-      final item = e.value;
-      final isDone = item['done'] as bool;
-      final isActive = item['active'] as bool;
-      final dotColor = isDone ? GuidyColors.ok : isActive ? accentC : lineC;
-
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Column(
-            children: [
-              Container(
-                width: 24, height: 24,
-                decoration: BoxDecoration(
-                  color: dotColor.withValues(alpha: isDone || isActive ? 1 : 0.2),
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: isDone
-                    ? const Icon(Icons.check, color: Colors.white, size: 14)
-                    : isActive
-                      ? Container(width: 8, height: 8, decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle))
-                      : Container(width: 6, height: 6, decoration: BoxDecoration(color: muteC, shape: BoxShape.circle)),
-                ),
-              ),
-              if (i < items.length - 1)
-                Container(width: 1.5, height: 36, color: isDone ? GuidyColors.ok.withValues(alpha: 0.3) : lineC),
-            ],
-          ),
-          const SizedBox(width: 12),
-          Expanded(child: Padding(
-            padding: const EdgeInsets.only(top: 2),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(item['label'] as String, style: GuidyText.body(textC).copyWith(
-                  fontWeight: isActive ? FontWeight.w800 : FontWeight.w500,
-                )),
-                Text(item['sub'] as String, style: GuidyText.small(subC)),
-                const SizedBox(height: 12),
-              ],
-            ),
-          )),
-        ],
-      );
-    }).toList();
-  }
-
-  Widget _infoRow(String label, String value, Color textC, Color subC) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        children: [
-          SizedBox(width: 80, child: Text(label, style: GuidyText.small(subC))),
-          Expanded(
-            child: Text(value, style: GuidyText.body(textC).copyWith(fontWeight: FontWeight.w600)),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _HeroBgPainterStudio extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final p = Paint()..color = Colors.white.withValues(alpha: 0.08);
-    canvas.drawCircle(Offset(size.width * 0.9, size.height * 0.2), 60, p);
-  }
-  @override
-  bool shouldRepaint(covariant CustomPainter old) => false;
-}
-
 class _MiniChartPainter extends CustomPainter {
   final Color color;
   const _MiniChartPainter({required this.color});
@@ -782,12 +570,11 @@ class _ActivityManagementSection extends StatelessWidget {
     required this.lineC,
   });
 
-  static const String _mockCreatorId = 'c1';
-
   @override
   Widget build(BuildContext context) {
     final appStore = context.watch<AppStore>();
-    final creator  = appStore.creatorById(_mockCreatorId);
+    final uid = AuthService.currentUser?.uid;
+    final creator = uid == null ? null : appStore.creatorById(uid);
     if (creator == null) return const SizedBox.shrink();
 
     final activities = creator.activities;
@@ -888,7 +675,7 @@ class _ActivityManagementSection extends StatelessWidget {
                       final newList = List<CreatorActivity>.from(activities)
                         ..removeAt(i);
                       context.read<AppStore>()
-                          .updateCreatorActivities(_mockCreatorId, newList);
+                          .updateCreatorActivities(creator.id, newList);
                     },
                     child: Icon(Icons.delete_outline_rounded,
                         size: 16, color: GuidyColors.danger),
