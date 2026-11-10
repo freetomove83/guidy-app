@@ -49,7 +49,9 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
 
   Future<void> _startBeacons() async {
     final links = await BeaconService.load();
-    if (links.isEmpty || !mounted || !await BeaconService.start() || !mounted) return;
+    if (links.isEmpty || !mounted) return;
+    await _cameraSettled();
+    if (!mounted || !await BeaconService.start() || !mounted) return;
     setState(() => _beaconsOn = true);
     _beacons = BeaconService.watch(links).listen((id) {
       if (!mounted || _scanned || _nearby != null || _announced.contains(id)) return;
@@ -58,6 +60,19 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
       _announced.add(id);
       setState(() => _nearby = artwork);
     }, onError: (e) => debugPrint('[Beacon] 감지 오류: $e'));
+  }
+
+  /// 카메라가 켜지거나 실패할 때까지 기다림 — 안드로이드는 권한 창을 한 번에 하나만 띄워서,
+  /// 카메라 권한을 묻는 중에 비콘 권한을 물으면 그 요청이 사라짐
+  Future<void> _cameraSettled() async {
+    final cam = _camera!;
+    bool settled() => cam.value.isInitialized || cam.value.error != null;
+    if (settled()) return;
+    final done = Completer<void>();
+    void check() { if (settled() && !done.isCompleted) done.complete(); }
+    cam.addListener(check);
+    await done.future.timeout(const Duration(seconds: 30), onTimeout: () {});
+    cam.removeListener(check);
   }
 
   /// 안내 카드에서 재생(버튼 또는 3초 뒤 자동). 두 번 불려도 한 번만 이동
