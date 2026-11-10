@@ -80,4 +80,25 @@ void main() {
     expect(store.creatorById('u1')?.name, '새 도슨트');
     expect(store.creatorById('c1')?.name, '바뀐 이름');
   });
+
+  test('official guide track replaces artwork audio and turns segments into captions', () {
+    final a = DummyData.artworks.first;
+    final played = ContentService.artworkWithTrack(a, {
+      'artwork_id': a.id,
+      'source': 'upload',
+      'audio': {'ko': {'url': 'https://x/a.mp3', 'duration_ms': 30000}},
+      'segments': [
+        {'id': 's1', 'text': {'ko': '첫 문단', 'en': 'First'}, 'start_ms': 0},
+        {'id': 's2', 'text': {'ko': '둘째 문단'}, 'start_ms': 12500},
+      ],
+    });
+    expect([played.audioUrl, played.durationSec, played.title], ['https://x/a.mp3', 30, a.title]);
+    expect([for (final c in played.captions) [c.startSec, c.endSec, c.text]], [
+      [0.0, 12.5, '첫 문단'],
+      [12.5, 30.0, '둘째 문단'],
+    ]);
+    // 트랙이 없거나 한국어 음성이 없으면 작품의 예전 음성 그대로
+    expect(ContentService.artworkWithTrack(a, null), same(a));
+    expect(ContentService.artworkWithTrack(a, {'audio': {'en': {'url': 'u'}}}), same(a));
+  });
 }
