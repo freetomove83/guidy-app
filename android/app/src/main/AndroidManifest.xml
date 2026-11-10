@@ -1,5 +1,8 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <!-- 비콘 감지 (QR 스캔 화면): 안드로이드 12 이상은 BLUETOOTH_SCAN, 11 이하는 위치 권한으로 블루투스를 찾음 -->
+    <!-- 비콘 라이브러리가 넣는 위치 포그라운드 서비스 권한은 뺌 — 스캔 화면이 열려 있을 때만 찾으므로 필요 없고, 있으면 Play 심사에서 별도 신고·영상을 요구함 -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" tools:node="remove"/>
     <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30"/>
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN"/>
