@@ -64,9 +64,20 @@ class ContentService {
           ids.contains(d.data()['exhibition_id']);
       final artworkDocs = results[1].docs.where(published).toList()
         ..sort((a, b) => _int(a.data()['order']).compareTo(_int(b.data()['order'])));
+      final tracks = await _officialTracks(db, {
+        for (final d in results[0].docs)
+          if (!_licenseExpired(d.data())) d.id,
+      }).timeout(timeout).catchError((Object e) {
+        // 가이드를 못 읽어도 전시·작품은 보여 줌 (작품에 남아 있는 예전 음성으로 재생)
+        debugPrint('[Content] 가이드 불러오기 실패: $e');
+        return <String, Map<String, dynamic>>{};
+      });
       store.replaceContent(
         exhibitions: exhibitions,
-        artworks: [for (final d in artworkDocs) artworkFromMap(d.id, d.data())],
+        artworks: [
+          for (final d in artworkDocs)
+            artworkWithTrack(artworkFromMap(d.id, d.data()), tracks[d.id]),
+        ],
         sections: [for (final d in results[2].docs.where(published)) sectionFromMap(d.id, d.data())],
       );
       debugPrint('[Content] Firestore 전시 ${exhibitions.length}개 사용');
@@ -88,6 +99,59 @@ class ContentService {
     } catch (e) {
       debugPrint('[Content] 크리에이터 불러오기 실패 → 기본 데이터 사용: $e');
     }
+  }
+
+  // shortcut: 기한 지난 전시의 가이드를 앱이 숨기기만 함, 서버 함수(Blaze)가 생기면 그쪽에서 unpublished로 바꿈
+  static bool _licenseExpired(Map<String, dynamic> exhibition) {
+    final until = (exhibition['license_until'] as Timestamp?)?.toDate();
+    return until != null && until.isBefore(DateTime.now());
+  }
+
+  /// 공개된 공식 가이드의 트랙 (작품 id → 트랙). 가이드 v2 — guidy-cms docs/design/audio-guide-v2.md
+  static Future<Map<String, Map<String, dynamic>>> _officialTracks(
+      FirebaseFirestore db, Set<String> exhibitionIds) async {
+    final guides = await db.collection('guides')
+        .where('state', isEqualTo: 'published').where('kind', isEqualTo: 'official').get();
+    final versions = await Future.wait([
+      for (final g in guides.docs)
+        if (exhibitionIds.contains(g.data()['exhibition_id']) && g.data()['published_version'] != null)
+          g.reference.collection('versions').doc('${g.data()['published_version']}').get(),
+    ]);
+    return {
+      for (final v in versions)
+        for (final t in (v.data()?['tracks'] as List<dynamic>? ?? const []))
+          if ((t as Map)['artwork_id'] is String) t['artwork_id'] as String: Map<String, dynamic>.from(t),
+    };
+  }
+
+  /// 가이드 트랙의 한국어 음성·문단으로 작품의 음성·자막을 바꿈. 트랙이 없으면 그대로
+  static Artwork artworkWithTrack(Artwork a, Map<String, dynamic>? track) {
+    final audio = (track?['audio'] as Map?)?['ko'] as Map?;
+    if (track == null || audio?['url'] is! String) return a;
+    final durationMs = _int(audio!['duration_ms']);
+    final segments = [for (final s in (track['segments'] as List<dynamic>? ?? const [])) s as Map];
+    return Artwork(
+      id: a.id,
+      exhibitionId: a.exhibitionId,
+      title: a.title,
+      artist: a.artist,
+      material: a.material,
+      imageUrl: a.imageUrl,
+      imageSeed: a.imageSeed,
+      audioUrl: audio['url'] as String,
+      durationSec: durationMs ~/ 1000,
+      captions: [
+        for (var i = 0; i < segments.length; i++)
+          Caption(
+            startSec: _int(segments[i]['start_ms']) / 1000,
+            // 다음 문단이 시작할 때까지, 마지막 문단은 음성 끝까지
+            endSec: (i + 1 < segments.length ? _int(segments[i + 1]['start_ms']) : durationMs) / 1000,
+            text: (segments[i]['text'] as Map?)?['ko'] as String? ?? '',
+          ),
+      ],
+      description: a.description,
+      curatorNote: a.curatorNote,
+    );
   }
 
   // ── Firestore map ↔ 모델 ──────────────────────────────────
