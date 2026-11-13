@@ -513,30 +513,15 @@ class _ArchiveTab extends StatelessWidget {
                   padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
                   child: Row(
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: GuidyColors.ok.withValues(alpha: 0.12),
-                          borderRadius: GuidyRadius.pillBorder,
-                          border: Border.all(
-                              color: GuidyColors.ok.withValues(alpha: 0.3)),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.lock_open_rounded,
-                                size: 11, color: GuidyColors.ok),
-                            const SizedBox(width: 4),
-                            Text('무료 감상',
-                                style: GuidyText.kicker(GuidyColors.ok)
-                                    .copyWith(fontWeight: FontWeight.w500)),
-                          ],
-                        ),
-                      ),
+                      const Icon(Icons.lock_open_rounded, size: 12, color: GuidyColors.ok),
+                      const SizedBox(width: 2),
+                      Text('무료 감상',
+                          style: GuidyText.small(GuidyColors.ok).copyWith(fontWeight: FontWeight.w500)),
                       const SizedBox(width: 8),
-                      Text('표시된 전시는 결제 없이 감상 가능',
-                          style: GuidyText.small(pal.mute)),
+                      Expanded(
+                        child: Text('표시된 전시는 결제 없이 들을 수 있어요',
+                            style: GuidyText.small(pal.mute), overflow: TextOverflow.ellipsis),
+                      ),
                     ],
                   ),
                 ),
@@ -667,7 +652,7 @@ class _ArchiveNoticeBanner extends StatelessWidget {
   }
 }
 
-// ─── 아카이브 전용 카드 (무료 배지 오버레이) ─────────────────
+// ─── 아카이브 카드 ─────────────────────────────────────────
 class _ArchiveCard extends StatelessWidget {
   final Exhibition exhibition;
   final VoidCallback onTap;
@@ -675,38 +660,8 @@ class _ArchiveCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        // 기본 ExhibitionCard
-        ExhibitionCard(exhibition: exhibition, onTap: onTap),
-        // 무료 감상 배지 오버레이
-        if (exhibition.isFreeAccess)
-          Positioned(
-            bottom: 10, left: 0, right: 0,
-            child: Center(
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: GuidyColors.ok,
-                  borderRadius: GuidyRadius.pillBorder,
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.lock_open_rounded,
-                        size: 11, color: Colors.white),
-                    const SizedBox(width: 4),
-                    Text('무료 감상',
-                        style: GuidyText.kicker(Colors.white)
-                            .copyWith(fontWeight: FontWeight.w500)),
-                  ],
-                ),
-              ),
-            ),
-          ),
-      ],
-    );
+    // 무료 감상 표시는 카드 안 가격 자리에서 함 (ExhibitionCard)
+    return ExhibitionCard(exhibition: exhibition, onTap: onTap);
   }
 }
 
