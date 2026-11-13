@@ -99,6 +99,9 @@ class AuthService {
   /// 구매 기록(purchases)은 전자상거래법 보관 의무 때문에 남김
   static Future<bool> deleteAccount({String? password}) async {
     final user = currentUser!;
+    final doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+    final blocked = deletionBlockReason(doc.data());
+    if (blocked != null) throw AccountBlockedException(blocked);
     final providers = user.providerData.map((p) => p.providerId).toSet();
     try {
       if (providers.contains('password')) {
@@ -132,6 +135,11 @@ class AuthService {
     await signOut();
     return true;
   }
+
+  /// 앱에서 탈퇴하면 안 되는 계정이면 안내 문구, 아니면 null
+  /// (관리자 계정을 지우면 CMS 관리자 권한도 함께 사라짐)
+  static String? deletionBlockReason(Map<String, dynamic>? userDoc) =>
+      userDoc?['role'] == 'admin' ? '관리자 계정은 앱에서 탈퇴할 수 없어요. 운영팀에 문의해주세요' : null;
 
   /// 앱용 Google 자격 증명, 사용자가 취소하면 null
   static Future<AuthCredential?> _googleCredential() async {
