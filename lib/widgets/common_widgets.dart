@@ -693,14 +693,23 @@ class ExhibitionCard extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(width: 4),
-                            Text(
-                              exhibition.price == 0
-                                  ? '무료'
-                                  : '₩${formatPrice(exhibition.price)}',
-                              style: GuidyText.small(
-                                exhibition.price == 0 ? GuidyColors.ok : pal.text,
-                              ).copyWith(fontWeight: FontWeight.w500),
-                            ),
+                            // 무료로 감상할 수 있는 전시는 가격 자리에 표시 (표지·글자를 가리지 않게)
+                            if (exhibition.isFreeAccess)
+                              Row(mainAxisSize: MainAxisSize.min, children: [
+                                const Icon(Icons.lock_open_rounded, size: 12, color: GuidyColors.ok),
+                                const SizedBox(width: 2),
+                                Text('무료 감상',
+                                    style: GuidyText.small(GuidyColors.ok).copyWith(fontWeight: FontWeight.w500)),
+                              ])
+                            else
+                              Text(
+                                exhibition.price == 0
+                                    ? '무료'
+                                    : '₩${formatPrice(exhibition.price)}',
+                                style: GuidyText.small(
+                                  exhibition.price == 0 ? GuidyColors.ok : pal.text,
+                                ).copyWith(fontWeight: FontWeight.w500),
+                              ),
                           ],
                         ),
 
