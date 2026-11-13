@@ -108,7 +108,11 @@ class AuthService {
         final cred = await user.reauthenticateWithProvider(AppleAuthProvider());
         // App Store 심사 요건: 탈퇴 시 Apple 로그인 연결 해제
         final code = cred.additionalUserInfo?.authorizationCode;
-        if (code != null) await FirebaseAuth.instance.revokeTokenWithAuthorizationCode(code);
+        // 연결 해제가 실패해도(콘솔의 Apple 코드 흐름 설정 누락 등) 탈퇴 자체는 막지 않음
+        if (code != null) {
+          await FirebaseAuth.instance.revokeTokenWithAuthorizationCode(code).catchError(
+              (Object e) => debugPrint('Apple token revoke failed: $e'));
+        }
       } else if (providers.contains('google.com')) {
         if (kIsWeb) {
           await user.reauthenticateWithPopup(GoogleAuthProvider());
