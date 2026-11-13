@@ -3,6 +3,7 @@
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import '../services/notification_center.dart';
 import '../theme/app_theme.dart';
 import '../models/models.dart';
 
@@ -392,16 +393,22 @@ class GuidyHeader extends StatelessWidget {
                   clipBehavior: Clip.none,
                   children: [
                     Icon(Icons.notifications_outlined, size: 24, color: textC),
-                    Positioned(
-                      top: -1, right: -1,
-                      child: Container(
-                        width: 8, height: 8,
-                        decoration: BoxDecoration(
-                          color: accentC,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: bgC, width: 1.5),
-                        ),
-                      ),
+                    // 읽지 않은 알림이 있을 때만 점
+                    ListenableBuilder(
+                      listenable: NotificationCenter.instance,
+                      builder: (_, __) => NotificationCenter.instance.unreadCount == 0
+                          ? const SizedBox.shrink()
+                          : Positioned(
+                              top: -1, right: -1,
+                              child: Container(
+                                width: 8, height: 8,
+                                decoration: BoxDecoration(
+                                  color: accentC,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: bgC, width: 1.5),
+                                ),
+                              ),
+                            ),
                     ),
                   ],
                 ),

@@ -27,6 +27,7 @@ import 'screens/auth/login_screen.dart';
 import 'screens/auth/signup_screen.dart';
 import 'screens/search/search_screen.dart';
 import 'screens/splash/splash_screen.dart';
+import 'services/notification_center.dart';
 import 'screens/notifications/notifications_screen.dart';
 import 'screens/creator_guides/creator_guides_screen.dart';
 import 'screens/section/section_detail_screen.dart';
@@ -48,6 +49,7 @@ void main() async {
   await Future.wait([
     appStore.init(),   // localStorage에서 CMS 추가 항목 불러오기
     userStore.init(),  // localStorage에서 사용자 개인화 데이터 복원
+    NotificationCenter.instance.load(),  // 알림 읽음·지움 상태
   ]);
   // CMS에서 게시한 전시가 있으면 그것으로 교체 (없거나 오프라인이면 앱 기본 데이터)
   if (firebaseReady) await Future.wait([ContentService.load(appStore), ContentService.loadCreators(appStore), AdDataStore.load(), AppSettings.load()]);

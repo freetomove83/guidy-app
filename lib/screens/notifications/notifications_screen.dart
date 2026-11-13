@@ -2,105 +2,8 @@
 // Guidy 알림 센터
 
 import 'package:flutter/material.dart';
+import '../../services/notification_center.dart';
 import '../../theme/app_theme.dart';
-
-// ─── 알림 데이터 모델 ─────────────────────────────────────
-enum NotifType { newGuide, purchase, creator, system, promo }
-
-class NotifItem {
-  final String id;
-  final NotifType type;
-  final String title;
-  final String body;
-  final String timeAgo;
-  final bool isRead;
-  final int? coverSeed;
-  final String? routeTo;
-
-  const NotifItem({
-    required this.id,
-    required this.type,
-    required this.title,
-    required this.body,
-    required this.timeAgo,
-    this.isRead = false,
-    this.coverSeed,
-    this.routeTo,
-  });
-}
-
-// ─── 더미 알림 데이터 ─────────────────────────────────────
-final _dummyNotifs = [
-  const NotifItem(
-    id: 'n1',
-    type: NotifType.newGuide,
-    title: '새 가이드가 등록되었어요',
-    body: '\'빛과 표면\' 전시의 신규 오디오 가이드 3개가 추가되었습니다.',
-    timeAgo: '방금 전',
-    isRead: false,
-    coverSeed: 0,
-    routeTo: '/detail/e1',
-  ),
-  const NotifItem(
-    id: 'n2',
-    type: NotifType.purchase,
-    title: '구매가 완료되었습니다',
-    body: '\'도시의 결\' 오디오 가이드 결제가 정상 처리되었습니다. ₩8,000',
-    timeAgo: '1시간 전',
-    isRead: false,
-    coverSeed: 1,
-    routeTo: '/library',
-  ),
-  const NotifItem(
-    id: 'n3',
-    type: NotifType.creator,
-    title: '팔로우한 크리에이터 업데이트',
-    body: 'Art Lab Seoul 이 새로운 가이드를 공개했습니다.',
-    timeAgo: '3시간 전',
-    isRead: false,
-    coverSeed: 2,
-    routeTo: '/creator/c1',
-  ),
-  const NotifItem(
-    id: 'n4',
-    type: NotifType.promo,
-    title: '이번 주 특가 혜택',
-    body: '선택한 가이드 30% 할인, 오늘까지',
-    timeAgo: '어제',
-    isRead: true,
-    coverSeed: 3,
-    routeTo: '/',
-  ),
-  const NotifItem(
-    id: 'n5',
-    type: NotifType.newGuide,
-    title: '큐레이션 오디오 가이드 공개',
-    body: '\'기억의 지형\' 전시 큐레이터 해설이 업로드되었습니다.',
-    timeAgo: '2일 전',
-    isRead: true,
-    coverSeed: 4,
-    routeTo: '/detail/e3',
-  ),
-  const NotifItem(
-    id: 'n6',
-    type: NotifType.system,
-    title: 'Guidy 앱이 업데이트되었습니다',
-    body: 'v1.1.0 — 검색 기능 개선, 버그 수정, 성능 향상.',
-    timeAgo: '3일 전',
-    isRead: true,
-    routeTo: null,
-  ),
-  const NotifItem(
-    id: 'n7',
-    type: NotifType.creator,
-    title: '크리에이터가 회신했습니다',
-    body: 'Sound Journey 가 당신의 리뷰에 감사 인사를 남겼습니다.',
-    timeAgo: '4일 전',
-    isRead: true,
-    coverSeed: 5,
-    routeTo: '/creator/c2',
-  ),
-];
 
 // ─── 알림 화면 ────────────────────────────────────────────
 class NotificationsScreen extends StatefulWidget {
@@ -111,53 +14,33 @@ class NotificationsScreen extends StatefulWidget {
 }
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
-  late List<NotifItem> _notifs;
+  final _center = NotificationCenter.instance;
+
+  void _undoable(String message, List<String> ids) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(
+        content: Text(message),
+        action: SnackBarAction(label: '되돌리기', onPressed: () => _center.restore(ids)),
+      ));
+  }
+
+  void _clearAll() => _undoable('알림을 모두 지웠어요', _center.clearAll());
 
   @override
-  void initState() {
-    super.initState();
-    _notifs = List.from(_dummyNotifs);
-  }
+  Widget build(BuildContext context) => ListenableBuilder(listenable: _center, builder: (context, _) => _build(context));
 
-  int get _unreadCount => _notifs.where((n) => !n.isRead).length;
-
-  void _markAllRead() {
-    setState(() {
-      _notifs = _notifs.map((n) => NotifItem(
-        id: n.id,
-        type: n.type,
-        title: n.title,
-        body: n.body,
-        timeAgo: n.timeAgo,
-        isRead: true,
-        coverSeed: n.coverSeed,
-        routeTo: n.routeTo,
-      )).toList();
-    });
-  }
-
-  void _markRead(String id) {
-    setState(() {
-      _notifs = _notifs.map((n) => n.id == id
-          ? NotifItem(
-              id: n.id, type: n.type, title: n.title,
-              body: n.body, timeAgo: n.timeAgo, isRead: true,
-              coverSeed: n.coverSeed, routeTo: n.routeTo,
-            )
-          : n).toList();
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final pal = GuidyPalette.of(context);
+    final notifs = _center.items;
+    final unreadCount = _center.unreadCount;
 
     // 오늘 / 이전 분리
-    final todayNotifs = _notifs.where(
+    final todayNotifs = notifs.where(
       (n) => n.timeAgo.contains('방금') || n.timeAgo.contains('시간') || n.timeAgo == '오늘',
     ).toList();
-    final olderNotifs = _notifs.where(
+    final olderNotifs = notifs.where(
       (n) => !(n.timeAgo.contains('방금') || n.timeAgo.contains('시간') || n.timeAgo == '오늘'),
     ).toList();
 
@@ -190,7 +73,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     child: Row(
                       children: [
                         Text('알림', style: GuidyText.h2(pal.text)),
-                        if (_unreadCount > 0) ...[
+                        if (unreadCount > 0) ...[
                           const SizedBox(width: 8),
                           Container(
                             padding: const EdgeInsets.symmetric(
@@ -200,7 +83,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                               borderRadius: GuidyRadius.pillBorder,
                             ),
                             child: Text(
-                              '$_unreadCount',
+                              '$unreadCount',
                               style: GuidyText.label(Colors.white),
                             ),
                           ),
@@ -208,14 +91,17 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       ],
                     ),
                   ),
-                  if (_unreadCount > 0)
-                    GestureDetector(
-                      onTap: _markAllRead,
-                      child: Text(
-                        '모두 읽음',
-                        style: GuidyText.small(pal.primary)
-                            .copyWith(fontWeight: FontWeight.w700),
-                      ),
+                  if (unreadCount > 0)
+                    TextButton(
+                      onPressed: _center.markAllRead,
+                      child: Text('모두 읽음',
+                          style: GuidyText.small(pal.primary).copyWith(fontWeight: FontWeight.w500)),
+                    ),
+                  if (notifs.isNotEmpty)
+                    IconButton(
+                      tooltip: '모두 지우기',
+                      onPressed: _clearAll,
+                      icon: Icon(Icons.delete_sweep_outlined, size: 22, color: pal.sub),
                     ),
                 ],
               ),
@@ -225,15 +111,22 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
             // ── 알림 목록 ────────────────────────────────
             Expanded(
-              child: _notifs.isEmpty
+              child: notifs.isEmpty
                   ? _EmptyState(muteC: pal.mute, subC: pal.sub)
                   : ListView(
                       padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
                       children: [
                         if (todayNotifs.isNotEmpty) ...[
                           _SectionLabel(label: '오늘', muteC: pal.mute),
-                          ...todayNotifs.map((n) => _NotifTile(
+                          ...todayNotifs.map((n) => _SwipeToDismiss(
+                            id: n.id,
+                            onDismissed: () {
+                              _center.dismiss(n.id);
+                              _undoable('알림을 지웠어요', [n.id]);
+                            },
+                            child: _NotifTile(
                             notif: n,
+                            read: _center.isRead(n),
                             isDark: isDark,
                             surfaceC: pal.surface,
                             lineC: pal.line,
@@ -241,18 +134,25 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                             subC: pal.sub,
                             muteC: pal.mute,
                             onTap: () {
-                              _markRead(n.id);
+                              _center.markRead(n.id);
                               if (n.routeTo != null) {
                                 Navigator.pushNamed(context, n.routeTo!);
                               }
                             },
-                          )),
+                          ))),
                         ],
                         if (olderNotifs.isNotEmpty) ...[
                           const SizedBox(height: 8),
                           _SectionLabel(label: '이전 알림', muteC: pal.mute),
-                          ...olderNotifs.map((n) => _NotifTile(
+                          ...olderNotifs.map((n) => _SwipeToDismiss(
+                            id: n.id,
+                            onDismissed: () {
+                              _center.dismiss(n.id);
+                              _undoable('알림을 지웠어요', [n.id]);
+                            },
+                            child: _NotifTile(
                             notif: n,
+                            read: _center.isRead(n),
                             isDark: isDark,
                             surfaceC: pal.surface,
                             lineC: pal.line,
@@ -260,12 +160,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                             subC: pal.sub,
                             muteC: pal.mute,
                             onTap: () {
-                              _markRead(n.id);
+                              _center.markRead(n.id);
                               if (n.routeTo != null) {
                                 Navigator.pushNamed(context, n.routeTo!);
                               }
                             },
-                          )),
+                          ))),
                         ],
                       ],
                     ),
@@ -298,6 +198,7 @@ class _SectionLabel extends StatelessWidget {
 // ─── 알림 타일 ───────────────────────────────────────────
 class _NotifTile extends StatelessWidget {
   final NotifItem notif;
+  final bool read;
   final bool isDark;
   final Color surfaceC, lineC, textC, subC, muteC;
   final VoidCallback onTap;
@@ -311,6 +212,7 @@ class _NotifTile extends StatelessWidget {
     required this.subC,
     required this.muteC,
     required this.onTap,
+    required this.read,
   });
 
   // 타입별 아이콘 & 색상
@@ -336,7 +238,7 @@ class _NotifTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final unread = !notif.isRead;
+    final unread = !read;
     final unreadBg = isDark
         ? GuidyColors.darkPrimary.withValues(alpha: 0.08)
         : GuidyColors.primarySoft.withValues(alpha: 0.45);
@@ -452,4 +354,34 @@ class _EmptyState extends StatelessWidget {
       ),
     );
   }
+}
+
+// ─── 왼쪽으로 밀어 지우기 ─────────────────────────────────
+class _SwipeToDismiss extends StatelessWidget {
+  final String id;
+  final VoidCallback onDismissed;
+  final Widget child;
+  const _SwipeToDismiss({required this.id, required this.onDismissed, required this.child});
+
+  @override
+  Widget build(BuildContext context) => Dismissible(
+        key: ValueKey('notif-$id'),
+        direction: DismissDirection.endToStart,
+        onDismissed: (_) => onDismissed(),
+        background: Container(
+          alignment: Alignment.centerRight,
+          padding: const EdgeInsets.only(right: 20),
+          margin: const EdgeInsets.only(bottom: 8),
+          decoration: BoxDecoration(
+            color: GuidyColors.danger.withValues(alpha: 0.12),
+            borderRadius: GuidyRadius.lgBorder,
+          ),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            const Icon(Icons.delete_outline_rounded, size: 18, color: GuidyColors.danger),
+            const SizedBox(width: 4),
+            Text('지우기', style: GuidyText.small(GuidyColors.danger).copyWith(fontWeight: FontWeight.w500)),
+          ]),
+        ),
+        child: child,
+      );
 }
