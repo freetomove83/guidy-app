@@ -42,7 +42,7 @@ class AdData {
 class AdDataStore {
   static AdData? _splashAd = AdData(
     id: 'ad_splash_001',
-    title: '여름 특별전 시작!',
+    title: '여름 특별전 시작',
     mediaType: AdMediaType.image,
     imageUrl: null, // Firebase Storage URL 연결 예정
     landingType: AdLandingType.internal,

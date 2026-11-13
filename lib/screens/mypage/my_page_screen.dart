@@ -597,7 +597,7 @@ class _ProfileTabState extends State<_ProfileTab> {
                   color: badgeColor,
                   borderRadius: GuidyRadius.pillBorder,
                 ),
-                child: Text('🎟 $badgeCount장',
+                child: Text('이용권 $badgeCount장',
                     style: GuidyText.kicker(Colors.white)
                         .copyWith(fontWeight: FontWeight.w700)),
               )

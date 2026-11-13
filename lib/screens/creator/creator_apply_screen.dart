@@ -791,7 +791,7 @@ class _ApprovedView extends StatelessWidget {
                     ),
                     const SizedBox(height: 20),
 
-                    Text('크리에이터 승인이 완료되었습니다!',
+                    Text('크리에이터로 승인되었습니다',
                         style: GuidyText.h2(pal.text)
                             .copyWith(fontWeight: FontWeight.w800),
                         textAlign: TextAlign.center),

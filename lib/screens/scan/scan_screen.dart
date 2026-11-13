@@ -240,7 +240,7 @@ class _ScanScreenState extends State<ScanScreen> with SingleTickerProviderStateM
               children: [
                 const SizedBox(height: 260),
                 Text(
-                  _scanned ? 'QR 코드 인식됨!'
+                  _scanned ? 'QR 코드를 읽었어요'
                       : _beaconsOn ? '작품 옆 QR을 비추거나 작품 가까이 가 보세요'
                       : '작품 옆 QR을 사각형 안에 담아주세요',
                   style: TextStyle(

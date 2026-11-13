@@ -191,7 +191,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                           Text(
                             '${_artworkIndex + 1} / ${_playlist.length}',
                             style: GuidyText.small(pal.mute)
-                                .copyWith(fontWeight: FontWeight.w700),
+                                .copyWith(fontWeight: FontWeight.w500),
                           ),
                           const SizedBox(width: 6),
                           Container(width: 4, height: 4,
@@ -227,7 +227,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                           Text('자막',
                               style: GuidyText.small(
                                       _captionsOn ? pal.bg : pal.mute)
-                                  .copyWith(fontWeight: FontWeight.w700)),
+                                  .copyWith(fontWeight: FontWeight.w500)),
                         ],
                       ),
                     ),
@@ -328,13 +328,13 @@ class _PlayerScreenState extends State<PlayerScreen>
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 14,
-                                    fontWeight: FontWeight.w700,
+                                    fontWeight: FontWeight.w500,
                                     height: 1.45,
                                     fontFamily: GuidyText.fontFamily,
                                   ),
                                 )
                               else
-                                Text('♪  재생 중...',
+                                Text('재생 중',
                                     style: TextStyle(
                                         color: Colors.white
                                             .withValues(alpha: 0.5),
@@ -503,7 +503,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                       child: Text(
                         '${audio.speed % 1 == 0 ? audio.speed.toInt() : audio.speed}x',
                         style: GuidyText.small(pal.text)
-                            .copyWith(fontWeight: FontWeight.w700),
+                            .copyWith(fontWeight: FontWeight.w500),
                       ),
                     ),
                   ),
@@ -525,13 +525,6 @@ class _PlayerScreenState extends State<PlayerScreen>
                       width: 64, height: 64,
                       decoration: BoxDecoration(
                         color: pal.text, shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: pal.text.withValues(alpha: 0.25),
-                            blurRadius: 20,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
                       ),
                       child: audio.isLoading
                           ? Center(
@@ -667,7 +660,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                                     isActive ? pal.primary : pal.mute)
                                 .copyWith(
                                     fontWeight: isActive
-                                        ? FontWeight.w800
+                                        ? FontWeight.w500
                                         : FontWeight.w500),
                           ),
                         ),
@@ -775,7 +768,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                       fontFamily: GuidyText.fontFamily,
                       fontSize: isActive ? 15 : 13,
                       fontWeight: isActive
-                          ? FontWeight.w700
+                          ? FontWeight.w500
                           : FontWeight.w500,
                       color: isActive ? textC : subC,
                       height: 1.5,
@@ -818,7 +811,7 @@ class _PlayerScreenState extends State<PlayerScreen>
               const SizedBox(width: 8),
               Text('큐레이터 노트',
                   style: GuidyText.body(textC)
-                      .copyWith(fontWeight: FontWeight.w800)),
+                      .copyWith(fontWeight: FontWeight.w500)),
             ]),
             const SizedBox(height: 12),
             Text(artwork.curatorNote,
@@ -844,7 +837,7 @@ class _PlayerScreenState extends State<PlayerScreen>
           ),
           const SizedBox(height: 20),
           Text('재료', style: GuidyText.small(textC)
-              .copyWith(fontWeight: FontWeight.w700)),
+              .copyWith(fontWeight: FontWeight.w500)),
           const SizedBox(height: 4),
           Text(artwork.material, style: GuidyText.body(subC)),
         ],
