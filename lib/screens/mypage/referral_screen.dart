@@ -228,7 +228,7 @@ class ReferralScreen extends StatelessWidget {
                                     Clipboard.setData(
                                         ClipboardData(text: inviteLink));
                                     _showSnack(context,
-                                        '초대 링크가 복사되었습니다. 친구에게 전달해보세요 🎉');
+                                        '초대 링크를 복사했어요. 친구에게 보내 보세요');
                                   },
                                   primaryC: pal.primary,
                                   surfaceC: pal.surface,
@@ -311,8 +311,8 @@ class ReferralScreen extends StatelessWidget {
                                 shape: BoxShape.circle,
                               ),
                               child: const Center(
-                                child: Text('🎟',
-                                    style: TextStyle(fontSize: 22)),
+                                child: Icon(Icons.confirmation_number_outlined,
+                                    size: 22, color: GuidyColors.ok),
                               ),
                             ),
                             const SizedBox(width: 14),
@@ -393,7 +393,7 @@ class ReferralScreen extends StatelessWidget {
                       onTap: () async {
                         await userStore.debugAddReward();
                         if (context.mounted) {
-                          _showSnack(context, '🎟 테스트: 무료 이용권 1장이 지급되었습니다');
+                          _showSnack(context, '테스트: 무료 이용권 1장이 지급되었습니다');
                         }
                       },
                       child: Container(

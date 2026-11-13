@@ -32,14 +32,11 @@ class GuidyCover extends StatelessWidget {
   });
 
   static const List<List<Color>> _gradients = [
-    [Color(0xFF0B3D5C), Color(0xFF1A5A7A)],
-    [Color(0xFFD97757), Color(0xFFE89575)],
-    [Color(0xFF2F8F5C), Color(0xFF4AB07A)],
-    [Color(0xFF7D6A94), Color(0xFF9D8AB4)],
-    [Color(0xFF0B3D5C), Color(0xFFD97757)],
-    [Color(0xFF1A3A2A), Color(0xFF2F8F5C)],
-    [Color(0xFF3A1A2A), Color(0xFF7D3A5C)],
-    [Color(0xFF1A2A3A), Color(0xFF0B3D5C)],
+    // 한 가지 잉크 톤 안에서 밝기만 조금씩 다름 (색 그라디언트·장식 원 없음 — 색은 실제 표지 이미지가 냄)
+    [Color(0xFF1E2E3B), Color(0xFF13212C)],
+    [Color(0xFF243440), Color(0xFF172530)],
+    [Color(0xFF1B2833), Color(0xFF111D26)],
+    [Color(0xFF28353F), Color(0xFF1A262F)],
   ];
 
   List<Color> get _colors => _gradients[seed % _gradients.length];
@@ -76,34 +73,8 @@ class GuidyCover extends StatelessWidget {
           colors: _colors,
         ),
       ),
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: CustomPaint(painter: _CoverPatternPainter(seed: seed)),
-          ),
-        ],
-      ),
     );
   }
-}
-
-class _CoverPatternPainter extends CustomPainter {
-  final int seed;
-  const _CoverPatternPainter({required this.seed});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.08)
-      ..style = PaintingStyle.fill;
-    final r = size.width * 0.6 + (seed * 13.0 % 40);
-    canvas.drawCircle(Offset(size.width * 0.7, size.height * 0.3), r, paint);
-    paint.color = Colors.white.withValues(alpha: 0.05);
-    canvas.drawCircle(Offset(size.width * 0.2, size.height * 0.8), r * 0.7, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 // ─── ChannelBadge ────────────────────────────────────────
@@ -115,37 +86,25 @@ class ChannelBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final label = _label();
-    final bg = _bg(isDark);
-    final textColor = Colors.white;
-    final fontSize = size == 'sm' ? 9.0 : 11.0;
+    final fontSize = size == 'sm' ? 11.0 : 12.0;
     final px = size == 'sm' ? 6.0 : 8.0;
-    final py = size == 'sm' ? 3.0 : 4.0;
+    final py = size == 'sm' ? 2.0 : 4.0;
 
     return Container(
       padding: EdgeInsets.symmetric(horizontal: px, vertical: py),
-      decoration: BoxDecoration(color: bg, borderRadius: GuidyRadius.pillBorder),
-      child: Text(label, style: TextStyle(
+      decoration: BoxDecoration(color: const Color(0xCC0B1F2E), borderRadius: BorderRadius.circular(6)),
+      child: Text(_label(), style: TextStyle(
         fontFamily: GuidyText.fontFamily, fontSize: fontSize,
-        fontWeight: FontWeight.w800, color: textColor, letterSpacing: 0.2,
+        fontWeight: FontWeight.w500, color: Colors.white,
       )),
     );
   }
 
   String _label() {
     switch (type) {
-      case ChannelType.curation: return '🏛 큐레이션';
-      case ChannelType.creator: return '🎨 크리에이터';
-      case ChannelType.archive: return '📚 아카이브';
-    }
-  }
-
-  Color _bg(bool isDark) {
-    switch (type) {
-      case ChannelType.curation: return GuidyPalette.forDark(isDark).curation;
-      case ChannelType.creator: return GuidyPalette.forDark(isDark).creator;
-      case ChannelType.archive: return GuidyPalette.forDark(isDark).archive;
+      case ChannelType.curation: return '큐레이션';
+      case ChannelType.creator: return '크리에이터';
+      case ChannelType.archive: return '아카이브';
     }
   }
 }
@@ -185,7 +144,7 @@ class PillButton extends StatelessWidget {
       onTap: onPressed,
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: px, vertical: py),
-        decoration: BoxDecoration(color: bg, borderRadius: GuidyRadius.pillBorder),
+        decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(10)),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -195,7 +154,7 @@ class PillButton extends StatelessWidget {
             ],
             Text(label, style: TextStyle(
               fontFamily: GuidyText.fontFamily, fontSize: fs,
-              fontWeight: FontWeight.w700, color: fg, letterSpacing: -0.1,
+              fontWeight: FontWeight.w500, color: fg,
             )),
           ],
         ),
@@ -249,9 +208,8 @@ class CategoryTabs extends StatelessWidget {
                   style: TextStyle(
                     fontFamily: GuidyText.fontFamily,
                     fontSize: 14,
-                    fontWeight: isActive ? FontWeight.w800 : FontWeight.w500,
+                    fontWeight: isActive ? FontWeight.w500 : FontWeight.w500,
                     color: isActive ? pal.text : pal.mute,
-                    letterSpacing: -0.1,
                   ),
                 ),
               ),
@@ -282,8 +240,7 @@ class CreatorAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ringColor = GuidyColors.creator;
-    final bgColor = _parseColor(creator.avatarColor);
+    final pal = GuidyPalette.of(context);
 
     return SizedBox(
       width: size + (showBadgeRing ? 8 : 0),
@@ -295,25 +252,18 @@ class CreatorAvatar extends StatelessWidget {
             height: size + (showBadgeRing ? 8 : 0),
             decoration: showBadgeRing ? BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: ringColor, width: 2),
+              border: Border.all(color: pal.mute.withValues(alpha: 0.4), width: 1),
             ) : null,
             padding: showBadgeRing ? const EdgeInsets.all(3) : EdgeInsets.zero,
             child: Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [bgColor, bgColor.withValues(alpha: 0.7)],
-                ),
-              ),
+              decoration: BoxDecoration(shape: BoxShape.circle, color: pal.bgAlt),
               child: Center(
                 child: Text(
                   creator.name.substring(0, 1),
                   style: TextStyle(
-                    color: Colors.white,
+                    color: pal.sub,
                     fontSize: size * 0.35,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w500,
                     fontFamily: GuidyText.fontFamily,
                   ),
                 ),
@@ -331,18 +281,13 @@ class CreatorAvatar extends StatelessWidget {
                 ),
                 child: Text(
                   newCount.toString(),
-                  style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w800),
+                  style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w500),
                 ),
               ),
             ),
         ],
       ),
     );
-  }
-
-  Color _parseColor(String hex) {
-    final h = hex.replaceAll('#', '');
-    return Color(int.parse('FF$h', radix: 16));
   }
 }
 
@@ -406,8 +351,7 @@ class GuidyHeader extends StatelessWidget {
             const SizedBox(width: 8),
             Text('Guidy', style: TextStyle(
               fontFamily: GuidyText.fontFamily,
-              fontSize: 18, fontWeight: FontWeight.w700,
-              letterSpacing: -0.36, color: textC,
+              fontSize: 18, fontWeight: FontWeight.w500, color: textC,
             )),
           ],
           if (title != null && !showLogo) ...[
@@ -415,8 +359,7 @@ class GuidyHeader extends StatelessWidget {
             Expanded(
               child: Text(title!, style: TextStyle(
                 fontFamily: GuidyText.fontFamily,
-                fontSize: 17, fontWeight: FontWeight.w800,
-                letterSpacing: -0.3, color: textC,
+                fontSize: 17, fontWeight: FontWeight.w500, color: textC,
               )),
             ),
           ],
@@ -519,7 +462,7 @@ class MiniPlayer extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(artworkTitle, style: GuidyText.body(pal.text).copyWith(fontWeight: FontWeight.w700),
+                  Text(artworkTitle, style: GuidyText.body(pal.text).copyWith(fontWeight: FontWeight.w500),
                     maxLines: 1, overflow: TextOverflow.ellipsis),
                   Text(exhibitionTitle, style: GuidyText.small(pal.sub), maxLines: 1, overflow: TextOverflow.ellipsis),
                 ],
@@ -647,14 +590,19 @@ class ExhibitionCard extends StatelessWidget {
                       Positioned(
                         top: 10, right: 10,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: GuidyColors.ok,
-                            borderRadius: GuidyRadius.pillBorder,
+                            color: const Color(0xCC0B1F2E),
+                            borderRadius: BorderRadius.circular(6),
                           ),
-                          child: const Text('진행 중', style: TextStyle(
-                            color: Colors.white, fontSize: 9, fontWeight: FontWeight.w800,
-                          )),
+                          child: Row(mainAxisSize: MainAxisSize.min, children: [
+                            Container(width: 6, height: 6,
+                                decoration: const BoxDecoration(color: Color(0xFF4CC38A), shape: BoxShape.circle)),
+                            const SizedBox(width: 4),
+                            const Text('진행 중', style: TextStyle(
+                              color: Colors.white, fontSize: 11, fontWeight: FontWeight.w500,
+                            )),
+                          ]),
                         ),
                       ),
                     // ── 진행률 바 — ClipRRect 내부라 이미지와 자연스럽게 일체화 ──
@@ -717,7 +665,7 @@ class ExhibitionCard extends StatelessWidget {
                       children: [
                         Text(
                           exhibition.title,
-                          style: GuidyText.body(pal.text).copyWith(fontWeight: FontWeight.w700),
+                          style: GuidyText.body(pal.text).copyWith(fontWeight: FontWeight.w500),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -751,7 +699,7 @@ class ExhibitionCard extends StatelessWidget {
                                   : '₩${formatPrice(exhibition.price)}',
                               style: GuidyText.small(
                                 exhibition.price == 0 ? GuidyColors.ok : pal.text,
-                              ).copyWith(fontWeight: FontWeight.w700),
+                              ).copyWith(fontWeight: FontWeight.w500),
                             ),
                           ],
                         ),
@@ -778,7 +726,7 @@ class GuidyInputLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(label, style: GuidyText.small(textC).copyWith(fontWeight: FontWeight.w700));
+    return Text(label, style: GuidyText.small(textC).copyWith(fontWeight: FontWeight.w500));
   }
 }
 
@@ -863,14 +811,11 @@ class SectionImageWidget extends StatelessWidget {
 
   // 섹션 전용 플레이스홀더 색상 팔레트
   static const List<List<Color>> _palette = [
-    [Color(0xFF0B3D5C), Color(0xFF1A5A7A)],
-    [Color(0xFFD97757), Color(0xFFE89575)],
-    [Color(0xFF2F8F5C), Color(0xFF4AB07A)],
-    [Color(0xFF6B4FA0), Color(0xFF8E72C0)],
-    [Color(0xFF3A4A7C), Color(0xFF5968A8)],
-    [Color(0xFF8C4A2A), Color(0xFFB06040)],
-    [Color(0xFF2A6A5C), Color(0xFF40907E)],
-    [Color(0xFF7A3A50), Color(0xFFA05570)],
+    // 한 가지 잉크 톤 안에서 밝기만 조금씩 다름 (색 그라디언트·장식 원 없음 — 색은 실제 표지 이미지가 냄)
+    [Color(0xFF1E2E3B), Color(0xFF13212C)],
+    [Color(0xFF243440), Color(0xFF172530)],
+    [Color(0xFF1B2833), Color(0xFF111D26)],
+    [Color(0xFF28353F), Color(0xFF1A262F)],
   ];
 
   @override

@@ -1,5 +1,6 @@
 // lib/theme/app_theme.dart
-// Guidy 디자인 시스템 v3 · Deep Marine 팔레트
+// Guidy 디자인 시스템 v4 — 종이 아이보리 위에 딥 마린 하나 (unslop 방향, CMS docs/design/cms-direction.md와 같은 가족)
+// 화면은 조용하게, 색은 작품 이미지·표지가 냄. 상태색은 의미가 있을 때만
 
 import 'package:flutter/material.dart';
 
@@ -11,27 +12,27 @@ class GuidyColors {
   static const surface = Color(0xFFFFFFFF);
   static const ink = Color(0xFF0B1F2E);      // 딥 마린 잉크
   static const sub = Color(0xFF4A5A66);
-  static const mute = Color(0xFF8B9099);
-  static const line = Color(0xFFE4DED4);
+  static const mute = Color(0xFF6F7680);     // 아이보리 위에서도 4.5:1
+  static const line = Color(0x140B1F2E);     // 글자색 8% 머리카락 선
   static const chip = Color(0xFFEDE7DC);
 
   // 포인트
   static const primary = Color(0xFF0B3D5C);   // 딥 마린
   static const primarySoft = Color(0xFFD8E5EF);
-  static const accent = Color(0xFFD97757);    // 테라코타
-  static const accentSoft = Color(0xFFF7E4DA);
+  static const accent = Color(0xFF0B3D5C);    // 예전 테라코타 자리 — 강조색은 하나
+  static const accentSoft = Color(0xFFD8E5EF);
 
   // 3채널
   static const curation = Color(0xFF0B3D5C);
   static const curationSoft = Color(0xFFD8E5EF);
-  static const creator = Color(0xFFD97757);
-  static const creatorSoft = Color(0xFFF7E4DA);
+  static const creator = Color(0xFF0B3D5C);   // 채널은 색이 아니라 글자로 구분
+  static const creatorSoft = Color(0xFFD8E5EF);
   static const archive = Color(0xFF4A5A66);
   static const archiveSoft = Color(0xFFE0E4E8);
 
   // 상태
-  static const ok = Color(0xFF2F8F5C);
-  static const warn = Color(0xFFD97706);
+  static const ok = Color(0xFF2F7A55);
+  static const warn = Color(0xFFB45309);
   static const danger = Color(0xFFC13B3B);
 
   // Dark
@@ -40,12 +41,12 @@ class GuidyColors {
   static const darkSurface = Color(0xFF152535);
   static const darkText = Color(0xFFF0EDE5);
   static const darkSub = Color(0xFFA8B4BE);
-  static const darkMute = Color(0xFF6E7A85);
-  static const darkLine = Color(0xFF1F2E3D);
+  static const darkMute = Color(0xFF7E8A95);
+  static const darkLine = Color(0x14F0EDE5);
   static const darkPrimary = Color(0xFF4A8BB0);
-  static const darkAccent = Color(0xFFE89575);
+  static const darkAccent = Color(0xFF4A8BB0);
   static const darkCuration = Color(0xFF4A8BB0);
-  static const darkCreator = Color(0xFFE89575);
+  static const darkCreator = Color(0xFF4A8BB0);
   static const darkArchive = Color(0xFFA8B4BE);
 }
 
@@ -104,47 +105,54 @@ class GuidyRadius {
 class GuidyText {
   static const String fontFamily = 'Noto Sans KR';
 
+  // 위계는 크기와 색으로, 굵기는 400·500 (드물게 600), 16px 미만 자간 0
   static TextStyle h1(Color color) => TextStyle(
-    fontFamily: fontFamily, fontSize: 28, fontWeight: FontWeight.w800,
-    letterSpacing: -0.84, color: color, height: 1.25,
+    fontFamily: fontFamily, fontSize: 28, fontWeight: FontWeight.w500,
+    color: color, height: 1.25,
   );
   static TextStyle h2(Color color) => TextStyle(
-    fontFamily: fontFamily, fontSize: 20, fontWeight: FontWeight.w800,
-    letterSpacing: -0.4, color: color, height: 1.3,
+    fontFamily: fontFamily, fontSize: 20, fontWeight: FontWeight.w500,
+    color: color, height: 1.3,
   );
   static TextStyle h3(Color color) => TextStyle(
-    fontFamily: fontFamily, fontSize: 16, fontWeight: FontWeight.w700,
-    letterSpacing: -0.32, color: color, height: 1.4,
+    fontFamily: fontFamily, fontSize: 16, fontWeight: FontWeight.w500,
+    color: color, height: 1.4,
   );
   static TextStyle body(Color color) => TextStyle(
-    fontFamily: fontFamily, fontSize: 14, fontWeight: FontWeight.w500,
-    letterSpacing: -0.14, color: color, height: 1.5,
+    fontFamily: fontFamily, fontSize: 14, fontWeight: FontWeight.w400,
+    color: color, height: 1.5,
   );
   static TextStyle small(Color color) => TextStyle(
-    fontFamily: fontFamily, fontSize: 12, fontWeight: FontWeight.w500,
-    letterSpacing: -0.12, color: color, height: 1.4,
+    fontFamily: fontFamily, fontSize: 12, fontWeight: FontWeight.w400,
+    color: color, height: 1.4,
   );
   static TextStyle label(Color color) => TextStyle(
-    fontFamily: fontFamily, fontSize: 11, fontWeight: FontWeight.w800,
-    letterSpacing: 0.22, color: color,
+    fontFamily: fontFamily, fontSize: 12, fontWeight: FontWeight.w500,
+    color: color,
   );
+  // 예전엔 대문자·넓은 자간 라벨, 이제는 작은 보조 글자
   static TextStyle kicker(Color color) => TextStyle(
-    fontFamily: fontFamily, fontSize: 10, fontWeight: FontWeight.w800,
-    letterSpacing: 1.5, color: color,
+    fontFamily: fontFamily, fontSize: 12, fontWeight: FontWeight.w500,
+    color: color,
+  );
+
+  /// 시그니처 — 벽 캡션처럼 쓰는 메타 정보 (장소·시간·가격·재생 시간). 고정폭 숫자
+  static TextStyle meta(Color color) => TextStyle(
+    fontFamily: fontFamily, fontSize: 12, fontWeight: FontWeight.w400,
+    color: color, height: 1.4, fontFeatures: const [FontFeature.tabularFigures()],
   );
 }
 
-// ─── 그림자 ────────────────────────────────────────────────
+// ─── 그림자 — 작고 중립적인 것만 ─────────────────────────────
 class GuidyShadow {
   static List<BoxShadow> card = [
-    BoxShadow(color: const Color(0xFF0B1F2E).withValues(alpha: 0.04), offset: const Offset(0, 1), blurRadius: 2),
-    BoxShadow(color: const Color(0xFF0B1F2E).withValues(alpha: 0.06), offset: const Offset(0, 8), blurRadius: 24),
+    BoxShadow(color: const Color(0xFF0B1F2E).withValues(alpha: 0.05), offset: const Offset(0, 1), blurRadius: 2),
   ];
   static List<BoxShadow> up = [
-    BoxShadow(color: const Color(0xFF0B1F2E).withValues(alpha: 0.06), offset: const Offset(0, -4), blurRadius: 24),
+    BoxShadow(color: const Color(0xFF0B1F2E).withValues(alpha: 0.06), offset: const Offset(0, -2), blurRadius: 8),
   ];
   static List<BoxShadow> pop = [
-    BoxShadow(color: const Color(0xFF0B1F2E).withValues(alpha: 0.18), offset: const Offset(0, 12), blurRadius: 40),
+    BoxShadow(color: const Color(0xFF0B1F2E).withValues(alpha: 0.08), offset: const Offset(0, 8), blurRadius: 24),
   ];
 }
 

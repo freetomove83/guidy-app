@@ -149,21 +149,10 @@ class _DiscoverTab extends StatelessWidget {
                   child: Container(
                     decoration: BoxDecoration(
                       borderRadius: GuidyRadius.xlBorder,
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [pal.primary, pal.accent],
-                      ),
-                      boxShadow: GuidyShadow.pop,
+                      color: pal.primary,
                     ),
                     child: Stack(
                       children: [
-                        // 배경 패턴
-                        Positioned.fill(
-                          child: CustomPaint(
-                            painter: _HeroBgPainter(isDark: isDark),
-                          ),
-                        ),
                         Padding(
                           padding: const EdgeInsets.all(20),
                           child: Column(
@@ -181,7 +170,7 @@ class _DiscoverTab extends StatelessWidget {
                                     child: const Text('이달의 크리에이터',
                                       style: TextStyle(
                                           color: Colors.white, fontSize: 10,
-                                          fontWeight: FontWeight.w800,
+                                          fontWeight: FontWeight.w500,
                                           letterSpacing: 0.5,
                                           fontFamily: GuidyText.fontFamily),
                                     ),
@@ -202,7 +191,7 @@ class _DiscoverTab extends StatelessWidget {
                                     child: const Center(
                                       child: Text('김', style: TextStyle(
                                         color: Colors.white, fontSize: 22,
-                                        fontWeight: FontWeight.w800,
+                                        fontWeight: FontWeight.w500,
                                         fontFamily: GuidyText.fontFamily,
                                       )),
                                     ),
@@ -215,9 +204,8 @@ class _DiscoverTab extends StatelessWidget {
                                       children: [
                                         const Text('김도슨트', style: TextStyle(
                                           color: Colors.white, fontSize: 18,
-                                          fontWeight: FontWeight.w800,
+                                          fontWeight: FontWeight.w500,
                                           fontFamily: GuidyText.fontFamily,
-                                          letterSpacing: -0.4,
                                         )),
                                         Text('미술사 큐레이터 · 가이드 14개',
                                           style: TextStyle(
@@ -245,7 +233,7 @@ class _DiscoverTab extends StatelessWidget {
                                     ),
                                     child: Text('가이드 보기', style: TextStyle(
                                       color: pal.primary, fontSize: 12,
-                                      fontWeight: FontWeight.w700,
+                                      fontWeight: FontWeight.w500,
                                       fontFamily: GuidyText.fontFamily,
                                     )),
                                   ),
@@ -291,7 +279,7 @@ class _DiscoverTab extends StatelessWidget {
                             const SizedBox(height: 8),
                             Text(cr.name,
                               style: GuidyText.body(pal.text)
-                                  .copyWith(fontWeight: FontWeight.w700),
+                                  .copyWith(fontWeight: FontWeight.w500),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               textAlign: TextAlign.center),
@@ -405,14 +393,7 @@ class _CreatorNoticeBanner extends StatelessWidget {
             Container(
               width: 38, height: 38,
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    accentC.withValues(alpha: 0.18),
-                    primaryC.withValues(alpha: 0.10),
-                  ],
-                ),
+                color: primaryC.withValues(alpha: 0.08),
                 borderRadius: GuidyRadius.mdBorder,
               ),
               child: Icon(Icons.mic_rounded, size: 18, color: accentC),
@@ -426,7 +407,7 @@ class _CreatorNoticeBanner extends StatelessWidget {
                   Text(
                     '크리에이터로 수익을 창출해보세요',
                     style: GuidyText.body(textC)
-                        .copyWith(fontWeight: FontWeight.w700),
+                        .copyWith(fontWeight: FontWeight.w500),
                   ),
                   const SizedBox(height: 2),
                   Text(
@@ -458,22 +439,7 @@ class _CreatorNoticeBanner extends StatelessWidget {
   }
 }
 
-// Hero 배경 painter
-class _HeroBgPainter extends CustomPainter {
-  final bool isDark;
-  const _HeroBgPainter({required this.isDark});
 
-  @override
-  void paint(Canvas canvas, Size size) {
-    final p = Paint()..color = Colors.white.withValues(alpha: 0.06);
-    canvas.drawCircle(Offset(size.width * 0.9, size.height * 0.1), 80, p);
-    p.color = Colors.white.withValues(alpha: 0.04);
-    canvas.drawCircle(Offset(size.width * 0.1, size.height * 0.9), 60, p);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter old) => false;
-}
 
 // ─── 큐레이션 탭 ─────────────────────────────────────────
 class _CurationTab extends StatelessWidget {
@@ -564,7 +530,7 @@ class _ArchiveTab extends StatelessWidget {
                             const SizedBox(width: 4),
                             Text('무료 감상',
                                 style: GuidyText.kicker(GuidyColors.ok)
-                                    .copyWith(fontWeight: FontWeight.w700)),
+                                    .copyWith(fontWeight: FontWeight.w500)),
                           ],
                         ),
                       ),
@@ -653,14 +619,7 @@ class _ArchiveNoticeBanner extends StatelessWidget {
             Container(
               width: 38, height: 38,
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    primaryC.withValues(alpha: 0.15),
-                    accentC.withValues(alpha: 0.10),
-                  ],
-                ),
+                color: primaryC.withValues(alpha: 0.08),
                 borderRadius: GuidyRadius.mdBorder,
               ),
               child: Icon(Icons.headphones_rounded, size: 18, color: primaryC),
@@ -675,7 +634,7 @@ class _ArchiveNoticeBanner extends StatelessWidget {
                   Text(
                     '아카이브 무료 감상 가능',
                     style: GuidyText.body(textC)
-                        .copyWith(fontWeight: FontWeight.w700),
+                        .copyWith(fontWeight: FontWeight.w500),
                   ),
                   const SizedBox(height: 2),
                   Text(
@@ -731,13 +690,6 @@ class _ArchiveCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: GuidyColors.ok,
                   borderRadius: GuidyRadius.pillBorder,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.15),
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -747,7 +699,7 @@ class _ArchiveCard extends StatelessWidget {
                     const SizedBox(width: 4),
                     Text('무료 감상',
                         style: GuidyText.kicker(Colors.white)
-                            .copyWith(fontWeight: FontWeight.w800)),
+                            .copyWith(fontWeight: FontWeight.w500)),
                   ],
                 ),
               ),

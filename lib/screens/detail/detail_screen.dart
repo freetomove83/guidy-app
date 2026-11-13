@@ -167,7 +167,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                   ),
                                   child: const Text('진행 중', style: TextStyle(
                                     color: GuidyColors.ok, fontSize: 11,
-                                    fontWeight: FontWeight.w800,
+                                    fontWeight: FontWeight.w500,
                                     fontFamily: GuidyText.fontFamily,
                                   )),
                                 ),
@@ -274,7 +274,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                         children: [
                                           Text('이 전시의 크리에이터 가이드',
                                             style: GuidyText.small(pal.accent)
-                                                .copyWith(fontWeight: FontWeight.w800)),
+                                                .copyWith(fontWeight: FontWeight.w500)),
                                           Text('다른 관점에서 감상해보세요',
                                             style: GuidyText.small(pal.sub)),
                                         ],
@@ -282,7 +282,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                     ),
                                     Text('${guides.length}개 →',
                                       style: GuidyText.small(pal.accent)
-                                          .copyWith(fontWeight: FontWeight.w700)),
+                                          .copyWith(fontWeight: FontWeight.w500)),
                                   ],
                                 ),
                               ),
@@ -405,7 +405,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 15,
-                                    fontWeight: FontWeight.w800,
+                                    fontWeight: FontWeight.w500,
                                     fontFamily: GuidyText.fontFamily,
                                   ),
                                 ))),
@@ -469,7 +469,7 @@ class _DetailScreenState extends State<DetailScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(label, style: GuidyText.kicker(muteC)),
-              Text(value, style: GuidyText.small(textC).copyWith(fontWeight: FontWeight.w700)),
+              Text(value, style: GuidyText.small(textC).copyWith(fontWeight: FontWeight.w500)),
             ],
           )),
         ],
@@ -498,7 +498,7 @@ class _DetailScreenState extends State<DetailScreen> {
             ),
             child: Center(
               child: Text('$num', style: const TextStyle(
-                color: GuidyColors.primary, fontSize: 12, fontWeight: FontWeight.w800,
+                color: GuidyColors.primary, fontSize: 12, fontWeight: FontWeight.w500,
                 fontFamily: GuidyText.fontFamily,
               )),
             ),
@@ -567,7 +567,7 @@ class _SectionCard extends StatelessWidget {
                       child: Center(
                         child: Text('${section.order}', style: const TextStyle(
                           color: GuidyColors.primary, fontSize: 10,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w500,
                           fontFamily: GuidyText.fontFamily,
                         )),
                       ),
@@ -673,7 +673,7 @@ class _ExhibitionShareSheet extends StatelessWidget {
                     children: [
                       Text(exhibition.title,
                           style: GuidyText.body(textC)
-                              .copyWith(fontWeight: FontWeight.w700),
+                              .copyWith(fontWeight: FontWeight.w500),
                           maxLines: 1, overflow: TextOverflow.ellipsis),
                       Text(exhibition.venue, style: GuidyText.small(subC)),
                     ],
@@ -725,7 +725,7 @@ class _ExhibitionShareSheet extends StatelessWidget {
                     ),
                     child: Text('복사',
                         style: GuidyText.kicker(Colors.white)
-                            .copyWith(fontWeight: FontWeight.w700)),
+                            .copyWith(fontWeight: FontWeight.w500)),
                   ),
                 ],
               ),

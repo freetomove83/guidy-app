@@ -258,7 +258,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               if (_referralVerified)
                                 Padding(
                                   padding: const EdgeInsets.only(top: 4, left: 2),
-                                  child: Text('추천인 코드가 확인되었습니다 🎉',
+                                  child: Text('추천인 코드가 확인되었습니다',
                                       style: GuidyText.kicker(GuidyColors.ok)),
                                 ),
                             ],
@@ -442,7 +442,7 @@ class _SignupScreenState extends State<SignupScreen> {
       await userStore.updateProfile(name: name, email: user.email);
       if (!mounted) return;
       _snack(referral
-          ? '가입 완료! 추천인 코드가 적용되었습니다 🎉 인증 메일도 확인해주세요'
+          ? '가입했어요. 추천인 코드가 적용됐고, 인증 메일을 확인해 주세요'
           : '가입 완료! $email 로 보낸 인증 메일을 확인해주세요');
       navigator.pushNamedAndRemoveUntil('/home', (_) => false);
     } catch (e) {

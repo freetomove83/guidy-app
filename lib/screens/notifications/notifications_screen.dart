@@ -65,7 +65,7 @@ final _dummyNotifs = [
     id: 'n4',
     type: NotifType.promo,
     title: '이번 주 특가 혜택',
-    body: '선택된 가이드 30% 할인 — 오늘까지만!',
+    body: '선택한 가이드 30% 할인, 오늘까지',
     timeAgo: '어제',
     isRead: true,
     coverSeed: 3,
