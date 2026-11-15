@@ -74,6 +74,10 @@ class BeaconService {
   /// 권한을 묻고 감지 시작. 권한·블루투스가 꺼져 있으면 false (호출한 쪽이 안내)
   static Future<bool> start() async {
     try {
+      // iOS 플러그인 기본값은 '항상' 위치 권한이라 Info.plist에 없는 요청이 무시되어 감지가 시작되지 않음
+      if (defaultTargetPlatform == TargetPlatform.iOS) {
+        await flutterBeacon.setLocationAuthorizationTypeDefault(AuthorizationStatus.whenInUse);
+      }
       return await flutterBeacon.initializeAndCheckScanning;
     } catch (e) {
       debugPrint('[Beacon] 시작 실패: $e');
