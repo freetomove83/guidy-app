@@ -74,15 +74,26 @@ class BeaconService {
   /// 권한을 묻고 감지 시작. 권한·블루투스가 꺼져 있으면 false (호출한 쪽이 안내)
   static Future<bool> start() async {
     try {
-      // iOS 플러그인 기본값은 '항상' 위치 권한이라 Info.plist에 없는 요청이 무시되어 감지가 시작되지 않음
-      if (defaultTargetPlatform == TargetPlatform.iOS) {
-        await flutterBeacon.setLocationAuthorizationTypeDefault(AuthorizationStatus.whenInUse);
-      }
+      if (defaultTargetPlatform == TargetPlatform.iOS) return await _startIos();
       return await flutterBeacon.initializeAndCheckScanning;
     } catch (e) {
       debugPrint('[Beacon] 시작 실패: $e');
       return false;
     }
+  }
+
+  /// iOS 플러그인의 initializeAndCheckScanning은 위치·블루투스 관리자가 이미 만들어져 있으면
+  /// 응답이 오지 않아 멈춤 → 권한·블루투스 상태를 직접 확인. 기본 '항상' 권한 요청은
+  /// Info.plist에 사유가 없어 iOS가 무시하므로 '앱 사용 중'으로 요청
+  static Future<bool> _startIos() async {
+    await flutterBeacon.setLocationAuthorizationTypeDefault(AuthorizationStatus.whenInUse);
+    var auth = await flutterBeacon.authorizationStatus;
+    if (auth == AuthorizationStatus.notDetermined) {
+      await flutterBeacon.requestAuthorization.timeout(const Duration(seconds: 60), onTimeout: () => false);
+      auth = await flutterBeacon.authorizationStatus;
+    }
+    final allowed = auth == AuthorizationStatus.whenInUse || auth == AuthorizationStatus.always;
+    return allowed && await flutterBeacon.bluetoothState == BluetoothState.stateOn;
   }
 
   /// 가까운 작품 id 흐름. iOS는 UUID를 알아야 찾을 수 있어 등록된 UUID마다 영역을 만듦
